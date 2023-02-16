@@ -23,6 +23,7 @@ class MenuPanel(ScreenPanel):
         super().__init__(screen, title)
         self.items = None
         self.grid = self._gtk.HomogeneousGrid()
+        self.refresh = {}
 
     def initialize(self, items):
         self.items = items
@@ -47,8 +48,15 @@ class MenuPanel(ScreenPanel):
         for item in items:
             key = list(item)[0]
             if not self.evaluate_enable(item[key]['enable']):
-                logging.debug(f"X > {key}")
-                continue
+                if item[key]['show_disabled']:
+                    # Show but make inactive
+                    self.labels[key].set_sensitive(False)
+                else:
+                    # Just don't show the button
+                    logging.debug(f"X > {key}")
+                    continue
+            else:
+                self.labels[key].set_sensitive(True)
 
             if columns == 4:
                 if length <= 4:
@@ -106,6 +114,11 @@ class MenuPanel(ScreenPanel):
                     b.connect("clicked", self._screen._send_action, item['method'], params)
             else:
                 b.connect("clicked", self._screen._go_to_submenu, key)
+
+            if item['refresh_on'] is not None:
+                for var in item['refresh_on'].split(', '):
+                    self._printer.register_callback(var, self.check_enable, i)
+
             self.labels[key] = b
 
     def evaluate_enable(self, enable):
@@ -122,3 +135,10 @@ class MenuPanel(ScreenPanel):
         except Exception as e:
             logging.debug(f"Error evaluating enable statement: {enable}\n{e}")
             return False
+
+    def check_enable(self, i):
+        item = self.items[i]
+        key = list(item.keys())[0]
+        enable = self.evaluate_enable(item[key]['enable'])
+        self.labels[key].set_sensitive(enable)
+

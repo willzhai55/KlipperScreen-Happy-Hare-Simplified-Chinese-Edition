@@ -46,6 +46,7 @@ PRINTER_BASE_STATUS_OBJECTS = [
     'motion_report',
     'firmware_retraction',
     'exclude_object',
+    'ercf'
 ]
 
 klipperscreendir = pathlib.Path(__file__).parent.resolve()
@@ -235,7 +236,8 @@ class KlipperScreen(Gtk.Window):
                 "webhooks": ["state", "state_message"],
                 "firmware_retraction": ["retract_length", "retract_speed", "unretract_extra_length", "unretract_speed"],
                 "motion_report": ["live_position", "live_velocity", "live_extruder_velocity"],
-                "exclude_object": ["current_object", "objects", "excluded_objects"]
+                "exclude_object": ["current_object", "objects", "excluded_objects"],
+                "ercf": ["enabled", "is_locked", "is_homed", "tool", "gate", "clog_detection", "endless_spool", "filament", "servo"]
             }
         }
         for extruder in self.printer.get_tools():
@@ -726,7 +728,7 @@ class KlipperScreen(Gtk.Window):
                 elif data.startswith("!! "):
                     self.show_popup_message(data[3:], 3)
                 elif "unknown" in data.lower() and \
-                        not ("TESTZ" in data or "MEASURE_AXES_NOISE" in data or "ACCELEROMETER_QUERY" in data):
+                        not ("TESTZ" in data or "MEASURE_AXES_NOISE" in data or "ACCELEROMETER_QUERY" in data or "ERCF" in data):
                     self.show_popup_message(data)
                 elif "SAVE_CONFIG" in data and self.printer.state == "ready":
                     script = {"script": "SAVE_CONFIG"}

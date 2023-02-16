@@ -175,7 +175,7 @@ class KlipperScreenConfig:
                 strs = ('gcode', '')
                 numbers = [f'{option}' for option in self.config[section] if option != 'gcode']
             elif section.startswith('menu '):
-                strs = ('name', 'icon', 'panel', 'method', 'params', 'enable', 'confirm', 'style')
+                strs = ('name', 'icon', 'panel', 'method', 'params', 'enable', 'show_disabled', 'refresh_on', 'confirm', 'style')
             elif section == 'bed_screws':
                 # This section may be deprecated in favor of moving this options under the printer section
                 numbers = ('rotation', '')
@@ -550,6 +550,8 @@ class KlipperScreenConfig:
             "method": cfg.get("method", None),
             "confirm": cfg.get("confirm", None),
             "enable": cfg.get("enable", "True"),
+            "show_disabled": cfg.get("show_disabled", False),
+            "refresh_on": cfg.get("refresh_on", None),
             "params": cfg.get("params", "{}"),
             "style": cfg.get("style", None)
         }
