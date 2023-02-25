@@ -132,8 +132,10 @@ class Printer:
 
     def register_callback(self, var, method, arg):
         if var in self.printer_callbacks:
+            logging.debug(f"PAUL register_callback append {var},{arg}")
             self.printer_callbacks[var].append([method, arg])
         else:
+            logging.debug(f"PAUL register_callback new var {var},{arg}")
             self.printer_callbacks[var] = [[method, arg]]
 
     def evaluate_state(self):
@@ -240,11 +242,12 @@ class Printer:
                 "output_pins": {"count": self.output_pin_count},
                 "gcode_macros": {"count": len(self.get_gcode_macros())},
                 "idle_timeout": self.get_stat("idle_timeout").copy(),
-                "pause_resume": {"is_paused": self.state == "paused"},
+                "pause_resume": self.get_stat("pause_resume").copy(),
                 "power_devices": {"count": len(self.get_power_devices())},
                 "ercf": self.get_stat("ercf").copy()
             }
         }
+        # PAUL WHY??       "pause_resume": {"is_paused": self.state == "paused"},
 
         sections = ["bed_mesh", "bltouch", "probe", "quad_gantry_level", "z_tilt"]
         for section in sections:

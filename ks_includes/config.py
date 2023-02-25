@@ -147,8 +147,8 @@ class KlipperScreenConfig:
             if section == 'main':
                 bools = (
                     'invert_x', 'invert_y', 'invert_z', '24htime', 'only_heaters', 'show_cursor', 'confirm_estop',
-                    'autoclose_popups', 'use_dpms', 'use_default_menu', 'side_macro_shortcut', 'use-matchbox-keyboard',
-                    'show_heater_power'
+                    'autoclose_popups', 'use_dpms', 'use_default_menu', 'side_macro_shortcut', 'side_ercf_shortcut',
+                    'use-matchbox-keyboard', 'show_heater_power'
                 )
                 strs = (
                     'default_printer', 'language', 'print_sort_dir', 'theme', 'screen_blanking', 'font_size',
@@ -240,7 +240,10 @@ class KlipperScreenConfig:
             {"24htime": {"section": "main", "name": _("24 Hour Time"), "type": "binary", "value": "True"}},
             {"side_macro_shortcut": {
                 "section": "main", "name": _("Macro shortcut on sidebar"), "type": "binary",
-                "value": "True", "callback": screen.toggle_macro_shortcut}},
+                "value": "True", "callback": screen.toggle_macro_shortcut}}, # PAUL maybe default this to false?
+            {"side_ercf_shortcut": {
+                "section": "main", "name": _("ERCF shortcut on sidebar"), "type": "binary",
+                "value": "True", "callback": screen.toggle_ercf_shortcut}},
             {"font_size": {
                 "section": "main", "name": _("Font Size"), "type": "dropdown",
                 "value": "medium", "callback": screen.restart_ks, "options": [

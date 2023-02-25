@@ -24,6 +24,7 @@ class BasePanel(ScreenPanel):
         self.titlebar_name_type = None
         self.buttons_showing = {
             'macros_shortcut': False,
+            'ercf_shortcut': False,
             'printer_select': len(self._config.get_printers()) > 1,
         }
         self.current_extruder = None
@@ -42,6 +43,12 @@ class BasePanel(ScreenPanel):
         self.control['macros_shortcut'].connect("clicked", self.menu_item_clicked, "gcode_macros", {
             "name": "Macros",
             "panel": "gcode_macros"
+        })
+
+        self.control['ercf_shortcut'] = self._gtk.Button('ercf_carrot', scale=abscale)
+        self.control['ercf_shortcut'].connect("clicked", self.menu_item_clicked, "ercf_panel", {
+            "name": "ERCF",
+            "panel": "ercf_panel"
         })
 
         self.control['estop'] = self._gtk.Button('emergency', scale=abscale)
@@ -67,6 +74,7 @@ class BasePanel(ScreenPanel):
         if self.buttons_showing['printer_select']:
             self.action_bar.add(self.control['printer_select'])
         self.show_macro_shortcut(self._config.get_main_config().getboolean('side_macro_shortcut', True))
+        self.show_ercf_shortcut(self._config.get_main_config().getboolean('side_ercf_shortcut', True))
         self.action_bar.add(self.control['estop'])
         self.show_estop(False)
 
@@ -273,6 +281,16 @@ class BasePanel(ScreenPanel):
         elif show is False and self.buttons_showing['macros_shortcut'] is True:
             self.action_bar.remove(self.control['macros_shortcut'])
             self.buttons_showing['macros_shortcut'] = False
+
+    def show_ercf_shortcut(self, show=True):
+        if show is True and self.buttons_showing['ercf_shortcut'] is False:
+            self.action_bar.add(self.control['ercf_shortcut'])
+            self.action_bar.reorder_child(self.control['ercf_shortcut'], 2)
+            self.control['ercf_shortcut'].show()
+            self.buttons_showing['ercf_shortcut'] = True
+        elif show is False and self.buttons_showing['ercf_shortcut'] is True:
+            self.action_bar.remove(self.control['ercf_shortcut'])
+            self.buttons_showing['ercf_shortcut'] = False
 
     def show_printer_select(self, show=True):
         if show and self.buttons_showing['printer_select'] is False:
