@@ -1,5 +1,10 @@
 .idea/
 KlipperScreen.conf
+/styles/colorized
+/styles/material-dark
+/styles/material-darker
+/styles/material-light
+/styles/z-bolt
 __pycache__/
 *.py[cod]
 *$py.class
