@@ -128,9 +128,11 @@ class MenuPanel(ScreenPanel):
         elif enable == "{{ camera_configured }}":
             return self.ks_printer_cfg and self.ks_printer_cfg.get("camera_url", None) is not None
         self.j2_data = self._printer.get_printer_status_data()
+        #logging.debug(f"PAUL: j2_data={self.j2_data}")
         try:
             j2_temp = Template(enable, autoescape=True)
             result = j2_temp.render(self.j2_data)
+            logging.debug(f"PAUL: Enable={enable}, Result={result}")
             return result == 'True'
         except Exception as e:
             logging.debug(f"Error evaluating enable statement: {enable}\n{e}")
