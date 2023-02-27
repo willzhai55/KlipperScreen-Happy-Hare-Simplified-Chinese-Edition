@@ -240,7 +240,7 @@ class KlipperScreenConfig:
             {"24htime": {"section": "main", "name": _("24 Hour Time"), "type": "binary", "value": "True"}},
             {"side_macro_shortcut": {
                 "section": "main", "name": _("Macro shortcut on sidebar"), "type": "binary",
-                "value": "True", "callback": screen.toggle_macro_shortcut}}, # PAUL maybe default this to false?
+                "value": "True", "callback": screen.toggle_macro_shortcut}},
             {"side_ercf_shortcut": {
                 "section": "main", "name": _("ERCF shortcut on sidebar"), "type": "binary",
                 "value": "True", "callback": screen.toggle_ercf_shortcut}},

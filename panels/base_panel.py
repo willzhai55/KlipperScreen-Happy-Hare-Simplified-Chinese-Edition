@@ -272,10 +272,8 @@ class BasePanel(ScreenPanel):
     def show_macro_shortcut(self, show=True):
         if show is True and self.buttons_showing['macros_shortcut'] is False:
             self.action_bar.add(self.control['macros_shortcut'])
-            if self.buttons_showing['printer_select'] is False:
-                self.action_bar.reorder_child(self.control['macros_shortcut'], 2)
-            else:
-                self.action_bar.reorder_child(self.control['macros_shortcut'], 3)
+            num_children = len(self.action_bar.get_children())
+            self.action_bar.reorder_child(self.control['macros_shortcut'], num_children - 2)
             self.control['macros_shortcut'].show()
             self.buttons_showing['macros_shortcut'] = True
         elif show is False and self.buttons_showing['macros_shortcut'] is True:

@@ -103,10 +103,11 @@ class Printer:
         logging.info(f"# Output pins: {self.output_pin_count}")
 
     def process_update(self, data):
+#        logging.info(f"PAUL: #$#$#$# printer.py:process_update data={data}")
         unique_cbs = []
         if self.data is None:
             return
-        for x in (self.get_tools() + self.get_heaters() + self.get_filament_sensors()):
+        for x in (self.get_tools() + self.get_heaters() + self.get_filament_sensors() + self.get_ercf_encoders()):
             if x in data:
                 for i in data[x]:
                     self.set_dev_stat(x, i, data[x][i])
@@ -124,9 +125,9 @@ class Printer:
                             unique_cbs.append(cb)
 
         if "webhooks" in data or "print_stats" in data or "idle_timeout" in data:
-            self.process_status_update()
+            self.process_status_update() # PAUL would need to add pause_resume
 
-        # Call associated callbacks
+        # Call specific associated callbacks
         for cb in unique_cbs:
             cb[0](cb[1])
 
@@ -142,6 +143,7 @@ class Printer:
         # webhooks states: startup, ready, shutdown, error
         # print_stats: standby, printing, paused, error, complete
         # idle_timeout: Idle, Printing, Ready
+        # PAUL maybe incorporate 'pause_resume' here... if exists it overrides print_stats for pause state
         if self.data['webhooks']['state'] == "ready" and self.data['print_stats']:
             if self.data['print_stats']['state'] == 'paused':
                 return "paused"
@@ -225,6 +227,9 @@ class Printer:
         sensors.extend(iter(self.get_config_section_list("filament_motion_sensor ")))
         return sensors
 
+    def get_ercf_encoders(self):
+        return list(self.get_config_section_list("ercf_encoder"))
+
     def get_probe(self):
         probe_types = ["probe", "bltouch", "smart_effector", "dockable_probe"]
         for probe_type in probe_types:
@@ -233,6 +238,7 @@ class Printer:
                 return self.get_config_section(probe_type)
         return None
 
+# PAUL called only from main menu and generic menu panels for variable evaluation
     def get_printer_status_data(self):
         data = {
             "printer": {
@@ -244,7 +250,7 @@ class Printer:
                 "idle_timeout": self.get_stat("idle_timeout").copy(),
                 "pause_resume": self.get_stat("pause_resume").copy(),
                 "power_devices": {"count": len(self.get_power_devices())},
-                "ercf": self.get_stat("ercf").copy()
+                "ercf": self.get_stat("ercf").copy() # PAUL may not be needed .. only for menu screens.. TEMP.. move
             }
         }
         # PAUL WHY??       "pause_resume": {"is_paused": self.state == "paused"},

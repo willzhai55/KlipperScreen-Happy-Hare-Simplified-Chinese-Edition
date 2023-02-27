@@ -228,8 +228,7 @@ class KlipperScreen(Gtk.Window):
                 "gcode_move": ["extrude_factor", "gcode_position", "homing_origin", "speed_factor", "speed"],
                 "idle_timeout": ["state"],
                 "pause_resume": ["is_paused"],
-                "print_stats": ["print_duration", "total_duration", "filament_used", "filename", "state", "message",
-                                "info"],
+                "print_stats": ["print_duration", "total_duration", "filament_used", "filename", "state", "message", "info"],
                 "toolhead": ["homed_axes", "estimated_print_time", "print_time", "position", "extruder",
                              "max_accel", "max_accel_to_decel", "max_velocity", "square_corner_velocity"],
                 "virtual_sdcard": ["file_position", "is_active", "progress"],
@@ -237,22 +236,25 @@ class KlipperScreen(Gtk.Window):
                 "firmware_retraction": ["retract_length", "retract_speed", "unretract_extra_length", "unretract_speed"],
                 "motion_report": ["live_position", "live_velocity", "live_extruder_velocity"],
                 "exclude_object": ["current_object", "objects", "excluded_objects"],
-                "ercf": ["enabled", "is_locked", "is_homed", "tool", "gate", "clog_detection", "endless_spool", "filament", "servo"]
+                "ercf": ["enabled", "is_locked", "is_homed", "tool", "next_tool", "gate", "clog_detection", "endless_spool",
+                            "filament", "servo", "gate_status", "endless_spool_groups", "ttg_map", "filament_visual"],
             }
         }
         for extruder in self.printer.get_tools():
-            requested_updates['objects'][extruder] = [
-                "target", "temperature", "pressure_advance", "smooth_time", "power"]
+            requested_updates['objects'][extruder] = ["target", "temperature", "pressure_advance", "smooth_time", "power"]
         for h in self.printer.get_heaters():
             requested_updates['objects'][h] = ["target", "temperature", "power"]
         for f in self.printer.get_fans():
             requested_updates['objects'][f] = ["speed"]
         for f in self.printer.get_filament_sensors():
             requested_updates['objects'][f] = ["enabled", "filament_detected"]
+        for e in self.printer.get_ercf_encoders():
+            requested_updates['objects'][e] = ["encoder_pos", "detection_length", "min_headroom", "headroom", "desired_headroom", "detection_mode", "enabled"]
         for p in self.printer.get_output_pins():
             requested_updates['objects'][p] = ["value"]
 
         self._ws.klippy.object_subscription(requested_updates)
+        # PAUL make this extensible with variables references in custom Menus..?
 
     def _load_panel(self, panel, *args):
         if panel not in self.load_panel:
@@ -857,11 +859,12 @@ class KlipperScreen(Gtk.Window):
 
         self.ws_subscribe()
         extra_items = (self.printer.get_tools()
-                       + self.printer.get_heaters()
-                       + self.printer.get_fans()
-                       + self.printer.get_filament_sensors()
-                       + self.printer.get_output_pins()
-                       )
+                     + self.printer.get_heaters()
+                     + self.printer.get_fans()
+                     + self.printer.get_filament_sensors()
+                     + self.printer.get_output_pins()
+                     + self.printer.get_ercf_encoders()
+                      )
 
         data = self.apiclient.send_request("printer/objects/query?" + "&".join(PRINTER_BASE_STATUS_OBJECTS +
                                                                                extra_items))
