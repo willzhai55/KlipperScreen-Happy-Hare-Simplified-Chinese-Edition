@@ -15,6 +15,7 @@ from ks_includes.screen_panel import ScreenPanel
 
 class BasePanel(ScreenPanel):
     def __init__(self, screen, title):
+        logging.debug(f"PAUL: ++++ BasePanel.__init__({screen}, {title})")
         super().__init__(screen, title)
         self.current_panel = None
         self.time_min = -1
@@ -46,10 +47,7 @@ class BasePanel(ScreenPanel):
         })
 
         self.control['ercf_shortcut'] = self._gtk.Button('ercf_carrot', scale=abscale)
-        self.control['ercf_shortcut'].connect("clicked", self.menu_item_clicked, "ercf_panel", {
-            "name": "ERCF",
-            "panel": "ercf_panel"
-        })
+        self.control['ercf_shortcut'].connect("clicked", self._screen._menu_go_to, 'ercf_panel', "ercf_panel", "ERCF") # PAUL maybe pass in items for sub menu..
 
         self.control['estop'] = self._gtk.Button('emergency', scale=abscale)
         self.control['estop'].connect("clicked", self.emergency_stop)

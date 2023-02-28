@@ -1,10 +1,10 @@
 import logging, gi
-import random # PAUL
 
 gi.require_version("Gtk", "3.0")
 
 from gi.repository import Gtk, GLib, Pango
 from ks_includes.screen_panel import ScreenPanel
+
 
 def create_panel(*args):
     return ErcfPanel(*args)
@@ -22,36 +22,48 @@ class ErcfPanel(ScreenPanel):
         super().__init__(screen, title)
 
         # We need to keep track of just a little bit of UI state
-        self.runout_mark = 0.
-        self.ui_tool = 0
+        self.ui_runout_mark = 0.
+        self.ui_sel_tool = 0
+        self.btn_states = {
+            'all':           ['check_gates', 'tool', 'eject', 'bypass', 'load_bypass', 'pause', 'unlock', 'resume', 'manage'],
+            'printing':      [                                                         'pause',                     'manage'],
+            'paused_locked': ['check_gates', 'tool', 'eject', 'bypass', 'load_bypass',          'unlock',           'manage'],
+            'paused':        ['check_gates', 'tool', 'eject', 'bypass', 'load_bypass',                    'resume', 'manage'],
+            'idle_locked':   ['check_gates', 'tool', 'eject', 'bypass', 'load_bypass',          'unlock',           'manage'],
+            'idle_paused':   ['check_gates', 'tool', 'eject', 'bypass', 'load_bypass',                    'resume', 'manage'],
+            'idle':          ['check_gates', 'tool', 'eject', 'bypass', 'load_bypass', 'pause',                     'manage'],
+            'bypass':        [                       'eject', 'bypass', 'load_bypass',                              'manage'],
+            'disabled':      [                                                                                              ],
+        }
 
         self.labels = {
             'check_gates': self._gtk.Button('ercf_checkgates', _("Chk. Gates")),
-            'pause': self._gtk.Button('pause', _('Pause'), 'color1'),
-            'unlock': self._gtk.Button('ercf_unlock', _('Unlock'), 'color2'),
-            'resume': self._gtk.Button('resume', _('Resume'), 'color3'),
-            'manage': self._gtk.Button('ercf_gear', _('Manage...'), 'color4'),
             'decrease': self._gtk.Button('decrease', None, scale=self.bts * 1.2),
             'tool': self._gtk.Button('extruder', _('Load T0'), 'color2'),
             'increase': self._gtk.Button('increase', None, scale=self.bts * 1.2),
             'eject': self._gtk.Button('ercf_eject', _('Eject'), 'color3'),
-            'bypass': self._gtk.Button('ercf_bypass', _('Sel. Bypass'), 'color4'),
+            'bypass': self._gtk.Button('ercf_bypass', _('Bypass'), 'color4'),
             'load_bypass': self._gtk.Button('ercf_load_bypass', _('Load'), 'color4'),
+            'pause': self._gtk.Button('pause', _('Pause'), 'color1'),
+            'unlock': self._gtk.Button('ercf_unlock', _('Unlock'), 'color2'),
+            'resume': self._gtk.Button('resume', _('Resume'), 'color3'),
+            'manage': self._gtk.Button('ercf_gear', _('Manage...'), 'color4'),
             'tool_icon': self._gtk.Image('extruder', self._gtk.img_width * 0.8, self._gtk.img_height * 0.8),
             'tool_label': self._gtk.Label(f'Unknown'),
-            'filament': self._gtk.Label(f'Filament: Unknown')
+            'filament': self._gtk.Label(f'Filament: Unknown'),
+            'unload_bypass_img': self._gtk.Image('ercf_unload_bypass')
         }
+        self.labels['eject_img'] = self.labels['eject'].get_image()
 
-        self.labels['check_gates'].connect("clicked", self.dummy)
+        self.labels['check_gates'].connect("clicked", self.select_check_gates)
         self.labels['decrease'].connect("clicked", self.select_tool, -1)
         self.labels['tool'].connect("clicked", self.select_tool, 0)
         self.labels['increase'].connect("clicked", self.select_tool, 1)
         self.labels['eject'].connect("clicked", self.select_eject)
         self.labels['pause'].connect("clicked", self.select_pause)
         self.labels['unlock'].connect("clicked", self.select_unlock)
-        self.labels['resume'].connect("clicked", self.dummy)
+        self.labels['resume'].connect("clicked", self.select_resume)
         self.labels['manage'].connect("clicked", self._screen._go_to_submenu, "ercf")
-#        self.labels['manage'].connect("clicked", self.select_manage)
         self.labels['bypass'].connect("clicked", self.select_bypass)
         self.labels['load_bypass'].connect("clicked", self.select_load_bypass)
 
@@ -89,7 +101,7 @@ class ErcfPanel(ScreenPanel):
             "status_tb": status_tb,
             "status_tv": status_tv
         })
-        status_tv.set_vexpand(False)
+        status_tv.set_vexpand(True)
         status_tv.set_hexpand(False)
         status_tv.set_buffer(status_tb)
         status_tv.set_editable(False)
@@ -125,7 +137,6 @@ class ErcfPanel(ScreenPanel):
         top_grid.attach(self.labels['check_gates'], 8, 0, 2, 2)
         top_grid.attach(runout_frame,              10, 0, 2, 3)
         top_grid.attach(status_window,              0, 1, 8, 1)
-#        top_grid.attach(self.labels['check_gates'], 8, 1, 2, 1)
         top_grid.attach(self.labels['filament_tv'], 0, 2, 10, 1)
         top_grid.attach(Gtk.Label(" "),             0, 3, 12, 1)
 
@@ -153,15 +164,12 @@ class ErcfPanel(ScreenPanel):
         self.content.add(lower_grid)
 
     def activate(self):
-        logging.info(f"++++ PAUL: avtivate() called")
+        logging.info(f"++++ PAUL: avtivate() called. Nothing to do yet!")
 
     def process_update(self, action, data):
         if action == "notify_gcode_response":
-            pass
-# This method works but assumes user has logging enabled
 #            if data.startswith('// ERCF ['):
-#                self.update_filament_pos(data[3:])
-#                self.labels['filament_tb'].set_text(text[:s.rfind('\n')]) # Replace last line
+            pass
 
         elif action == "notify_status_update":
             if 'ercf_encoder ercf_encoder' in data: # There is only one ercf_encoder
@@ -174,50 +182,98 @@ class ErcfPanel(ScreenPanel):
                     self.update_status()
                 if 'filament_visual' in e_data:
                     self.update_filament_status(e_data['filament_visual'])
-                if 'enabled' in e_data:
-                    # Deactivate or activate everything..
-                    logging.info(f"+++++ PAUL: ENABLED")
-#                    self.labels['status_frame'].set_sensitive(e_data['enabled'])
-#                    self.labels['status_tv'].set_sensitive(e_data['enabled'])
-                    self.labels['status_tv'].get_style_context().add_class("ercf_status_look_active")
-# EXAMPLE of class removal                self.devices[device]['name'].get_style_context().remove_class(self.devices[device]['class'])
-                    # PAUL
-                if 'tool' in e_data:
-                    self.tool = e_data['tool']
-                if 'next_tool' in e_data:
-                    self.next_tool = e_data['next_tool']
-                if 'gate' in e_data:
-                    self.gate = e_data['gate']
                 if 'tool' in e_data or 'next_tool' in e_data:
                     self.update_tool(e_data)
+                if 'enabled' in e_data:
+                    self.update_enabled(e_data['enabled'])
 
-#            if 'is_locked' in e_data:
-#                if e_data['is_locked']:
-#                    for i in 'increase', 'tool', 'decrease', 'eject', 'check_gates', 'pause', 'resume':
-#                        self.labels[i].set_sensitive(True)
-#                else:
-#                    for i in 'increase', 'tool', 'decrease', 'eject', 'check_gates', 'unlock', 'resume':
-#                        self.labels[i].set_sensitive(False)
-#                    for i in 'increase', 'tool', 'decrease', 'eject', 'check_gates', 'unlock', 'resume':
-#                        self.labels[i].set_sensitive(False)
+            if 'ercf' in data or 'pause_resume' in data or 'print_stats' in data:
+                if 'ercf' in data: logging.info(f">>> ercf found")
+                if 'pause_resume' in data: logging.info(f">>> pause_resume found")
+                if 'print_stats' in data: logging.info(f">>> print_stats found")
+                # Dynamically update button sensitivity based on state
+                ercf = self._printer.get_stat("ercf")
+                printer_state = self._printer.get_stat("print_stats")['state']
+                locked = ercf['is_locked']
+                is_paused = self._printer.get_stat("pause_resume")['is_paused']
+                enabled = ercf['enabled']
+                tool = ercf['tool']
+                filament = ercf['filament']
+                logging.info(f"*-*-*-* printer_state={printer_state}, locked={locked}, is_paused={is_paused}, enabled={enabled}, tool={tool}, filament={filament}")
+                if enabled:
+                    if tool == self.TOOL_BYPASS and filament != "Unloaded":
+                        ui_state = "bypass"
+                    else:
+                        if printer_state == "printing":
+                            ui_state = "printing"
+                        elif printer_state == "paused" or is_paused:
+                            if locked:
+                                ui_state = "paused_locked"
+                            else:
+                                ui_state = "paused"
+                        else:
+                            if is_paused:
+                                if locked:
+                                    ui_state = "idle_locked"
+                                else:
+                                    ui_state = "idle_paused"
+                            else:
+                                ui_state = "idle"
+                    self.enable_tool_buttons()
+                else:
+                    ui_state = "disabled"
+                    self.labels['increase'].set_sensitive(False)
+                    self.labels['decrease'].set_sensitive(False)
+    
+                logging.info(f"*-*-*-* >>>>> ui_state={ui_state}")
+                for i in self.btn_states['all']:
+                    if i in self.btn_states[ui_state]:
+                        logging.info(f"{i} On")
+                        self.labels[i].set_sensitive(True)
+                    else:
+                        logging.info(f"{i} Off")
+                        self.labels[i].set_sensitive(False)
 
     def _mm_format(self, w, v):
         return f"{-v:.1f}mm"
+
+    def select_check_gates(self, widget):
+        self._screen._ws.klippy.gcode_script(f"ERCF_CHECK_GATES")
 
     def select_tool(self, widget, param=0):
         ercf = self._printer.get_stat("ercf")
         num_gates = len(ercf['gate_status'])
         tool = ercf['tool']
-        if param < 0 and self.ui_tool > 0:
-            self.ui_tool -= 1
-            self.labels['tool'].set_label(f"Load T{self.ui_tool}")
-        elif param > 0 and self.ui_tool < num_gates - 1:
-            self.ui_tool += 1
-            self.labels['tool'].set_label(f"Load T{self.ui_tool}")
+        if param < 0 and self.ui_sel_tool > 0:
+            self.ui_sel_tool -= 1
+            self.labels['tool'].set_label(f"Load T{self.ui_sel_tool}")
+        elif param > 0 and self.ui_sel_tool < num_gates - 1:
+            self.ui_sel_tool += 1
+            self.labels['tool'].set_label(f"Load T{self.ui_sel_tool}")
         elif param == 0:
-            if self.ui_tool != tool:
+            if self.ui_sel_tool != tool:
                 self.labels['tool'].set_label(f"Loading")
-            self._screen._ws.klippy.gcode_script(f"T{self.ui_tool}")
+            self._screen._ws.klippy.gcode_script(f"T{self.ui_sel_tool}")
+        self.enable_tool_buttons()
+
+    def enable_tool_buttons(self):
+        ercf = self._printer.get_stat("ercf")
+        num_gates = len(ercf['gate_status'])
+        tool = ercf['tool']
+        filament = ercf['filament']
+        if tool == self.TOOL_BYPASS and filament != "Unloaded":
+            self.labels['decrease'].set_sensitive(False)
+            self.labels['increase'].set_sensitive(False)
+        else:
+            if self.ui_sel_tool == 0:
+                self.labels['decrease'].set_sensitive(False)
+            else:
+                self.labels['decrease'].set_sensitive(True)
+
+            if self.ui_sel_tool == num_gates -1:
+                self.labels['increase'].set_sensitive(False)
+            else:
+                self.labels['increase'].set_sensitive(True)
 
     def select_eject(self, widget):
         self._screen._ws.klippy.gcode_script(f"ERCF_EJECT")
@@ -234,34 +290,16 @@ class ErcfPanel(ScreenPanel):
     def select_unlock(self, widget):
         self._screen._ws.klippy.gcode_script(f"ERCF_UNLOCK")
 
-    def select_unlock(self, widget):
+    def select_resume(self, widget):
         self._screen._ws.klippy.gcode_script(f"RESUME")
 
-    def select_manage(self, widget):
-        pass
-#        self.menu_item_clicked, "gcode_macros", {
-#            "name": "Macros",
-#            "panel": "gcode_macros"
-#        })
-#        #self._screen.show_panel('ercf', "menu", None, 0, items=self._config.get_menu_items("__main actions ercf"))
-#        itms=self._config.get_menu_items(menu="__main", subsection="actions")
-#        self._screen.show_panel('ercf', "menu", None, 2, items=itms)
-
-    def update_paused_locked(self, data):
-        # PAUL TODO
-        pass
-
-    def update_paused(self, data):
-        # PAUL TODO
-        pass
-
-    def update_printing(self, data):
-        # PAUL TODO
-        pass
-
-    def update_idle(self, data):
-        # PAUL TODO
-        pass
+    def update_enabled(self, enabled):
+        if enabled:
+            self.labels['status_tv'].get_style_context().remove_class("ercf_status_look_inactive")
+            self.labels['filament_tv'].get_style_context().remove_class("ercf_status_look_inactive")
+        else:
+            self.labels['status_tv'].get_style_context().add_class("ercf_status_look_inactive")
+            self.labels['filament_tv'].get_style_context().add_class("ercf_status_look_inactive")
 
     def update_tool(self, data):
         logging.info(f"@@@************@@@ PAUL: update_tool")
@@ -272,15 +310,21 @@ class ErcfPanel(ScreenPanel):
         text += (" > T%d" % next_tool) if next_tool >= 0 and next_tool != tool else ""
         self.labels['tool_label'].set_text(text)
         if 'tool' in data:
-            self.labels['tool'].set_label(f"Load T{self.ui_tool}")
+            self.labels['tool'].set_label(f"Load T{self.ui_sel_tool}")
+            if tool == self.TOOL_BYPASS:
+                self.labels['eject'].set_image(self.labels['unload_bypass_img'])
+                self.labels['eject'].set_label(f"Unload")
+            else:
+                self.labels['eject'].set_image(self.labels['eject_img'])
+                self.labels['eject'].set_label(f"Eject")
 
     def update_encoder(self, data):
         logging.info(f"@@@************@@@ PAUL: update_encoder")
         scale = self.labels['scale']
         if 'desired_headroom' in data:
             desired_headroom = data['desired_headroom']
-            if self.runout_mark != desired_headroom:
-                self.runout_mark = desired_headroom
+            if self.ui_runout_mark != desired_headroom:
+                self.ui_runout_mark = desired_headroom
                 scale.clear_marks()
                 scale.add_mark(-desired_headroom, Gtk.PositionType.RIGHT, f"{desired_headroom}")
         if 'detection_length' in data:
@@ -313,7 +357,7 @@ class ErcfPanel(ScreenPanel):
 
     def update_status(self):
         logging.info(f"@@@************@@@ PAUL: update_status")
-        text, multi_tool = self.get_status_text() # PAUL multi_tool not yet used
+        text, multi_tool = self.get_status_text() # PAUL multi_tool flag not yet used
         self.labels['status_tb'].set_text(text)
 
     def get_status_text(self):
@@ -324,7 +368,6 @@ class ErcfPanel(ScreenPanel):
         tool_selected = ercf['tool']
         num_gates = len(gate_status)
 
-        # This is pulled from Happy Hare driver and modified to reduce long lines
         multi_tool = False
         msg_gates = "Gates: "
         msg_tools = "Tools: "
@@ -352,29 +395,9 @@ class ErcfPanel(ScreenPanel):
         msg += "|\n"
         msg += msg_tools
         msg += "|\n"
-        #msg += "|%s\n" % (" Some gates support multiple tools!" if multi_tool else "") # PAUL highlight another way with HTML formating?
         msg += msg_avail
         msg += "|\n"
         msg += msg_selct
         msg += "|\n" if gate_selected == (num_gates - 1) else "-\n"
-#        msg += ercf['filament_visual']
         return msg, multi_tool
-
-
-
-
-
-# PAUL vvv testing
-    def dummy(self, widget, param=None):
-        logging.info(f"PAUL: dummy param={param}")
-#        r = random.random() * 23
-#        if r < self.min_headroom:
-#            self.min_headroom = r
-#        data = {'encoder_pos': 4546.3,
-#                'desired_headroom': 5.5,
-#                'detection_length': 23,
-#                'min_headroom': self.min_headroom,
-#                'headroom': r
-#        }
-#        self.update_runout(data)
 

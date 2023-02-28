@@ -26,6 +26,7 @@ button:active, .button_active {
     background-color: #304C62;
 }
 
+/* PAUL removed ... do better to prevent button resize
 button:disabled,
 button.color1:disabled,
 button.color2:disabled,
@@ -33,6 +34,7 @@ button.color3:disabled,
 button.color4:disabled {
     border: 0;
 }
+*/
 
 button:disabled label,
 button.color1:disabled label,
@@ -549,11 +551,12 @@ popover button {
     background-color: darkred;
 }
 
-/* PAUL vvv */
+/* PAUL added vvv  IS THIS WORKING? */
 .ercf_runout trough highlight, trough progress, trough slider {
     min-height: 0;
 }
 
+/* PAUL added vvv  IS THIS WORKING? */
 .ercf_runout contents, contents trough {
     margin-top: 0;
 }
@@ -561,15 +564,17 @@ popover button {
 .ercf_tool_text {
     margin-top: 8px;
     margin-bottom: 8px;
-    font-size: 2em;
+    font-size: 1.8em;
 }
 
-.ercf_status_look_active text {
-    color: white;
+/* PAUL TODO customize for each theme
+.ercf_status_look_inactive text {
+    color: grey;
 }
+*/
 
 .ercf_status_filament {
-    background-color: #222;
+/*    background-color: #222;  PAUL */
     padding-top: .4em;
     padding-bottom: .4em;
 }

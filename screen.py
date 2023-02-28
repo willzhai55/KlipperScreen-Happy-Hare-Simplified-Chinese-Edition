@@ -502,11 +502,16 @@ class KlipperScreen(Gtk.Window):
         logging.info(f"#### Menu go {'home' if home else 'back'}")
         self.remove_keyboard()
         if self._config.get_main_config().getboolean('autoclose_popups', True):
-            self.close_popup_message()
+           self.close_popup_message()
         while len(self._cur_panels) > 1:
             self._remove_current_panel()
             if not home:
                 break
+
+    def _menu_go_to(self, widget, panel_name, panel_type, title): # PAUL added
+        logging.info(f"#### Menu go home then to {panel_name}")
+        self._menu_go_back(widget, True)
+        self.show_panel(panel_name, panel_type, title, 1, False)
 
     def add_subscription(self, panel_name):
         if panel_name not in self.subscriptions:

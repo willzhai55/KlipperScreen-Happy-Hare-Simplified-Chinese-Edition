@@ -143,7 +143,7 @@ class Printer:
         # webhooks states: startup, ready, shutdown, error
         # print_stats: standby, printing, paused, error, complete
         # idle_timeout: Idle, Printing, Ready
-        # PAUL maybe incorporate 'pause_resume' here... if exists it overrides print_stats for pause state
+        # PAUL maybe incorporate 'pause_resume' here... if exists it overrides print_stats for pause state?
         if self.data['webhooks']['state'] == "ready" and self.data['print_stats']:
             if self.data['print_stats']['state'] == 'paused':
                 return "paused"
