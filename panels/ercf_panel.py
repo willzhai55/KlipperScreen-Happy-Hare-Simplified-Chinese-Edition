@@ -26,7 +26,7 @@ class ErcfPanel(ScreenPanel):
         self.ui_tool = 0
 
         self.labels = {
-            'check_gates': self._gtk.Button('ercf_checkgates', _("Chk. Gates"), scale=self.bts * 1.6),
+            'check_gates': self._gtk.Button('ercf_checkgates', _("Chk. Gates")),
             'pause': self._gtk.Button('pause', _('Pause'), 'color1'),
             'unlock': self._gtk.Button('ercf_unlock', _('Unlock'), 'color2'),
             'resume': self._gtk.Button('resume', _('Resume'), 'color3'),
@@ -39,7 +39,7 @@ class ErcfPanel(ScreenPanel):
             'load_bypass': self._gtk.Button('ercf_load_bypass', _('Load'), 'color4'),
             'tool_icon': self._gtk.Image('extruder', self._gtk.img_width * 0.8, self._gtk.img_height * 0.8),
             'tool_label': self._gtk.Label(f'Unknown'),
-            'filament': self._gtk.Label(f'Filament: 0.0mm')
+            'filament': self._gtk.Label(f'Filament: Unknown')
         }
 
         self.labels['check_gates'].connect("clicked", self.dummy)
@@ -50,7 +50,8 @@ class ErcfPanel(ScreenPanel):
         self.labels['pause'].connect("clicked", self.select_pause)
         self.labels['unlock'].connect("clicked", self.select_unlock)
         self.labels['resume'].connect("clicked", self.dummy)
-        self.labels['manage'].connect("clicked", self.dummy)
+        self.labels['manage'].connect("clicked", self._screen._go_to_submenu, "ercf")
+#        self.labels['manage'].connect("clicked", self.select_manage)
         self.labels['bypass'].connect("clicked", self.select_bypass)
         self.labels['load_bypass'].connect("clicked", self.select_load_bypass)
 
@@ -88,9 +89,8 @@ class ErcfPanel(ScreenPanel):
             "status_tb": status_tb,
             "status_tv": status_tv
         })
-        status_tv.set_vexpand(True)
+        status_tv.set_vexpand(False)
         status_tv.set_hexpand(False)
-        status_tv.set_monospace(True)
         status_tv.set_buffer(status_tb)
         status_tv.set_editable(False)
         status_tv.set_cursor_visible(False)
@@ -104,11 +104,11 @@ class ErcfPanel(ScreenPanel):
         })
         filament_tv.set_vexpand(False)
         filament_tv.set_hexpand(False)
-        filament_tv.set_monospace(True)
         filament_tv.set_buffer(filament_tb)
         filament_tv.set_editable(False)
         filament_tv.set_cursor_visible(False)
         filament_tv.set_sensitive(False)
+        filament_tv.get_style_context().add_class("ercf_status_filament")
 
         status_window = Gtk.ScrolledWindow()
         status_window.set_vexpand(True)
@@ -121,12 +121,13 @@ class ErcfPanel(ScreenPanel):
 
         top_grid = Gtk.Grid()
         top_grid.set_column_homogeneous(True)
-        top_grid.attach(top_box,          0, 0, 10, 1)
-        top_grid.attach(runout_frame,    10, 0, 2, 3)
-        top_grid.attach(status_window,    0, 1, 8, 1)
-        top_grid.attach(self.labels['check_gates'],    8, 1, 2, 1)
-        top_grid.attach(self.labels['filament_tv'],    0, 2, 10, 1)
-        top_grid.attach(Gtk.Label(" "),   0, 3, 12, 1)
+        top_grid.attach(top_box,                    0, 0, 8, 1)
+        top_grid.attach(self.labels['check_gates'], 8, 0, 2, 2)
+        top_grid.attach(runout_frame,              10, 0, 2, 3)
+        top_grid.attach(status_window,              0, 1, 8, 1)
+#        top_grid.attach(self.labels['check_gates'], 8, 1, 2, 1)
+        top_grid.attach(self.labels['filament_tv'], 0, 2, 10, 1)
+        top_grid.attach(Gtk.Label(" "),             0, 3, 12, 1)
 
         middle_grid = Gtk.Grid()
         middle_grid.set_column_homogeneous(True)
@@ -168,7 +169,6 @@ class ErcfPanel(ScreenPanel):
                 self.update_encoder(ee_data)
 
             if 'ercf' in data:
-                logging.info(f"PAUL: process_update (ercf present): {action} {data}")
                 e_data = data['ercf']
                 if 'tool' in e_data or 'gate' in e_data or 'ttg_map' in e_data or 'gate_status' in e_data:
                     self.update_status()
@@ -179,7 +179,8 @@ class ErcfPanel(ScreenPanel):
                     logging.info(f"+++++ PAUL: ENABLED")
 #                    self.labels['status_frame'].set_sensitive(e_data['enabled'])
 #                    self.labels['status_tv'].set_sensitive(e_data['enabled'])
-                    self.labels['status_tv'].get_style_context().add_class("ercf_disabled")
+                    self.labels['status_tv'].get_style_context().add_class("ercf_status_look_active")
+# EXAMPLE of class removal                self.devices[device]['name'].get_style_context().remove_class(self.devices[device]['class'])
                     # PAUL
                 if 'tool' in e_data:
                     self.tool = e_data['tool']
@@ -218,27 +219,33 @@ class ErcfPanel(ScreenPanel):
                 self.labels['tool'].set_label(f"Loading")
             self._screen._ws.klippy.gcode_script(f"T{self.ui_tool}")
 
-    def select_eject(self, widget, param=0):
+    def select_eject(self, widget):
         self._screen._ws.klippy.gcode_script(f"ERCF_EJECT")
 
-    def select_bypass(self, widget, param=0):
+    def select_bypass(self, widget):
         self._screen._ws.klippy.gcode_script(f"ERCF_SELECT_BYPASS")
 
-    def select_load_bypass(self, widget, param=0):
+    def select_load_bypass(self, widget):
         self._screen._ws.klippy.gcode_script(f"ERCF_LOAD_BYPASS")
 
-    def select_pause(self, widget, param=0):
+    def select_pause(self, widget):
         self._screen._ws.klippy.gcode_script(f"ERCF_PAUSE")
 
-    def select_unlock(self, widget, param=0):
+    def select_unlock(self, widget):
         self._screen._ws.klippy.gcode_script(f"ERCF_UNLOCK")
 
-    def select_unlock(self, widget, param=0):
+    def select_unlock(self, widget):
         self._screen._ws.klippy.gcode_script(f"RESUME")
 
-    def select_manage(self, widget, param=0):
-        # TODO
+    def select_manage(self, widget):
         pass
+#        self.menu_item_clicked, "gcode_macros", {
+#            "name": "Macros",
+#            "panel": "gcode_macros"
+#        })
+#        #self._screen.show_panel('ercf', "menu", None, 0, items=self._config.get_menu_items("__main actions ercf"))
+#        itms=self._config.get_menu_items(menu="__main", subsection="actions")
+#        self._screen.show_panel('ercf', "menu", None, 2, items=itms)
 
     def update_paused_locked(self, data):
         # PAUL TODO
@@ -262,7 +269,7 @@ class ErcfPanel(ScreenPanel):
         tool = ercf['tool']
         next_tool = ercf['next_tool']
         text = ("T%d" % tool) if tool >= 0 else "Bypass" if tool == -2 else "Unknown"
-        text += (" > T%d" % next_tool) if next_tool >= 0 else ""
+        text += (" > T%d" % next_tool) if next_tool >= 0 and next_tool != tool else ""
         self.labels['tool_label'].set_text(text)
         if 'tool' in data:
             self.labels['tool'].set_label(f"Load T{self.ui_tool}")

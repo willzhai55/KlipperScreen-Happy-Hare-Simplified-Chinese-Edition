@@ -456,6 +456,7 @@ class KlipperScreen(Gtk.Window):
 
     def _go_to_submenu(self, widget, name):
         logging.info(f"#### Go to submenu {name}")
+        logging.info(f"---------------PAUL: _cur_panels:{self._cur_panels}")
         # Find current menu item
         if "main_panel" in self._cur_panels:
             menu = "__main"

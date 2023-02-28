@@ -21,6 +21,7 @@ class MenuPanel(ScreenPanel):
 
     def __init__(self, screen, title):
         super().__init__(screen, title)
+        logging.debug(f"-----PAUL. MenuPanel__init__(): screen={screen}, title={title}")
         self.items = None
         self.grid = self._gtk.HomogeneousGrid()
         self.refresh = {}
@@ -132,7 +133,7 @@ class MenuPanel(ScreenPanel):
         try:
             j2_temp = Template(enable, autoescape=True)
             result = j2_temp.render(self.j2_data)
-            logging.debug(f"PAUL: Enable={enable}, Result={result}")
+#            logging.debug(f"PAUL: Enable={enable}, Result={result}")
             return result == 'True'
         except Exception as e:
             logging.debug(f"Error evaluating enable statement: {enable}\n{e}")

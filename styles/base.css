@@ -194,12 +194,6 @@ textview .time {
     color: grey;
 }
 
-/* PAUL vvv
-textview:disabled text {
-    color: grey;
-}
-PAUL vvv */
-
 trough {
     margin: .5em .5em;
 }
@@ -570,8 +564,14 @@ popover button {
     font-size: 2em;
 }
 
-.ercf_disabled text {
+.ercf_status_look_active text {
     color: white;
+}
+
+.ercf_status_filament {
+    background-color: #222;
+    padding-top: .4em;
+    padding-bottom: .4em;
 }
 
 /* Hardcoded values until creation of dynamic CSS updates */
