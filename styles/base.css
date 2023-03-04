@@ -35,6 +35,14 @@ button.color4:disabled {
     border: 0;
 }
 */
+/* PAUL vv alternative to be tested */
+button:disabled,
+button.color1:disabled,
+button.color2:disabled,
+button.color3:disabled,
+button.color4:disabled {
+    border-bottom: solid #13181C;
+}
 
 button:disabled label,
 button.color1:disabled label,
@@ -551,32 +559,46 @@ popover button {
     background-color: darkred;
 }
 
-/* PAUL added vvv  IS THIS WORKING? */
-.ercf_runout trough highlight, trough progress, trough slider {
+/* PAUL vvv */
+.ercf_recover {
+    padding: 0.8em;
+    padding-left: 2em;
+    font-size: 1.4em;
+}
+
+.ercf_runout slider, .ercf_runout highlight, .ercf_runout fill {
     min-height: 0;
 }
 
-/* PAUL added vvv  IS THIS WORKING? */
-.ercf_runout contents, contents trough {
+.ercf_runout trough {
     margin-top: 0;
 }
 
 .ercf_tool_text {
-    margin-top: 8px;
-    margin-bottom: 8px;
+    margin-top: 6px;
+    margin-bottom: 6px;
     font-size: 1.8em;
 }
 
-/* PAUL TODO customize for each theme
-.ercf_status_look_inactive text {
-    color: grey;
+.ercf_gate_text {
+    margin-top: 8px;
+    margin-bottom: 8px;
+    font-size: 1.2em;
 }
-*/
 
 .ercf_status_filament {
-/*    background-color: #222;  PAUL */
-    padding-top: .4em;
-    padding-bottom: .4em;
+    padding-top: 4px;
+    padding-bottom: 8px;
+}
+
+.ercf_test_red {
+    background: red
+}
+.ercf_test_blue {
+    background: blue
+}
+.ercf_test_green {
+    background: green
 }
 
 /* Hardcoded values until creation of dynamic CSS updates */
