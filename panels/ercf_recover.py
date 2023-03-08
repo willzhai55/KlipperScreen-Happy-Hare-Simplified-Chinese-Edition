@@ -10,12 +10,10 @@ gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, GLib, Pango
 from ks_includes.screen_panel import ScreenPanel
 
-
 def create_panel(*args):
-    return ErcfRecoveryPanel(*args)
+    return ErcfRecovery(*args)
 
-
-class ErcfRecoveryPanel(ScreenPanel):
+class ErcfRecovery(ScreenPanel):
     TOOL_UNKNOWN = -1
     TOOL_BYPASS = -2
 
@@ -32,8 +30,20 @@ class ErcfRecoveryPanel(ScreenPanel):
         self.ui_sel_tool = self.ui_sel_gate = self.DUMMY
         self.ui_sel_loaded = self.DUMMY
 
-        self.all_btns = ['t_decrease', 'tool', 't_increase', 'g_decrease', 'gate', 'g_increase', 'filament', 'manual', 'auto', "reset",
-                'home', 'motors_off', 'servo_up', 'servo_down', 'load_ext', 'unload_ext']
+        self.has_bypass = False
+        self.min_tool = 0
+        if 'ercf' in self._printer.get_config_section_list():
+            ercf_config = self._printer.get_config_section("ercf")
+            if 'bypass_selector' in ercf_config:
+                if float(ercf_config['bypass_selector']) > 0.:
+                    self.has_bypass = True
+                    self.min_tool = self.TOOL_BYPASS
+
+        # btn_states: the "gaps" are what functionality the state takes away
+        self.btn_states = {
+            'all':        ['tool', 'gate', 'filament', 'manual', 'auto', 'reset'],
+            'disabled':   [                                                     ],
+        }
 
         self.labels = {
             't_decrease': self._gtk.Button('decrease', None, scale=self.bts * 1.2),
@@ -42,16 +52,10 @@ class ErcfRecoveryPanel(ScreenPanel):
             'g_decrease': self._gtk.Button('decrease', None, scale=self.bts * 1.2),
             'gate': self._gtk.Label("Gate #0"),
             'g_increase': self._gtk.Button('increase', None, scale=self.bts * 1.2),
-            'filament': Gtk.CheckButton("Filament: UNKNOWN"),
-            'manual': self._gtk.Button('ercf_recover_manual', _('Set State'), 'color1'),
+            'filament': Gtk.CheckButton("Filament: Unknown"),
+            'reset': self._gtk.Button('ercf_reset', _('Reset ERCF'), 'color1'),
             'auto': self._gtk.Button('ercf_recover_auto', _('Auto Recover'), 'color2'),
-            'reset': self._gtk.Button('ercf_reset', _('Reset ERCF')),
-            'home': self._gtk.Button('home', _('Home'), 'color1'),
-            'motors_off': self._gtk.Button('motor-off', _('Motors Off'), 'color2'),
-            'servo_up': self._gtk.Button('arrow-up', _('Servo Up'), 'color3'),
-            'servo_down': self._gtk.Button('arrow-down', _('Servo Down'), 'color3'),
-            'load_ext': self._gtk.Button('ercf_load_extruder', _('Load Extruder'), 'color4'),
-            'unload_ext': self._gtk.Button('ercf_unload_extruder', _('Unoad Extruder'), 'color4'),
+            'manual': self._gtk.Button('ercf_recover_manual', _('Set State'), 'color1'),
         }
 
         self.labels['t_decrease'].connect("clicked", self.select_toolgate, 'tool', -1)
@@ -59,13 +63,9 @@ class ErcfRecoveryPanel(ScreenPanel):
         self.labels['g_decrease'].connect("clicked", self.select_toolgate, 'gate', -1)
         self.labels['g_increase'].connect("clicked", self.select_toolgate, 'gate', 1)
         self.labels['filament'].connect("notify::active", self.select_toolgate, 'loaded')
+        self.labels['reset'].connect("clicked", self.select_reset)
         self.labels['auto'].connect("clicked", self.select_auto)
         self.labels['manual'].connect("clicked", self.select_manual)
-
-        self.labels['reset'].connect("clicked", self.select_reset)
-        self.labels['home'].connect("clicked", self.select_home)
-        self.labels['load_ext'].connect("clicked", self.select_load_extruder)
-        self.labels['unload_ext'].connect("clicked", self.select_unload_extruder)
 
         self.labels['t_increase'].set_halign(Gtk.Align.START)
         self.labels['t_increase'].set_margin_start(10)
@@ -75,72 +75,96 @@ class ErcfRecoveryPanel(ScreenPanel):
         self.labels['g_increase'].set_margin_start(10)
         self.labels['g_decrease'].set_halign(Gtk.Align.END)
         self.labels['g_decrease'].set_margin_end(10)
+        self.labels['filament'].set_halign(Gtk.Align.CENTER)
 
         self.labels['tool'].get_style_context().add_class("ercf_tool_text")
         self.labels['gate'].get_style_context().add_class("ercf_gate_text")
         self.labels['filament'].get_style_context().add_class("ercf_recover")
 
-        recover_grid = Gtk.Grid()
-        recover_grid.set_column_homogeneous(True)
-        recover_grid.set_row_homogeneous(False)
-        box = Gtk.Box()
-        box.pack_start(Gtk.Label("ERCF STATE:"), True, True, 0)
-        box.pack_start(self.labels['reset'], False, False, 0)
-        recover_grid.attach(box,                         0, 0, 3, 1)
-        recover_grid.attach(self.labels['t_decrease'],   0, 1, 1, 1)
-        recover_grid.attach(self.labels['tool'],         1, 1, 1, 1)
-        recover_grid.attach(self.labels['t_increase'],   2, 1, 1, 1)
-        recover_grid.attach(self.labels['g_decrease'],   0, 2, 1, 1)
-        recover_grid.attach(self.labels['gate'],         1, 2, 1, 1)
-        recover_grid.attach(self.labels['g_increase'],   2, 2, 1, 1)
-        recover_grid.attach(self.labels['filament'],     0, 3, 3, 1)
+        for i in ['current_state', 'tool_label', 'gate_label', 'filament_label', 'future_state']:
+            self.labels[i] = Gtk.Label()
+            self.labels[i].set_xalign(0.5 if i.endswith("state") else 0)
+            self.labels[i].set_yalign(0.7 if i.endswith("state") else 0.5)
+            self.labels[i].get_style_context().add_class("ercf_recover")
+        self.labels['current_state'].set_label("Current ERCF State:")
+        self.labels['future_state'].set_label("Reset State To:")
+
+        status_grid = Gtk.Grid()
+        status_grid.set_column_homogeneous(True)
+        status_grid.set_row_homogeneous(True)
+        status_grid.attach(self.labels['current_state'],     0, 0, 3, 1)
+        status_grid.attach(self._gtk.Image('extruder'),      0, 1, 1, 1)
+        status_grid.attach(self.labels['tool_label'],        1, 1, 2, 1)
+        status_grid.attach(self._gtk.Image('ercf_gate'),     0, 2, 1, 1)
+        status_grid.attach(self.labels['gate_label'],        1, 2, 2, 1)
+        status_grid.attach(self._gtk.Image('ercf_filament'), 0, 3, 1, 1)
+        status_grid.attach(self.labels['filament_label'],    1, 3, 2, 1)
+
+        status_grid.attach(self.labels['future_state'],      3, 0, 3, 1)
+        status_grid.attach(self.labels['t_decrease'],        3, 1, 1, 1)
+        status_grid.attach(self.labels['tool'],              4, 1, 1, 1)
+        status_grid.attach(self.labels['t_increase'],        5, 1, 1, 1)
+        status_grid.attach(self.labels['g_decrease'],        3, 2, 1, 1)
+        status_grid.attach(self.labels['gate'],              4, 2, 1, 1)
+        status_grid.attach(self.labels['g_increase'],        5, 2, 1, 1)
+        status_grid.attach(self.labels['filament'],          3, 3, 3, 1)
 
         grid = Gtk.Grid()
         grid.set_column_homogeneous(True)
         grid.set_row_homogeneous(True)
-        grid.attach(recover_grid,               0, 0, 2, 2)
-        grid.attach(self.labels['home'],        2, 0, 1, 1)
-        grid.attach(self.labels['motors_off'],  3, 0, 1, 1)
-        grid.attach(self.labels['servo_up'],    2, 1, 1, 1)
-        grid.attach(self.labels['servo_down'],  3, 1, 1, 1)
-        grid.attach(self.labels['manual'],      0, 2, 1, 1)
-        grid.attach(self.labels['auto'],        1, 2, 1, 1)
-        grid.attach(self.labels['load_ext'],    2, 2, 1, 1)
-        grid.attach(self.labels['unload_ext'],  3, 2, 1, 1)
+        grid.attach(status_grid,           0, 0, 4, 2)
+        grid.attach(self.labels['reset'],  0, 2, 1, 1)
+        grid.attach(self.labels['auto'],   1, 2, 1, 1)
+        grid.attach(self.labels['manual'], 2, 2, 2, 1)
 
         self.content.add(grid)
 
     def activate(self):
-        logging.info(f"++++ PAUL: avtivate() called")
         self.ui_sel_tool = self.ui_sel_gate = self.ui_sel_loaded = self.DUMMY
         self.init_toolgate_values()
-        self.update_toolgate_buttons()
 
     def process_update(self, action, data):
         if action == "notify_status_update":
             if 'ercf' in data:
                 e_data = data['ercf']
                 if 'tool' in e_data or 'gate' in e_data or 'filament' in e_data:
+                    self.update_state_labels()
                     self.update_toolgate_buttons()
                 if 'enabled' in e_data:
-                    self.update_enabled(e_data['enabled'])
+                    self.update_active_buttons()
 
-    def update_enabled(self, enabled):
-        for i in self.all_btns:
-            if enabled:
-                self.labels[i].set_sensitive(True)
+    # Dynamically update button sensitivity based on state
+    def update_active_buttons(self):
+        ercf = self._printer.get_stat("ercf")
+        printer_state = self._printer.get_stat("print_stats")['state']
+        servo = ercf['servo']
+        enabled = ercf['enabled']
+        ui_state = []
+        if not enabled:
+            ui_state.append("disabled")
+
+        for label in self.btn_states['all']:
+            sensitive = True
+            for state in ui_state:
+                if not label in self.btn_states[state]:
+                    sensitive = False
+                    break
+            if sensitive:
+                self.labels[label].set_sensitive(True)
             else:
-                self.labels[i].set_sensitive(False)
+                self.labels[label].set_sensitive(False)
+            if label == "tool":
+                self.update_toolgate_buttons(sensitive)
 
+    # Get starting values
     def init_toolgate_values(self):
-        # Get starting values
         ercf = self._printer.get_stat("ercf")
         if self.ui_sel_tool == self.DUMMY:
             self.ui_sel_tool = ercf['tool']
         if self.ui_sel_gate == self.DUMMY:
             self.ui_sel_gate = ercf['gate']
         if self.ui_sel_loaded == self.DUMMY:
-            self.ui_sel_loaded = 0 if ercf['filament'] == "Unloaded" else 1
+            self.ui_sel_loaded = 0 if ercf['filament'] == "Unloaded" else 1 if ercf['filament'] == "Loaded" else -1
 
     def get_possible_gates(self, tool):
         ercf = self._printer.get_stat("ercf")
@@ -151,30 +175,25 @@ class ErcfRecoveryPanel(ScreenPanel):
 
         gate = ttg_map[tool]
         group = endless_spool_groups[tool]
-        logging.info(f"@@@************@@@ PAUL: initial gate={gate}, group={group}")
 
-        next_gate = -1
-        checked_gates = []
+        best_gate = -1
+        possible_gates = []
         for i in range(num_gates):
-            check = (gate + i + 1) % num_gates
-            logging.info(f"@@@************@@@ PAUL: checking={check}")
+            check = (gate + i) % num_gates
             if endless_spool_groups[check] == group:
-                checked_gates.append(check)
-                if gate_status[check] != self.GATE_EMPTY:
-                    next_gate = check
-                    break
-        if next_gate == -1:
-            next_gate = gate
-        logging.info(f"@@@************@@@ PAUL: next_gate={next_gate}, possible={checked_gates}")
-        return next_gate, checked_gates
+                possible_gates.append(check)
+                if best_gate == -1 and gate_status[check] != self.GATE_EMPTY:
+                    best_gate = check
+        if best_gate == -1:
+            best_gate = gate
+        return best_gate, possible_gates
 
     def select_toolgate(self, widget, toolgate, param=0):
-        logging.info(f"@@@************@@@ PAUL: select_toolgate toolgate={toolgate} param={param}")
         ercf = self._printer.get_stat("ercf")
         num_gates = len(ercf['gate_status'])
 
         if toolgate == "tool":
-            if param < 0 and self.ui_sel_tool > -2:
+            if param < 0 and self.ui_sel_tool > self.min_tool:
                 self.ui_sel_tool -= 1
                 if self.ui_sel_tool == self.TOOL_UNKNOWN:
                     self.ui_sel_tool = self.TOOL_BYPASS
@@ -190,13 +209,9 @@ class ErcfRecoveryPanel(ScreenPanel):
                 suggested_gate, possible_gates = self.get_possible_gates(self.ui_sel_tool)
                 if self.ui_sel_gate == self.TOOL_UNKNOWN or self.ui_sel_gate == self.TOOL_BYPASS or not self.ui_sel_gate in possible_gates:
                     self.ui_sel_gate = suggested_gate
+
         elif toolgate == "gate":
-            # PAUL TODO logic to use:
-            # suggested_gate, possible_gates = self.get_possible_gates(self.ui_sel_tool)
-            # for smart setting.  Only call if tool is not UNKNOWN
-            # May want pop up to explain illegal values...? How to do?
-            # Example popup... self._screen.show_popup_message(_("Can't set above the maximum:") + f' {max_temp}')
-            if param < 0 and self.ui_sel_gate > -2:
+            if param < 0 and self.ui_sel_gate > (self.min_tool if self.ui_sel_tool == self.TOOL_BYPASS else 0):
                 self.ui_sel_gate -= 1
                 if self.ui_sel_gate == self.TOOL_UNKNOWN:
                     self.ui_sel_gate = self.TOOL_BYPASS
@@ -210,74 +225,44 @@ class ErcfRecoveryPanel(ScreenPanel):
                 self.ui_sel_loaded = 1
             else:
                 self.ui_sel_loaded = 0
-
         self.update_toolgate_buttons()
 
-    def select_manual(self, widget):
-        loaded = "Loaded" if self.ui_sel_loaded == 1 else "Unloaded"
-        summary = (f"T{self.ui_sel_tool} on Gate #{self.ui_sel_gate} with filament {loaded}")
-        self._screen._confirm_send_action(
-            None,
-            _("This will set the ERCF state to\n\n" + summary + "\n\nSure you want to continue?"),
-            "printer.gcode.script",
-            {'script': f"ERCF_RECOVER TOOL={self.ui_sel_tool} GATE={self.ui_sel_gate} LOADED={self.ui_sel_loaded}"}
-        )
-        self._screen._menu_go_back()
-
-    def select_auto(self, widget):
-        self._screen._confirm_send_action(
-            None,
-            _("This will automatically attempt to reset the ERCF state\n\nSure you want to continue?"),
-            "printer.gcode.script",
-            {'script': "ERCF_RECOVER"}
-        )
-        self._screen._menu_go_back()
-
-    def select_home(self, widget):
-        self._screen._ws.klippy.gcode_script(f"ERCF_HOME")
-        self._screen._menu_go_back()
-
-    def select_load_extruder(self, widget):
-        self._screen._ws.klippy.gcode_script(f"ERCF_LOAD EXTRUDER_ONLY=1")
-
-    def select_unload_extruder(self, widget):
-        self._screen._ws.klippy.gcode_script(f"ERCF_EJECT EXTRUDER_ONLY=1")
-
-    def select_reset(self, widget):
-        self._screen._confirm_send_action(
-            None,
-            _("This will reset persisted ERCF state to defaults including\n\nTTG map, EndlessSpool groups, gate status and selector position\n\nSure you want to continue?"),
-            "printer.gcode.script",
-            {'script': "ERCF_RESET"}
-        )
-        self._screen._menu_go_back()
-
-    def update_toolgate_buttons(self):
+    def update_toolgate_buttons(self, tool_sensitive=True):
         ercf = self._printer.get_stat("ercf")
         num_gates = len(ercf['gate_status'])
-        if self.ui_sel_tool == self.TOOL_BYPASS:
-            self.labels['t_decrease'].set_sensitive(False)
-        else:
-            self.labels['t_decrease'].set_sensitive(True)
 
-        if self.ui_sel_tool == num_gates -1:
+        # Set sensitivity of +/- buttons
+        if not tool_sensitive:
+            self.labels['t_decrease'].set_sensitive(False)
             self.labels['t_increase'].set_sensitive(False)
         else:
-            self.labels['t_increase'].set_sensitive(True)
+            if self.ui_sel_tool == self.min_tool:
+                self.labels['t_decrease'].set_sensitive(False)
+            else:
+                self.labels['t_decrease'].set_sensitive(True)
 
-        if self.ui_sel_gate == self.TOOL_BYPASS:
+            if self.ui_sel_tool == num_gates -1:
+                self.labels['t_increase'].set_sensitive(False)
+            else:
+                self.labels['t_increase'].set_sensitive(True)
+
+        if self.ui_sel_tool == self.TOOL_BYPASS or not tool_sensitive:
             self.labels['g_decrease'].set_sensitive(False)
-        else:
-            self.labels['g_decrease'].set_sensitive(True)
-
-        if self.ui_sel_gate == num_gates -1:
             self.labels['g_increase'].set_sensitive(False)
         else:
-            self.labels['g_increase'].set_sensitive(True)
+            if self.ui_sel_gate == (self.min_tool if self.ui_sel_tool == self.TOOL_BYPASS else 0):
+                self.labels['g_decrease'].set_sensitive(False)
+            else:
+                self.labels['g_decrease'].set_sensitive(True)
+
+            if self.ui_sel_gate == num_gates -1:
+                self.labels['g_increase'].set_sensitive(False)
+            else:
+                self.labels['g_increase'].set_sensitive(True)
 
         if (self.ui_sel_tool == self.DUMMY or self.ui_sel_gate == self.DUMMY
                 or self.ui_sel_loaded == self.DUMMY or self.ui_sel_tool == self.TOOL_UNKNOWN
-                or self.ui_sel_gate == self.TOOL_UNKNOWN):
+                or self.ui_sel_gate == self.TOOL_UNKNOWN or not tool_sensitive):
             self.labels['manual'].set_sensitive(False)
         else:
             self.labels['manual'].set_sensitive(True)
@@ -297,9 +282,66 @@ class ErcfRecoveryPanel(ScreenPanel):
             self.labels['gate'].set_label(f"n/a")
 
         if self.ui_sel_loaded == 1:
-            self.labels['filament'].set_label("Filament: LOADED")
+            self.labels['filament'].set_label("Filament: Loaded")
+            self.labels['filament'].set_active(True)
         elif self.ui_sel_loaded == 0:
-            self.labels['filament'].set_label("Filament: UNLOADED")
+            self.labels['filament'].set_label("Filament: Unloaded")
+            self.labels['filament'].set_active(False)
         else:
-            self.labels['filament'].set_label("Filament: UNKNOWN")
+            self.labels['filament'].set_label("Filament: Unknown")
+            self.labels['filament'].set_active(False)
+
+    def update_state_labels(self):
+        ercf = self._printer.get_stat("ercf")
+        tool = ercf['tool']
+        gate = ercf['gate']
+        filament = ercf['filament']
+
+        tool_str = (f"T{tool}") if tool >= 0 else "Bypass" if tool == self.TOOL_BYPASS else "Unknown"
+        gate_str = (f"#{gate}") if gate >= 0 else "Bypass" if gate == self.TOOL_BYPASS else "Unknown"
+        self.labels['tool_label'].set_label(f"Tool: {tool_str}")
+        self.labels['gate_label'].set_label(f"Gate: {gate_str}")
+        self.labels['filament_label'].set_label(f"Filament: {filament}")
+
+    def select_manual(self, widget):
+        ercf = self._printer.get_stat("ercf")
+        endless_spool = ercf['endless_spool']
+        warning = ""
+        loaded = "Loaded" if self.ui_sel_loaded == 1 else "Unloaded"
+        if self.ui_sel_gate != self.TOOL_BYPASS:
+            suggested_gate, possible_gates = self.get_possible_gates(self.ui_sel_tool)
+            if self.ui_sel_gate != suggested_gate:
+                warning = (f"\n\nSpecified gate may not the correct gate for T{self.ui_sel_tool}.\nProceed will update the TTG map and mark the gate available")
+                if endless_spool and len (possible_gates) > 1:
+                    warning += (f"\nEndlessSpool group includes gates: {possible_gates}")
+            summary = (f"T{self.ui_sel_tool} on Gate #{self.ui_sel_gate} with filament {loaded}")
+        else:
+            self.ui_sel_gate = self.TOOL_BYPASS
+            summary = (f"Bypass (on bypass gate) with filament {loaded}")
+
+        sel_loaded = self.ui_sel_loaded
+        if self.ui_sel_loaded == -1:
+            sel_loaded = 0 # Assume unloaded
+        self._screen._confirm_send_action(
+            None,
+            _("This will set the ERCF state to:\n\n" + summary + warning + "\n\nSure you want to continue?"),
+            "printer.gcode.script",
+            {'script': f"ERCF_RECOVER TOOL={self.ui_sel_tool} GATE={self.ui_sel_gate} LOADED={self.ui_sel_loaded}"}
+        )
+
+    def select_auto(self, widget):
+        self._screen._confirm_send_action(
+            None,
+            _("This will automatically attempt to reset the ERCF filament state\n\nSure you want to continue?"),
+            "printer.gcode.script",
+            {'script': "ERCF_RECOVER"}
+        )
+
+    def select_reset(self, widget):
+        self._screen._confirm_send_action(
+            None,
+            _("This will reset persisted ERCF state to defaults including\n\nTTG map, EndlessSpool groups, gate status and selector position\n\nSure you want to continue?"),
+            "printer.gcode.script",
+            {'script': "ERCF_RESET"}
+        )
 
