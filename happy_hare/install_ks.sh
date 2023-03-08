@@ -106,12 +106,15 @@ clear
 # Find SRCDIR from the pathname of this script
 SRCDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )"/ && pwd )"
 
-num_gates=9
-while getopts "g" arg; do
+while getopts "g:" arg; do
     case $arg in
         g) num_gates=$OPTARG;;
     esac
 done
+if [ -z "$num_gates" ]; then
+    echo "Must specify the number of gates (selectors) with the -g <num_gates> argument" >&2
+    exit 1
+fi
 
 verify_not_root
 verify_home_dirs

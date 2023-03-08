@@ -10,10 +10,8 @@ gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, GLib, Pango
 from ks_includes.screen_panel import ScreenPanel
 
-
 def create_panel(*args):
     return ErcfMain(*args)
-
 
 class ErcfMain(ScreenPanel):
     TOOL_UNKNOWN = -1
@@ -139,7 +137,6 @@ class ErcfMain(ScreenPanel):
         # TextView has problems in this use case so use 5 separate labels... Simple!
         status_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
         for i in range(5):
-            logging.info(f"PAUL {i+1}")
             name = (f'status{i+1}')
             self.labels[name] = Gtk.Label("Gates: |#0 |#1 |#2 |#3 |#4 |#5 |#6 |#7 |#8 |")
             self.labels[name].get_style_context().add_class("ercf_status")
@@ -184,14 +181,14 @@ class ErcfMain(ScreenPanel):
         lower_grid.attach(self.labels['resume'], 2, 0, 1, 1)
         lower_grid.attach(self.labels['more'],   3, 0, 1, 1)
 
-        self.content.pack_start(top_grid, False, True, 0) # PAUL self.content.add(top_grid)
+        self.content.pack_start(top_grid, False, True, 0)
         self.content.add(middle_grid)
         self.content.add(lower_grid)
 
     def activate(self):
         logging.info(f"PAUL ---- activate on ercf_main called")
         self.init_tool_value()
-        self.update_tool()
+#        self.update_tool() PAUL is this needed?
 
     def process_update(self, action, data):
         if action == "notify_status_update":
@@ -211,7 +208,6 @@ class ErcfMain(ScreenPanel):
                     self.update_enabled()
                 if 'action' in e_data:
                     self.update_encoder_pos()
-#                    self.update_tool_buttons() # PAUL is this needed? now called from update_active_buttons()
 
             if 'ercf' in data or 'pause_resume' in data:
                 if 'ercf' in data: logging.info(f">>> ercf found")
@@ -234,17 +230,15 @@ class ErcfMain(ScreenPanel):
     def select_check_gates(self, widget):
         self._screen._confirm_send_action(
             None,
-            _("Check filament availabily in all ERCF gates?"),
+            _("Check filament availabily in all ERCF gates?\n\nAre you sure you want to continue?"),
             "printer.gcode.script",
             {'script': "ERCF_CHECK_GATES"}
         )
 
     def select_tool(self, widget, param=0):
-        logging.info(f"PAUL ---- select_tool()")
         ercf = self._printer.get_stat("ercf")
         num_gates = len(ercf['gate_status'])
         tool = ercf['tool']
-        filament = ercf['filament']
         if param < 0 and self.ui_sel_tool > self.min_tool:
             self.ui_sel_tool -= 1
             if self.ui_sel_tool == self.TOOL_UNKNOWN:

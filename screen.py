@@ -254,7 +254,7 @@ class KlipperScreen(Gtk.Window):
             requested_updates['objects'][p] = ["value"]
 
         self._ws.klippy.object_subscription(requested_updates)
-        # PAUL make this extensible with variables references in custom Menus..?
+        # PAUL make this extensible with variables references in custom Menus..? Can you call object_subscription more than once?
 
     def _load_panel(self, panel, *args):
         if panel not in self.load_panel:
@@ -456,7 +456,6 @@ class KlipperScreen(Gtk.Window):
 
     def _go_to_submenu(self, widget, name):
         logging.info(f"#### Go to submenu {name}")
-        logging.info(f"---------------PAUL: _cur_panels:{self._cur_panels}")
         # Find current menu item
         if "main_panel" in self._cur_panels:
             menu = "__main"
@@ -508,8 +507,8 @@ class KlipperScreen(Gtk.Window):
             if not home:
                 break
 
-    def _menu_go_to(self, widget, panel_name, panel_type, title): # PAUL added
-        logging.info(f"#### Menu go home then to {panel_name}")
+    def _menu_go_to(self, widget, panel_name, panel_type, title):
+        logging.info(f"#### Menu go_to {panel_name}")
         self._menu_go_back(widget, True)
         self.show_panel(panel_name, panel_type, title, 1, False)
 

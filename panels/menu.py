@@ -21,10 +21,10 @@ class MenuPanel(ScreenPanel):
 
     def __init__(self, screen, title):
         super().__init__(screen, title)
-        logging.debug(f"-----PAUL. MenuPanel__init__(): screen={screen}, title={title}")
         self.items = None
         self.grid = self._gtk.HomogeneousGrid()
         self.refresh = {}
+        self.menu_callbacks = {}
 
     def initialize(self, items):
         self.items = items
@@ -40,33 +40,66 @@ class MenuPanel(ScreenPanel):
         else:
             self.arrangeMenuItems(self.items, 4)
 
+    def process_update(self, action, data):
+        if action != "notify_status_update":
+            return
+
+        unique_cbs = []
+        for x in data:
+            for i in data[x]:
+                if ("printer.%s.%s" % (x, i)) in self.menu_callbacks:
+                    for cb in self.menu_callbacks["printer.%s.%s" % (x, i)]:
+                        if cb not in unique_cbs:
+                            unique_cbs.append(cb)
+
+        # Call specific associated callbacks
+        for cb in unique_cbs:
+            cb[0](cb[1])
+
+    def register_callback(self, var, method, arg):
+        if var in self.menu_callbacks:
+            self.menu_callbacks[var].append([method, arg])
+        else:
+            self.menu_callbacks[var] = [[method, arg]]
+
+    def check_enable(self, i):
+        item = self.items[i]
+        key = list(item.keys())[0]
+        enable = self.evaluate_enable(item[key]['enable'])
+        self.labels[key].set_sensitive(enable)
+
     def arrangeMenuItems(self, items, columns, expand_last=False):
         for child in self.grid.get_children():
             self.grid.remove(child)
 
         length = len(items)
         i = 0
+        show_list = []
         for item in items:
             key = list(item)[0]
             if not self.evaluate_enable(item[key]['enable']):
                 if item[key]['show_disabled']:
                     # Show but make inactive
                     self.labels[key].set_sensitive(False)
+                    show_list.append(key)
                 else:
                     # Just don't show the button
                     logging.debug(f"X > {key}")
                     continue
             else:
                 self.labels[key].set_sensitive(True)
+                show_list.append(key)
 
-            if columns == 4:
-                if length <= 4:
-                    # Arrange 2 x 2
-                    columns = 2
-                elif 4 < length <= 6:
-                    # Arrange 3 x 2
-                    columns = 3
+        length = len(show_list)
+        if columns == 4:
+            if length <= 4:
+                # Arrange 2 x 2
+               columns = 2
+            elif 4 < length <= 6:
+                # Arrange 3 x 2
+                columns = 3
 
+        for key in show_list:
             col = i % columns
             row = int(i / columns)
 
@@ -118,7 +151,7 @@ class MenuPanel(ScreenPanel):
 
             if item['refresh_on'] is not None:
                 for var in item['refresh_on'].split(', '):
-                    self._printer.register_callback(var, self.check_enable, i)
+                    self.register_callback(var, self.check_enable, i)
 
             self.labels[key] = b
 
@@ -129,19 +162,14 @@ class MenuPanel(ScreenPanel):
         elif enable == "{{ camera_configured }}":
             return self.ks_printer_cfg and self.ks_printer_cfg.get("camera_url", None) is not None
         self.j2_data = self._printer.get_printer_status_data()
-        #logging.debug(f"PAUL: j2_data={self.j2_data}")
+        self.j2_data["klipperscreen"] = {
+                "side_ercf_shortcut": self._config.get_main_config().getboolean("side_ercf_shortcut")
+                }
         try:
             j2_temp = Template(enable, autoescape=True)
             result = j2_temp.render(self.j2_data)
-#            logging.debug(f"PAUL: Enable={enable}, Result={result}")
             return result == 'True'
         except Exception as e:
             logging.debug(f"Error evaluating enable statement: {enable}\n{e}")
             return False
-
-    def check_enable(self, i):
-        item = self.items[i]
-        key = list(item.keys())[0]
-        enable = self.evaluate_enable(item[key]['enable'])
-        self.labels[key].set_sensitive(enable)
 

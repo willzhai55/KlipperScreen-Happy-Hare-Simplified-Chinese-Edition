@@ -70,6 +70,24 @@ class KlipperScreenConfig:
                 logging.info('Loading default config')
                 self.config = configparser.ConfigParser()
                 self.config.read(self.default_config_path)
+
+            # Allow for menus to be dual rooted without duplicating config
+            for i in self.config.sections():
+                if i.startswith("menu __"):
+                    menu_hierachy = i.split()
+                    if len(menu_hierachy) > 2:
+                        roots = menu_hierachy[1].split(",")
+                        if len(roots) > 1:
+                            for j in roots:
+                                if j.startswith("__"):
+                                    duplicated_menu = " ".join([str(item) for item in menu_hierachy[2:]])
+                                    new_section = (f"menu {j} {duplicated_menu}")
+                                    logging.debug(f"Spliting {i}")
+                                    self.config.add_section(new_section)
+                                    for key in self.config.options(i):
+                                        self.config.set(new_section, key, self.config.get(i, key))
+                            self.config.remove_section(i)
+
         except KeyError as Kerror:
             msg = f"Error reading config: {self.config_path}\n{Kerror}"
             logging.exception(msg)

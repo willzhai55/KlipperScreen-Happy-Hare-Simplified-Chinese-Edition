@@ -26,7 +26,6 @@ button:active, .button_active {
     background-color: #304C62;
 }
 
-/* PAUL removed ... do better to prevent button resize
 button:disabled,
 button.color1:disabled,
 button.color2:disabled,
@@ -34,15 +33,7 @@ button.color3:disabled,
 button.color4:disabled {
     border: 0;
 }
-*/
-/* PAUL vv alternative to be tested */
-button:disabled,
-button.color1:disabled,
-button.color2:disabled,
-button.color3:disabled,
-button.color4:disabled {
-    border-bottom: solid #13181C;
-}
+/* PAUL border-bottom: solid #13181C; doesn't work because of different button sizes */
 
 button:disabled label,
 button.color1:disabled label,
@@ -559,19 +550,18 @@ popover button {
     background-color: darkred;
 }
 
-/* PAUL vvv */
-.ercf_recover {
-    padding: 0.8em;
-    padding-left: 2em;
-    font-size: 1.4em;
-}
-
+/* PAUL added vvv */
 .ercf_runout slider, .ercf_runout highlight, .ercf_runout fill {
     min-height: 0;
 }
 
 .ercf_runout trough {
     margin-top: 0;
+}
+
+.ercf_tool_image {
+    margin-top: 12px;
+    margin-bottom: 12px;
 }
 
 .ercf_tool_text {
@@ -586,20 +576,43 @@ popover button {
     font-size: 1.2em;
 }
 
-.ercf_status_filament {
-    padding-top: 4px;
-    padding-bottom: 8px;
+.ercf_status {
+    background: transparent;
+    font-family: Free Mono;
+    font-size: 1em;
+    border: 0;
+    padding: 0;
 }
 
+.ercf_status_filament {
+    margin-top: 8px;
+    margin-bottom: 12px;
+}
+
+.ercf_recover check {
+    padding: 0.2em;
+}
+
+.ercf_recover, .ercf_recover label {
+    background: transparent;
+    font-size: 1.2em;
+}
+
+.ercf_disabled_text {
+    color: grey;
+}
+
+/* PAUL TESTING ONLY */
 .ercf_test_red {
-    background: red
+    background: red;
 }
 .ercf_test_blue {
-    background: blue
+    background: blue;
 }
 .ercf_test_green {
-    background: green
+    background: green;
 }
+
 
 /* Hardcoded values until creation of dynamic CSS updates */
 .graph_label_hidden {padding-left: .9em;} /* .4em on top of normal button padding */

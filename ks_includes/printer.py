@@ -25,7 +25,6 @@ class Printer:
         self.busy_cb = None
         self.busy = None
         self.temperature_store_size = None
-        self.printer_callbacks = {}
 
     def reset(self):
         self.config = None
@@ -45,7 +44,6 @@ class Printer:
         self.busy_cb = None
         self.busy = None
         self.temperature_store_size = None
-        self.printer_callbacks = {}
 
     def reinit(self, printer_info, data):
         self.config = data['configfile']['config']
@@ -103,8 +101,6 @@ class Printer:
         logging.info(f"# Output pins: {self.output_pin_count}")
 
     def process_update(self, data):
-#        logging.info(f"PAUL: #$#$#$# printer.py:process_update data={data}")
-        unique_cbs = []
         if self.data is None:
             return
         for x in (self.get_tools() + self.get_heaters() + self.get_filament_sensors() + self.get_ercf_encoders()):
@@ -118,25 +114,14 @@ class Printer:
             if x not in self.data:
                 self.data[x] = {}
             self.data[x].update(data[x])
-            for i in data[x]:
-                if ("printer.%s.%s" % (x, i)) in self.printer_callbacks:
-                    for cb in self.printer_callbacks["printer.%s.%s" % (x, i)]:
-                        if cb not in unique_cbs:
-                            unique_cbs.append(cb)
 
         if "webhooks" in data or "print_stats" in data or "idle_timeout" in data:
             self.process_status_update() # PAUL would need to add pause_resume
 
-        # Call specific associated callbacks
-        for cb in unique_cbs:
-            cb[0](cb[1])
-
     def register_callback(self, var, method, arg):
         if var in self.printer_callbacks:
-            logging.debug(f"PAUL register_callback append {var},{arg}")
             self.printer_callbacks[var].append([method, arg])
         else:
-            logging.debug(f"PAUL register_callback new var {var},{arg}")
             self.printer_callbacks[var] = [[method, arg]]
 
     def evaluate_state(self):
