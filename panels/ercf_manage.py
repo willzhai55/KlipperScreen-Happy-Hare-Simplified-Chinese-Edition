@@ -1,7 +1,8 @@
 # Happy Hare ERCF Software
-# Basic management panel (generally in recovery situation)
+# Basic manual operation panel (generally in recovery situation)
 #
-# Copyright (C) 2022  moggieuk#6538 (discord)
+# Copyright (C) 2023  moggieuk#6538 (discord)
+#                     moggieuk@hotmail.com
 #
 import logging, gi
 
