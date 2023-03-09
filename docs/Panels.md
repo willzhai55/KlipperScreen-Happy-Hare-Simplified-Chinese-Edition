@@ -119,3 +119,15 @@ panel: temperature
 panel: zcalibrate
 ```
 ![Z Calibrate](img/panels/zcalibrate.png)
+
+### [ERCF](ERCF.md)
+```py
+panel: ercf
+```
+![ERCF Main](img/panels/ercf_main.png)
+
+![ERCF Manage](img/panels/ercf_manage.png)
+
+![ERCF Recover](img/panels/ercf_recover.png)
+
+TODO
