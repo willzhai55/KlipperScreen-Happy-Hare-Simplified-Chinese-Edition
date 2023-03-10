@@ -6,6 +6,7 @@
 #                     moggieuk@hotmail.com
 #
 
+# Screen Capture: scrot -s -D :0.0
 KLIPPER_HOME="${HOME}/klipper"
 KLIPPER_CONFIG_HOME="${HOME}/klipper_config"
 PRINTER_DATA_CONFIG_HOME="${HOME}/printer_data/config"

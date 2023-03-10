@@ -33,7 +33,6 @@ button.color3:disabled,
 button.color4:disabled {
     border: 0;
 }
-/* PAUL border-bottom: solid #13181C; doesn't work because of different button sizes */
 
 button:disabled label,
 button.color1:disabled label,
