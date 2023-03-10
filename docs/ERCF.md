@@ -81,10 +81,13 @@ One note: If you move the selector on the Manage panel you will change the gate 
 
 ![ercf_picker](img/ercf/ercf_picker.png)
 
+Ooops, did I include that?!?  Check back later, but rest assured, Bambu Labs AMS will not have the advantage for long!
 
 ## User extensible management panel
 
 ![ercf_manage_menu](img/ercf/ercf_user_manage_menu.png)
+
+The bottom left 'More...' button brings up this panel.  This one is not custom but uses the KlipperScreen menu concept. Therefore it is extensible by users. If included a lot of useful stuff and have replicated some functionality found elsewhere as individual descrete buttons (like load tool or select gate).  Some might prefer this but feel free to comment it out.
 
 ## User extensible calibration/test panel
 
