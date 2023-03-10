@@ -157,7 +157,8 @@ class ErcfRecovery(ScreenPanel):
             else:
                 self.labels[label].set_sensitive(False)
             if label == "tool":
-                self.update_toolgate_buttons(sensitive)
+                tool_sensitive = sensitive
+        self.update_toolgate_buttons(tool_sensitive)
 
     # Get starting values
     def init_toolgate_values(self):

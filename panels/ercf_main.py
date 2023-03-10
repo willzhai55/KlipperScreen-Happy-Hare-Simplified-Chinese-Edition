@@ -63,7 +63,7 @@ class ErcfMain(ScreenPanel):
             't_decrease': self._gtk.Button('decrease', None, scale=self.bts * 1.2),
             'tool': self._gtk.Button('extruder', _('Load T0'), 'color2'),
             't_increase': self._gtk.Button('increase', None, scale=self.bts * 1.2),
-            'picker': self._gtk.Button('ercf_tool_picker', _('Colors'), 'color3'),
+            'picker': self._gtk.Button('ercf_tool_picker', _('Colors...'), 'color3'),
             'eject': self._gtk.Button('ercf_eject', _('Eject'), 'color4'),
             'pause': self._gtk.Button('pause', _('Pause'), 'color1'),
             'unlock': self._gtk.Button('ercf_unlock', _('Unlock'), 'color2'),
@@ -126,8 +126,14 @@ class ErcfMain(ScreenPanel):
         manage_grid = Gtk.Grid()
         manage_grid.set_column_homogeneous(True)
         manage_grid.set_row_homogeneous(True)
-        manage_grid.attach(Gtk.Label(),           0, 0, 1, 3)
-        manage_grid.attach(self.labels['manage'], 1, 0, 2, 3)
+
+        ercf = self._printer.get_stat("ercf")
+        num_gates = len(ercf['gate_status'])
+        if num_gates > 9:
+            manage_grid.attach(Gtk.Label(),           0, 0, 1, 3)
+            manage_grid.attach(self.labels['manage'], 1, 0, 2, 3)
+        else:
+            manage_grid.attach(self.labels['manage'], 0, 0, 3, 3)
 
         runout_layer = Gtk.Notebook()
         self.labels['runout_layer'] = runout_layer
@@ -187,7 +193,6 @@ class ErcfMain(ScreenPanel):
         self.content.add(scroll)
 
     def activate(self):
-        logging.info(f"PAUL ---- activate on ercf_main called")
         self.init_tool_value()
 
     def process_update(self, action, data):
@@ -296,9 +301,13 @@ class ErcfMain(ScreenPanel):
         self.labels['tool_label'].set_text(text)
         if data != None and 'tool' in data:
             if tool == self.TOOL_BYPASS:
+                self.labels['picker'].set_image(self.labels['load_bypass_img'])
+                self.labels['picker'].set_label(f"Load")
                 self.labels['eject'].set_image(self.labels['unload_bypass_img'])
                 self.labels['eject'].set_label(f"Unload")
             else:
+                self.labels['picker'].set_image(self.labels['tool_picker_img'])
+                self.labels['picker'].set_label(f"Colors...")
                 self.labels['eject'].set_image(self.labels['eject_img'])
                 self.labels['eject'].set_label(f"Eject")
 
@@ -347,11 +356,8 @@ class ErcfMain(ScreenPanel):
 
         if self.ui_sel_tool == self.TOOL_BYPASS:
             self.labels['tool'].set_image(self.labels['select_bypass_img'])
-            self.labels['picker'].set_image(self.labels['load_bypass_img'])
-            self.labels['picker'].set_label(f"Load") # PAUL test me
         else:
             self.labels['tool'].set_image(self.labels['tool_img'])
-            self.labels['picker'].set_image(self.labels['tool_picker_img'])
 
     def update_encoder(self, data):
         logging.info(f"@@@************@@@ PAUL: update_encoder")
@@ -464,7 +470,8 @@ class ErcfMain(ScreenPanel):
             else:
                 self.labels[label].set_sensitive(False)
             if label == "tool":
-                self.update_tool_buttons(sensitive)
+                tool_sensitive = sensitive
+        self.update_tool_buttons(tool_sensitive)
 
     def get_status_text(self):
         ercf = self._printer.get_stat("ercf")

@@ -125,7 +125,7 @@ class ErcfPicker(ScreenPanel):
             grid.attach(material,   6, i+1, 3, 1)
             grid.attach(gate_box,   9, i+1, 4, 1)
 
-        grid.attach(Gtk.Label("Shhhhh.... INGORE THIS PANEL IT IS WIP :-)"), 0, 0, 12, 1) # WIP
+        grid.attach(Gtk.Label("Shhhhh.... INGORE THIS PANEL IT'S A SECRET ;-)"), 0, 0, 12, 1) # WIP
 
         scroll = self._gtk.ScrolledWindow()
         scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
@@ -145,6 +145,5 @@ class ErcfPicker(ScreenPanel):
                     #self._screen._menu_go_back() # We don't support dynamic updates on this screen
 
     def select_tool(self, widget):
-        logging.info(f"PAUL ---- select_tool")
         pass
 

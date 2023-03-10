@@ -41,12 +41,17 @@ class ErcfManage(ScreenPanel):
 
         # btn_states: the "gaps" are what functionality the state takes away
         self.btn_states = {
-            'all':          ['gate', 'checkgate', 'recover', 'load', 'eject', 'home', 'motors_off', 'servo_up', 'servo_down', 'load_ext', 'unload_ext'],
-            'not_homed':    [                     'recover',                  'home', 'motors_off', 'servo_up', 'servo_down', 'load_ext', 'unload_ext'],
-            'servo_up':     ['gate', 'checkgate', 'recover', 'load', 'eject', 'home', 'motors_off',             'servo_down', 'load_ext', 'unload_ext'],
-            'servo_down':   ['gate', 'checkgate', 'recover', 'load', 'eject', 'home', 'motors_off', 'servo_up',               'load_ext', 'unload_ext'],
-            'gate_changed': ['gate',              'recover',                  'home', 'motors_off', 'servo_up',               'load_ext', 'unload_ext'],
-            'disabled':     [                                                                                                                     ],
+            'all':             ['gate', 'checkgate', 'recover', 'load', 'eject', 'home', 'motors_off', 'servo_up', 'servo_down', 'load_ext', 'unload_ext'],
+            'not_homed':       [                     'recover',                  'home', 'motors_off', 'servo_up', 'servo_down', 'load_ext', 'unload_ext'],
+            'servo_up':        ['gate', 'checkgate', 'recover', 'load', 'eject', 'home', 'motors_off',             'servo_down', 'load_ext', 'unload_ext'],
+            'servo_down':      ['gate', 'checkgate', 'recover', 'load', 'eject', 'home', 'motors_off', 'servo_up',               'load_ext', 'unload_ext'],
+            'bypass_loaded':   [                     'recover',         'eject',         'motors_off', 'servo_up', 'servo_down',             'unload_ext'],
+            'bypass_unloaded': ['gate', 'checkgate', 'recover', 'load',          'home', 'motors_off', 'servo_up', 'servo_down', 'load_ext', 'unload_ext'],
+            'bypass_unknown':  ['gate', 'checkgate', 'recover', 'load', 'eject', 'home', 'motors_off', 'servo_up', 'servo_down', 'load_ext', 'unload_ext'],
+            'tool_loaded':     [                     'recover',         'eject',         'motors_off', 'servo_up', 'servo_down',             'unload_ext'],
+            'tool_unloaded':   ['gate', 'checkgate', 'recover', 'load',          'home', 'motors_off', 'servo_up', 'servo_down', 'load_ext', 'unload_ext'],
+            'tool_unknown':    ['gate', 'checkgate', 'recover', 'laod', 'eject', 'home', 'motors_off', 'servo_up', 'servo_down', 'load_ext', 'unload_ext'],
+            'disabled':        [                                                                                                                         ],
         }
 
         self.labels = {
@@ -118,42 +123,9 @@ class ErcfManage(ScreenPanel):
         if action == "notify_status_update":
             if 'ercf' in data:
                 e_data = data['ercf']
-#                if 'gate' in e_data:
-#                    self.update_gate_buttons()
+                if 'gate' in e_data:
+                    self.ui_sel_gate = e_data['gate']
                 self.update_active_buttons()
-
-    # Dynamically update button sensitivity based on state
-    def update_active_buttons(self):
-        ercf = self._printer.get_stat("ercf")
-        printer_state = self._printer.get_stat("print_stats")['state']
-        enabled = ercf['enabled']
-        servo = ercf['servo']
-        is_homed = ercf['is_homed']
-        current_gate = ercf['gate']
-        ui_state = []
-        if enabled:
-            ui_state.append("servo_up" if servo == "Up" else "servo_down" if servo == "Down" else "all")
-            if not is_homed:
-                ui_state.append("not_homed")
-            if current_gate != self.ui_sel_gate:
-                ui_state.append("gate_changed")
-        else:
-            ui_state.append("disabled")
-        # PAUL more to do
-
-        logging.info(f"*-*-*-* >>>>> ui_state={ui_state}")
-        for label in self.btn_states['all']:
-            sensitive = True
-            for state in ui_state:
-                if not label in self.btn_states[state]:
-                    sensitive = False
-                    break
-            if sensitive:
-                self.labels[label].set_sensitive(True)
-            else:
-                self.labels[label].set_sensitive(False)
-            if label == "gate":
-                self.update_gate_buttons(sensitive)
 
     def init_gate_values(self):
         # Get starting values
@@ -165,7 +137,7 @@ class ErcfManage(ScreenPanel):
         ercf = self._printer.get_stat("ercf")
         num_gates = len(ercf['gate_status'])
 
-        if param < 0 and self.ui_sel_gate > (self.min_gate if self.ui_sel_gate == self.TOOL_BYPASS else 0):
+        if param < 0 and self.ui_sel_gate > self.min_gate:
             self.ui_sel_gate -= 1
             if self.ui_sel_gate == self.TOOL_UNKNOWN:
                 self.ui_sel_gate = self.TOOL_BYPASS
@@ -185,7 +157,9 @@ class ErcfManage(ScreenPanel):
         self._screen._ws.klippy.gcode_script(f"ERCF_SELECT GATE={self.ui_sel_gate}")
 
     def select_checkgate(self, widget):
-        self._screen._ws.klippy.gcode_script(f"ERCF_CHECK_GATES GATE={self.ui_sel_gate}")
+        ercf = self._printer.get_stat("ercf")
+        current_gate = ercf['gate']
+        self._screen._ws.klippy.gcode_script(f"ERCF_CHECK_GATES GATE={current_gate}")
 
     def select_load(self, widget):
         self._screen._ws.klippy.gcode_script(f"ERCF_LOAD TEST=0") # TEST=0 is to aid backward compatibility
@@ -216,14 +190,64 @@ class ErcfManage(ScreenPanel):
     def select_unload_extruder(self, widget):
         self._screen._ws.klippy.gcode_script(f"ERCF_EJECT EXTRUDER_ONLY=1")
 
+    # Dynamically update button sensitivity based on state
+    def update_active_buttons(self):
+        ercf = self._printer.get_stat("ercf")
+        printer_state = self._printer.get_stat("print_stats")['state']
+        enabled = ercf['enabled']
+        servo = ercf['servo']
+        is_homed = ercf['is_homed']
+        gate = ercf['gate']
+        tool = ercf['tool']
+        filament = ercf['filament']
+        ui_state = []
+        if enabled:
+            ui_state.append("servo_up" if servo == "Up" else "servo_down" if servo == "Down" else "all")
+            if not is_homed:
+                ui_state.append("not_homed")
+
+            if tool == self.TOOL_BYPASS:
+                if filament == "Loaded":
+                    ui_state.append("bypass_loaded")
+                elif filament == "Unloaded":
+                    ui_state.append("bypass_unloaded")
+                else:
+                    ui_state.append("bypass_unknown")
+            elif tool >= 0:
+                if filament == "Loaded":
+                    ui_state.append("tool_loaded")
+                elif filament == "Unloaded":
+                    ui_state.append("tool_unloaded")
+                else:
+                    ui_state.append("tool_unknown")
+        else:
+            ui_state.append("disabled")
+
+        logging.info(f"PAUL *-*-*-* >>>>> ui_state={ui_state}")
+        for label in self.btn_states['all']:
+            sensitive = True
+            for state in ui_state:
+                if not label in self.btn_states[state]:
+                    sensitive = False
+                    break
+            if sensitive:
+                self.labels[label].set_sensitive(True)
+            else:
+                self.labels[label].set_sensitive(False)
+            if label == "gate":
+                gate_sensitive = sensitive
+        self.update_gate_buttons(gate_sensitive)
+
     def update_gate_buttons(self, gate_sensitive=True):
         ercf = self._printer.get_stat("ercf")
+        gate = ercf['gate']
+        filament = ercf['filament']
         num_gates = len(ercf['gate_status'])
-        if self.ui_sel_gate == self.TOOL_BYPASS or not gate_sensitive:
+        if (gate == self.TOOL_BYPASS and filament != "Unloaded") or not gate_sensitive:
             self.labels['g_decrease'].set_sensitive(False)
             self.labels['g_increase'].set_sensitive(False)
         else:
-            if self.ui_sel_gate == (self.min_gate if self.ui_sel_gate == self.TOOL_BYPASS else 0):
+            if self.ui_sel_gate == self.min_gate:
                 self.labels['g_decrease'].set_sensitive(False)
             else:
                 self.labels['g_decrease'].set_sensitive(True)
@@ -241,6 +265,14 @@ class ErcfManage(ScreenPanel):
                 self.labels['gate'].set_sensitive(True)
         elif self.ui_sel_gate == self.TOOL_BYPASS:
             self.labels['gate'].set_label(f"Bypass")
+            if ercf['gate'] == self.ui_sel_gate:
+                self.labels['gate'].set_sensitive(False)
+            else:
+                self.labels['gate'].set_sensitive(True)
         else:
             self.labels['gate'].set_label(f"Unknown")
 
+        if self.ui_sel_gate == self.TOOL_BYPASS:
+            self.labels['checkgate'].set_sensitive(False)
+        elif gate_sensitive:
+            self.labels['checkgate'].set_sensitive(True)
