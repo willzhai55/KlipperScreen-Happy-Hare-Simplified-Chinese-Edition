@@ -99,6 +99,7 @@ If you really don't like typing on the Klipper console, all the important calibr
 
 Here is the set that is included by default.
 
+
     (\_/)
     ( *,*)
     (")_(") ERCF Ready
