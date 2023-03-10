@@ -9,7 +9,7 @@ KlipperScreen is an amazing piece of software but unfortunally lacks the level o
 Install and setup a base KlipperScreen from the original source. Get it working. Don't skip this step because I cannot help with basic KlipperScreen and system setup.
 
     > cd ~/KlipperScreen
-    > git remote set-url origin https://github.com/moggieuk/KlipperScreen.git
+    > git remote set-url origin https://github.com/moggieuk/KlipperScreen-Happy-Hare-Edition.git
     > ...
    
     > cd ~/KlipperScreen/happy_hare
