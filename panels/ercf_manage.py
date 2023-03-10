@@ -80,10 +80,10 @@ class ErcfManage(ScreenPanel):
         self.labels['load_ext'].connect("clicked", self.select_load_extruder)
         self.labels['unload_ext'].connect("clicked", self.select_unload_extruder)
 
-        self.labels['g_increase'].set_halign(Gtk.Align.START)
-        self.labels['g_increase'].set_margin_start(10)
-        self.labels['g_decrease'].set_halign(Gtk.Align.END)
-        self.labels['g_decrease'].set_margin_end(10)
+        self.labels['g_increase'].set_hexpand(False)
+        self.labels['g_increase'].get_style_context().add_class("ercf_sel_increase")
+        self.labels['g_decrease'].set_hexpand(False)
+        self.labels['g_decrease'].get_style_context().add_class("ercf_sel_decrease")
 
         gate_grid = Gtk.Grid()
         gate_grid.set_column_homogeneous(False)
@@ -106,12 +106,13 @@ class ErcfManage(ScreenPanel):
         grid.attach(self.labels['load_ext'],   2, 2, 1, 1)
         grid.attach(self.labels['unload_ext'], 3, 2, 1, 1)
 
-        self.content.add(grid)
+        scroll = self._gtk.ScrolledWindow()
+        scroll.add(grid)
+        self.content.add(scroll)
 
     def activate(self):
         self.ui_sel_gate = self.DUMMY
         self.init_gate_values()
-#        self.update_gate_buttons()
 
     def process_update(self, action, data):
         if action == "notify_status_update":

@@ -87,18 +87,16 @@ class ErcfMain(ScreenPanel):
         self.labels['tool'].connect("clicked", self.select_tool, 0)
         self.labels['t_increase'].connect("clicked", self.select_tool, 1)
         self.labels['picker'].connect("clicked", self.select_picker)
-# PAUL        self.labels['picker'].connect("clicked", self.menu_item_clicked, "picker", {
-# PAUL           "panel": "ercf_picker", "name": _("ERCF Tool Picker")})
         self.labels['eject'].connect("clicked", self.select_eject)
         self.labels['pause'].connect("clicked", self.select_pause)
         self.labels['unlock'].connect("clicked", self.select_unlock)
         self.labels['resume'].connect("clicked", self.select_resume)
         self.labels['more'].connect("clicked", self._screen._go_to_submenu, "ercf")
 
-        self.labels['t_increase'].set_halign(Gtk.Align.START)
-        self.labels['t_increase'].set_margin_start(10)
-        self.labels['t_decrease'].set_halign(Gtk.Align.END)
-        self.labels['t_decrease'].set_margin_end(10)
+        self.labels['t_increase'].set_hexpand(False)
+        self.labels['t_increase'].get_style_context().add_class("ercf_sel_increase")
+        self.labels['t_decrease'].set_hexpand(False)
+        self.labels['t_decrease'].get_style_context().add_class("ercf_sel_decrease")
 
         self.labels['manage'].get_style_context().add_class("ercf_manage_button")
         self.labels['tool_icon'].get_style_context().add_class("ercf_tool_image")
@@ -168,30 +166,29 @@ class ErcfMain(ScreenPanel):
         tool_grid.attach(self.labels['tool'],       1, 0, 1, 1)
         tool_grid.attach(self.labels['t_increase'], 2, 0, 1, 1)
 
-        middle_grid = Gtk.Grid()
-        middle_grid.set_vexpand(True)
-        middle_grid.set_column_homogeneous(True)
-        middle_grid.attach(tool_grid,                  0, 0, 3, 1)
-        middle_grid.attach(self.labels['picker'],      3, 0, 1, 1)
-        middle_grid.attach(self.labels['eject'],       4, 0, 1, 1)
-        middle_grid.attach(self.labels['check_gates'], 5, 0, 1, 1)
+        main_grid = Gtk.Grid()
+        main_grid.set_vexpand(True)
+        main_grid.set_column_homogeneous(True)
+        main_grid.attach(tool_grid,                   0, 0, 6, 1)
+        main_grid.attach(self.labels['picker'],       6, 0, 2, 1)
+        main_grid.attach(self.labels['eject'],        8, 0, 2, 1)
+        main_grid.attach(self.labels['check_gates'], 10, 0, 2, 1)
+        main_grid.attach(self.labels['pause'],        0, 1, 3, 1)
+        main_grid.attach(self.labels['unlock'],       3, 1, 3, 1)
+        main_grid.attach(self.labels['resume'],       6, 1, 3, 1)
+        main_grid.attach(self.labels['more'],         9, 1, 3, 1)
 
-        lower_grid = Gtk.Grid()
-        lower_grid.set_vexpand(True)
-        lower_grid.set_column_homogeneous(True)
-        lower_grid.attach(self.labels['pause'],  0, 0, 1, 1)
-        lower_grid.attach(self.labels['unlock'], 1, 0, 1, 1)
-        lower_grid.attach(self.labels['resume'], 2, 0, 1, 1)
-        lower_grid.attach(self.labels['more'],   3, 0, 1, 1)
+        box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
+        box.pack_start(top_grid, False, True, 0)
+        box.add(main_grid)
 
-        self.content.pack_start(top_grid, False, True, 0)
-        self.content.add(middle_grid)
-        self.content.add(lower_grid)
+        scroll = self._gtk.ScrolledWindow()
+        scroll.add(box)
+        self.content.add(scroll)
 
     def activate(self):
         logging.info(f"PAUL ---- activate on ercf_main called")
         self.init_tool_value()
-#        self.update_tool() PAUL is this needed?
 
     def process_update(self, action, data):
         if action == "notify_status_update":
@@ -269,8 +266,6 @@ class ErcfMain(ScreenPanel):
             self._screen._ws.klippy.gcode_script(f"ERCF_LOAD_BYPASS")
         else:
             self._screen.show_panel('picker', 'ercf_picker', _("ERCF Tool Picker"), 1, False)
-#            self.show_panel('picker', 'ercf_picker', _("ERCF Tool Picker"), 2, False)
-#    def show_panel(self, panel_name, panel_type, title, remove=None, pop=True, **kwargs):
 
     def select_pause(self, widget):
         self._screen._ws.klippy.gcode_script(f"ERCF_PAUSE FORCE_IN_PRINT=1")

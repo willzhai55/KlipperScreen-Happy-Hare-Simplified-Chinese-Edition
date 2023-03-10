@@ -118,7 +118,9 @@ class ErcfRecovery(ScreenPanel):
         grid.attach(self.labels['auto'],   1, 2, 1, 1)
         grid.attach(self.labels['manual'], 2, 2, 2, 1)
 
-        self.content.add(grid)
+        scroll = self._gtk.ScrolledWindow()
+        scroll.add(grid)
+        self.content.add(scroll)
 
     def activate(self):
         self.ui_sel_tool = self.ui_sel_gate = self.ui_sel_loaded = self.DUMMY

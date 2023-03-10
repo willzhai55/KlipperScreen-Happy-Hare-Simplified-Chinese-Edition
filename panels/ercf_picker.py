@@ -60,12 +60,9 @@ class ErcfPicker(ScreenPanel):
                 { 'material': 'ABS',  'color': 'pink',    'status': 1  }
             ]
 
-        scroll = self._gtk.ScrolledWindow()
-        scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
         grid = Gtk.Grid()
         grid.set_column_homogeneous(True)
         grid.set_row_spacing(10)
-        scroll.add(grid)
 
         ercf = self._printer.get_stat("ercf")
         num_tools = len(ercf['gate_status'])
@@ -130,6 +127,9 @@ class ErcfPicker(ScreenPanel):
 
         grid.attach(Gtk.Label("Shhhhh.... INGORE THIS PANEL IT IS WIP :-)"), 0, 0, 12, 1) # WIP
 
+        scroll = self._gtk.ScrolledWindow()
+        scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
+        scroll.add(grid)
         self.content.add(scroll)
 
     def activate(self):

@@ -569,6 +569,20 @@ popover button {
     font-size: 1.8em;
 }
 
+.ercf_sel_increase {
+    margin-left: 10px;
+    margin-right: 25px;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.ercf_sel_decrease {
+    margin-left: 25px;
+    margin-right: 10px;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
 .ercf_gate_text {
     margin-top: 8px;
     margin-bottom: 8px;
