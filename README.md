@@ -14,9 +14,13 @@ will natively work with [Klipper](https://github.com/kevinOConnor/klipper) and [
 
 [More Screenshots](https://klipperscreen.readthedocs.io/en/latest/Panels/)
 
+<br>
+<br>
+KlipperScreen "Happy Hare" Fork...
+
+# KlipperScreen - ERCF Happy Hare edition
+
 [![ERCF Control](docs/img/ercf/ercf_main.png)](docs/ERCF.md)
-
-
 
 ## Introduction
 KlipperScreen ERCF Happy Hare edition is quite a mouthful!  It is a forked version of KlipperScreen designed to run/manage ERCF using the Happy Hare driver software.
@@ -28,7 +32,7 @@ Install and setup a base KlipperScreen from the original source. Get it working.
 
     > cd ~/KlipperScreen
     > git remote set-url origin https://github.com/moggieuk/KlipperScreen-Happy-Hare-Edition.git
-    > ...
+    > git pull
    
     > cd ~/KlipperScreen/happy_hare
     > ./install_ks -g <num_gates>
@@ -53,5 +57,5 @@ I have only tested on a single screen.  A 640x480 resolution BTT TFT5.0.   I am 
 
 *All screen shots are taken with the "Colorize" theme.  The default is z-bolt and looks slightly different (which I actually prefer)*
 
-Now go read the rest of the doc here: [![ERCF Panels Explained]](docs/ERCF.md)
+Now go read the [rest of the doc here](docs/ERCF.md)
 
