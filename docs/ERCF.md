@@ -24,24 +24,36 @@ Expert tip: The last step of running './install_ks -g <num_gates>' can be run ma
 Note that the base KlipperScreen is fully up-to-date (as of March 10th, 2023) with the master but includes extra functionality that can be used in the creation of custom menus.  See the generated ercf_klipperscreen.conf for clues!
 
 ## Request
-Remember that this is current a Beta release.  I need/want your help in finding corner cases, bugs or ideas for improvement.  I can offer limited help on the Discord channels but I would prefer if you submit an issue report via github so I can manage them.  This project and Happy Hare itself have taken a lot of time. I have a lot more planned so I need your help in making my life easier.
+Remember that this is current a Beta release.  I need/want your help in finding corner cases, bugs or ideas for improvement.  I can offer limited help on the Discord channels but I would prefer if you submit an issue report via github so I can manage them.  This project and Happy Hare itself have taken a lot of time. I have a lot more planned so I need your help in organizing my work.
 
-Also, some folks have asked about making a donation to cover the cost of the all the coffee I'm drinking.  I'm not doing this for any financial reward but it you feel inclined a donation to PayPal https://www.paypal.me/moggieuk will certainly be spent make your life with ERCF more enjoyable.
+Also, some folks have asked about making a donation to cover the cost of the all the coffee I'm drinking.  I'm not doing this for any financial reward but it you feel inclined a donation to PayPal https://www.paypal.me/moggieuk will certainly be spent making your life with ERCF more enjoyable.
 
 Thank you!
 
+## Caveats
+I have only tested on a single screen.  A 640x480 resolution BTT TFT5.0.   I am not a UI programming expert and it is possible that you might find layout problems on other (likely smaller) displays.  Also, I have only tested in and optimized for horizonal orientation.  I doubt it will be effective in vertical but I don't know of any Voron owners with vertically mounted panels. 
 
-*All screen shots are taken with the "Colorize" theme.  The default is z-bolt and looks slightly different*
+*All screen shots are taken with the "Colorize" theme.  The default is z-bolt and looks slightly different (which I actually prefer)*
 
 ## Main Panel
 
-
 ![ercf_panel_non_printing](img/ercf/ercf_main.png)
+
+This is the main screen and is accessed by clicking on the little carrot on the left navbar.   Note that you can turn off this carrot in settings in whch case buttons will automatically be added to the KlipperScreen home and print pages.  Personally I think ERCF deserves this first class link.
+
+The philosopy behind this screen is that it works with the concept of 'Tool' which is really a virtual entity in Happy Hare because of the Tool-To-Gate mapping.  When you are actually printing the panel will look a little different:
 
 ![ercf_panel_printing](img/ercf/ercf_main_printing.png)
 
+The top left button is replaced with a live monitor of Happy Hare clog/runout detection.  This 'thermonitor' usually will sit at the bottom of the scale.  As the difference between extruder and encoder measured movement increases the 'temperature' will rise.  If it hits the top a runout condition will be triggered.  The configurable check mark on the side is the 'headroom' used by the automatic tuning option and represents a safe gap to avoid accidental firing.  The detection length (and headroom) are all tunable, but with automatic, they will be updated at least every tool change.
+
+**Perhaps someone can help me... now you can visualize when clog detection is triggered, can you figure out what is being done in the wipe tower -- I'll let you see for yourselves...**
+
+If you have a bypass (aka passthrough) installed, and I think they are very useful, then clicking "to the left of T0" will bring you to the bypass selector:
+
 ![ercf_panel_bypass](img/ercf/ercf_main_bypass.png)
 
+When bypass is selected, the 'Colors...' button and Eject button change to 'Load (Bypass)' and 'Unload (Bypass)' respectively.
 
 ## Manage Panel
 
