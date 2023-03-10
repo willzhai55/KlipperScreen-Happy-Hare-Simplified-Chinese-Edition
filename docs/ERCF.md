@@ -1,4 +1,4 @@
-# ERCF
+# ERCF - Happy Hare
 
 ## Introduction
 KlipperScreen ERCF Happy Hare edition is quite a mouthful!  It is a forked version of KlipperScreen designed to run/manage ERCF using the Happy Hare driver software.
@@ -81,17 +81,24 @@ One note: If you move the selector on the Manage panel you will change the gate 
 
 ![ercf_picker](img/ercf/ercf_picker.png)
 
-Ooops, did I include that?!?  Check back later, but rest assured, Bambu Labs AMS will not have the advantage for long!
+Ooops, did I include that?!? ;-)  Check back later, but rest assured, Bambu Labs AMS will not have the advantage for long!
 
 ## User extensible management panel
 
 ![ercf_manage_menu](img/ercf/ercf_user_manage_menu.png)
 
-The bottom left 'More...' button brings up this panel.  This one is not custom but uses the KlipperScreen menu concept. Therefore it is extensible by users. If included a lot of useful stuff and have replicated some functionality found elsewhere as individual descrete buttons (like load tool or select gate).  Some might prefer this but feel free to comment it out.
+The bottom left 'More...' button brings up this panel.  This one is not custom but uses the KlipperScreen menu concept. Therefore it is extensible by users. If included a lot of useful stuff and have replicated some functionality found elsewhere as individual descrete buttons (like load tool or select gate).  Some might prefer this but feel free to comment it out if you don't like duplication.  Also you can use the menu logic that is there as a guide to add you own special macros.
 
 ## User extensible calibration/test panel
 
 ![ercf_klipperscreen](img/ercf/klipperscreen_config.png)
 
+If you really don't like typing on the Klipper console, all the important calibration and test macros can be accessed under 'ERCF Settings' via the KlipperScreen 'Configuration' page.
+
 ![ercf_calibration_menu](img/ercf/ercf_user_calibration_menu.png)
 
+Here is the set that is included by default.
+
+    (\_/)
+    ( *,*)
+    (")_(") ERCF Ready
