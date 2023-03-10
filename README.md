@@ -1,4 +1,4 @@
-# KlipperScreen
+# KlipperScreen - ERCF Happy Hare edition
 
 KlipperScreen is a touchscreen GUI that interfaces with [Klipper](https://github.com/kevinOConnor/klipper) via [Moonraker](https://github.com/arksine/moonraker). It can switch between multiple printers to access them from a single location, and it doesn't even need to run on the same host, you can install it on another device and configure the IP address to access the printer.
 
@@ -11,5 +11,7 @@ KlipperScreen was inspired by [OctoScreen](https://github.com/Z-Bolt/OctoScreen/
 will natively work with [Klipper](https://github.com/kevinOConnor/klipper) and [Moonraker](https://github.com/arksine/moonraker).
 
 [![Main Menu](docs/img/panels/main_panel.png)](https://klipperscreen.readthedocs.io/en/latest/Panels/)
+
+[![ERCF Control](docs/img/ercf/ercf_main.png)](docs/ERCF.md)
 
 [More Screenshots](https://klipperscreen.readthedocs.io/en/latest/Panels/)
