@@ -28,7 +28,7 @@ KlipperScreen ERCF Happy Hare edition is quite a mouthful!  It is a forked versi
 KlipperScreen is an amazing piece of software but unfortunally lacks the level of plugin integration I needed for this project.  I hope in the future to have changes integrated so that this becomes a layered install at most.  Until then you must follow these install directions closely:
 
 ## Installation
-Install and setup a base KlipperScreen from the original source. Get it working. Don't skip this step because I cannot help with basic KlipperScreen and system setup.
+Install and setup a base KlipperScreen from the original source. Get it working. Don't skip this step because I cannot help with basic KlipperScreen and system setup.  Once you have that installed and working, log into you Rasberry Pi and execute the following commands. You can cut'n'paste...
 
     > cd ~/KlipperScreen
     > git remote set-url origin https://github.com/moggieuk/KlipperScreen-Happy-Hare-Edition.git
@@ -57,5 +57,5 @@ I have only tested on a single screen.  A 640x480 resolution BTT TFT5.0.   I am 
 
 *All screen shots are taken with the "Colorize" theme.  The default is z-bolt and looks slightly different (which I actually prefer)*
 
-Now go read the [rest of the doc here](docs/ERCF.md)
+Now go read the [rest of the doc here](docs/ERCF.md)...
 
