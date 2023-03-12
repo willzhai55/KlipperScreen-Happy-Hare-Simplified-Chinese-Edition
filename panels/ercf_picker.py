@@ -27,38 +27,7 @@ class ErcfPicker(ScreenPanel):
     def __init__(self, screen, title):
         super().__init__(screen, title)
 
-        #
-        # WORK IN PROGRESS.  EXPERIMENTAL LAYOUT FOR FEEDBACK
-        #
-        tool_map = [
-                { 'gate': 0, 'alt_gates': [3, 6] },
-                { 'gate': 1, 'alt_gates': [2, 3, 4, 5, 6, 7, 8] },
-                { 'gate': 2, 'alt_gates': []     },
-                { 'gate': 3, 'alt_gates': []     },
-                { 'gate': 4, 'alt_gates': []     },
-                { 'gate': 5, 'alt_gates': []     },
-                { 'gate': 6, 'alt_gates': []     },
-                { 'gate': 7, 'alt_gates': []     },
-                { 'gate': 8, 'alt_gates': []     }
-            ]
-
-        # Color string notes:
-        # A standard name (Taken from the X11 rgb.txt file)
-        # A hexadecimal value in the form “#rgb”, “#rrggbb”, “#rrrgggbbb” or ”#rrrrggggbbbb”
-        # A RGB color in the form “rgb(r,g,b)” (In this case the color will have full opacity)
-        # A RGBA color in the form “rgba(r,g,b,a)”
-        # (last two cases, r/g/b are from 0-255 or % value, a is in the range 0 to 1.
-        gate_map = [
-                { 'material': 'PLA',  'color': 'red',     'status': 1  },
-                { 'material': 'ABS',  'color': 'lt_grey', 'status': 1  },
-                { 'material': 'PLA+', 'color': 'green',   'status': 1  },
-                { 'material': 'ABS',  'color': '#1010FF', 'status': -1 },
-                { 'material': 'ABS',  'color': 'cyan',    'status': 1  },
-                { 'material': 'ABS',  'color': 'black',   'status': 0  },
-                { 'material': 'ABS',  'color': 'grey',    'status': 0  },
-                { 'material': 'ABS',  'color': 'white',   'status': 1  },
-                { 'material': 'ABS',  'color': 'pink',    'status': 1  }
-            ]
+        self.init_tool_map()
 
         grid = Gtk.Grid()
         grid.set_column_homogeneous(True)
@@ -67,8 +36,9 @@ class ErcfPicker(ScreenPanel):
         ercf = self._printer.get_stat("ercf")
         num_tools = len(ercf['gate_status'])
         endless_spool = ercf['endless_spool']
+        gate_map = ercf['gate_map']
         for i in range(num_tools):
-            t_map = tool_map[i]
+            t_map = self.tool_map[i]
             g_map = gate_map[t_map['gate']]
             logging.info(f"@@@************@@@ PAUL: i={i}, t_map={t_map}, g_map={g_map}")
             color = Gdk.RGBA()
@@ -80,12 +50,12 @@ class ErcfPicker(ScreenPanel):
                 alt_gate_str = '+(' + ', '.join(map(str, t_map['alt_gates'][:5]))
                 alt_gate_str += ', ...)' if len(t_map['alt_gates']) > 5 else ')'
 
-            if g_map['status'] == 1:
+            if g_map['available'] == 1:
                 status_icon = 'ercf_tick'
                 status_str = "Available"
-            elif g_map['status'] == 0:
+            elif g_map['available'] == 0:
                 status_icon = 'ercf_cross'
-                status_str = "Unavailable"
+                status_str = "Empty"
             else: 
                 status_icon = 'ercf_unknown'
                 status_str = "Unknown"
@@ -104,7 +74,7 @@ class ErcfPicker(ScreenPanel):
             name.get_style_context().add_class("ercf_tool_text")
             name.set_xalign(0.5)
 
-            material = self.labels[f'material_{i}'] = Gtk.Label(g_map['material'])
+            material = self.labels[f'material_{i}'] = Gtk.Label(g_map['material'][:5])
             material.get_style_context().add_class("ercf_tool_text")
             material.set_xalign(0.2)
 
@@ -119,13 +89,11 @@ class ErcfPicker(ScreenPanel):
             gate_box.pack_start(gate, True, True, 0)
             gate_box.pack_start(alt_gates, True, True, 0)
 
-            grid.attach(status_box, 0, i+1, 2, 1)
-            grid.attach(name,       2, i+1, 2, 1)
-            grid.attach(tool,       4, i+1, 2, 1)
-            grid.attach(material,   6, i+1, 3, 1)
-            grid.attach(gate_box,   9, i+1, 4, 1)
-
-        grid.attach(Gtk.Label("Shhhhh.... INGORE THIS PANEL IT'S A SECRET ;-)"), 0, 0, 12, 1) # WIP
+            grid.attach(status_box, 0, i, 2, 1)
+            grid.attach(name,       2, i, 2, 1)
+            grid.attach(tool,       4, i, 2, 1)
+            grid.attach(material,   6, i, 3, 1)
+            grid.attach(gate_box,   9, i, 4, 1)
 
         scroll = self._gtk.ScrolledWindow()
         scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
@@ -133,17 +101,40 @@ class ErcfPicker(ScreenPanel):
         self.content.add(scroll)
 
     def activate(self):
-        pass
+        self.init_tool_map()
+
+    def init_tool_map(self):
+        # WORK IN PROGRESS. REPLACEMENT FOR ENDLESS SPOOL GROUPS
+        # TODO Build this structure from existing endless_spool_groups
+        self.tool_map = [
+                { 'gate': 0, 'alt_gates': [3, 6] },
+                { 'gate': 1, 'alt_gates': [2, 3, 4, 5, 6, 7, 8] },
+                { 'gate': 2, 'alt_gates': []     },
+                { 'gate': 3, 'alt_gates': []     },
+                { 'gate': 4, 'alt_gates': []     },
+                { 'gate': 5, 'alt_gates': []     },
+                { 'gate': 6, 'alt_gates': []     },
+                { 'gate': 7, 'alt_gates': []     },
+                { 'gate': 8, 'alt_gates': []     }
+            ]
 
     def process_update(self, action, data):
         if action == "notify_status_update":
             if 'ercf' in data:
                 e_data = data['ercf']
-                if 'tool' in e_data or 'gate' in e_data or 'gate_status' in e_data:
+                if 'tool' in e_data or 'gate' in e_data or 'gate_status' in e_data or 'gate_map' in e_data:
                     pass
-                    # This doesn't work because of intial call during activate
-                    #self._screen._menu_go_back() # We don't support dynamic updates on this screen
+                    # This doesn't work because of intial call will all the data. Maybe determine base on size of data and ignore first..
+                    #self._screen._menu_go_back() # We don't support dynamic updates on this screen so just go back
 
     def select_tool(self, widget):
-        pass
+        ercf = self._printer.get_stat("ercf")
+        tool = ercf['tool']
+        filament = ercf['filament']
+        if tool == self.TOOL_BYPASS and filament == "Loaded":
+            # Should not of got here but do nothing for safety
+            pass
+        else:
+            self._screen._ws.klippy.gcode_script(f"T{tool}")
+            self._screen._menu_go_back()
 

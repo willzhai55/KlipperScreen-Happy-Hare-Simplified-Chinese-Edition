@@ -40,7 +40,7 @@ class ErcfRecovery(ScreenPanel):
                     self.has_bypass = True
                     self.min_tool = self.TOOL_BYPASS
 
-        # btn_states: the "gaps" are what functionality the state takes away
+        # btn_states: The "gaps" are what functionality the state takes away. Multiple states are combined
         self.btn_states = {
             'all':        ['tool', 'gate', 'filament', 'manual', 'auto', 'reset'],
             'disabled':   [                                                     ],
@@ -125,6 +125,9 @@ class ErcfRecovery(ScreenPanel):
     def activate(self):
         self.ui_sel_tool = self.ui_sel_gate = self.ui_sel_loaded = self.DUMMY
         self.init_toolgate_values()
+        self.update_state_labels()
+        self.update_toolgate_buttons()
+        self.update_active_buttons()
 
     def process_update(self, action, data):
         if action == "notify_status_update":

@@ -165,7 +165,8 @@ class KlipperScreenConfig:
             if section == 'main':
                 bools = (
                     'invert_x', 'invert_y', 'invert_z', '24htime', 'only_heaters', 'show_cursor', 'confirm_estop',
-                    'autoclose_popups', 'use_dpms', 'use_default_menu', 'side_macro_shortcut', 'side_ercf_shortcut',
+                    'autoclose_popups', 'use_dpms', 'use_default_menu', 'side_macro_shortcut',
+                    'side_ercf_shortcut', 'ercf_color_selector', 'ercf_color_filament',
                     'use-matchbox-keyboard', 'show_heater_power'
                 )
                 strs = (
@@ -262,6 +263,12 @@ class KlipperScreenConfig:
             {"side_ercf_shortcut": {
                 "section": "main", "name": _("ERCF shortcut on sidebar"), "type": "binary",
                 "value": "True", "callback": screen.toggle_ercf_shortcut}},
+            {"ercf_color_gates": {
+                "section": "main", "name": _("ERCF show color in gates"), "type": "binary",
+                "value": "True", "callback": screen.reload_panels}},
+            {"ercf_color_filament": {
+                "section": "main", "name": _("ERCF show colored filament"), "type": "binary",
+                "value": "False", "callback": screen.reload_panels}},
             {"font_size": {
                 "section": "main", "name": _("Font Size"), "type": "dropdown",
                 "value": "medium", "callback": screen.restart_ks, "options": [

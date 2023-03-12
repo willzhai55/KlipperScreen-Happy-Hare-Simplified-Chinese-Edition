@@ -5,8 +5,8 @@
 # Copyright (C) 2023  moggieuk#6538 (discord)
 #                     moggieuk@hotmail.com
 #
-
 # Screen Capture: scrot -s -D :0.0
+#
 KLIPPER_HOME="${HOME}/klipper"
 KLIPPER_CONFIG_HOME="${HOME}/klipper_config"
 PRINTER_DATA_CONFIG_HOME="${HOME}/printer_data/config"
@@ -119,7 +119,7 @@ EOF
     for file in `ls ${SRCDIR}/iter*.conf`; do
         token=`basename $file .conf`
         echo -e "    ${INFO}Expanding menu ${token} for ${num_gates} gates"
-        expanded=$(for i in {0..8..1}; do
+	expanded=$(for i in $(eval echo "{0..`expr $num_gates - 1`}"); do
             cat ${SRCDIR}/${token}.conf | sed -e "s/{i}/${i}/g"
         done)
         expanded="# Generated menus for each tool/gate...\n${expanded}"

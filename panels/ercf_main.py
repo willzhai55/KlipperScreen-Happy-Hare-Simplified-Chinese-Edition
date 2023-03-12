@@ -4,11 +4,11 @@
 # Copyright (C) 2023  moggieuk#6538 (discord)
 #                     moggieuk@hotmail.com
 #
-import logging, gi
+import logging, gi, re
 
 gi.require_version("Gtk", "3.0")
 
-from gi.repository import Gtk, GLib, Pango
+from gi.repository import Gtk, Gdk, GLib, Pango
 from ks_includes.screen_panel import ScreenPanel
 
 def create_panel(*args):
@@ -21,6 +21,20 @@ class ErcfMain(ScreenPanel):
     GATE_UNKNOWN = -1
     GATE_EMPTY = 0
     GATE_AVAILABLE = 1
+
+    LOADED_STATUS_UNKNOWN = -1
+    LOADED_STATUS_UNLOADED = 0
+    LOADED_STATUS_PARTIAL_BEFORE_ENCODER = 1
+    LOADED_STATUS_PARTIAL_PAST_ENCODER = 2
+    LOADED_STATUS_PARTIAL_IN_BOWDEN = 3
+    LOADED_STATUS_PARTIAL_END_OF_BOWDEN = 4
+    LOADED_STATUS_PARTIAL_HOMED_EXTRUDER = 5
+    LOADED_STATUS_PARTIAL_HOMED_SENSOR = 6
+    LOADED_STATUS_PARTIAL_IN_EXTRUDER = 7
+    LOADED_STATUS_FULL = 8
+
+    DIRECTION_LOAD = 1
+    DIRECTION_UNLOAD = -1
 
     DUMMY = -99
 
@@ -40,7 +54,7 @@ class ErcfMain(ScreenPanel):
                     self.has_bypass = True
                     self.min_tool = self.TOOL_BYPASS
 
-        # btn_states: the "gaps" are what functionality the state takes away
+        # btn_states: The "gaps" are what functionality the state takes away. Multiple states are combined
         self.btn_states = {
             'all':             ['check_gates', 'tool', 'eject', 'picker', 'pause', 'unlock', 'resume', 'manage', 'manage', 'more'],
             'printing':        [                                          'pause',                     'manage',           'more'],
@@ -145,7 +159,7 @@ class ErcfMain(ScreenPanel):
         status_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
         for i in range(5):
             name = (f'status{i+1}')
-            self.labels[name] = Gtk.Label("Gates: |#0 |#1 |#2 |#3 |#4 |#5 |#6 |#7 |#8 |")
+            self.labels[name] = Gtk.Label("")
             self.labels[name].get_style_context().add_class("ercf_status")
             self.labels[name].set_xalign(0)
             if i < 4:
@@ -193,6 +207,9 @@ class ErcfMain(ScreenPanel):
         self.content.add(scroll)
 
     def activate(self):
+        self.markup_status = self._config.get_main_config().getboolean("ercf_color_gates", True)
+        self.markup_filament = self._config.get_main_config().getboolean("ercf_color_filament", False)
+        self.ui_sel_tool = self.DUMMY
         self.init_tool_value()
 
     def process_update(self, action, data):
@@ -201,30 +218,30 @@ class ErcfMain(ScreenPanel):
                 ee_data = data['ercf_encoder ercf_encoder']
                 self.update_encoder(ee_data)
 
+            if 'filament_switch_sensor toolhead_sensor' in data:
+                self.update_filament_status()
+
             if 'ercf' in data:
                 e_data = data['ercf']
                 if 'tool' in e_data or 'gate' in e_data or 'ttg_map' in e_data or 'gate_status' in e_data:
                     self.update_status()
-                if 'filament_visual' in e_data:
+                if 'loaded_status' in e_data or 'filament_direction':
                     self.update_filament_status()
                 if 'tool' in e_data or 'next_tool' in e_data:
-                    self.update_tool(e_data)
+                    self.update_tool()
                 if 'enabled' in e_data:
                     self.update_enabled()
                 if 'action' in e_data:
                     self.update_encoder_pos()
 
             if 'ercf' in data or 'pause_resume' in data:
-                if 'ercf' in data: logging.info(f">>> ercf found")
-                if 'pause_resume' in data: logging.info(f">>> pause_resume found")
                 self.update_active_buttons()
             elif 'print_stats' in data and 'state' in data['print_stats']:
-                logging.info(f">>> print_stats found")
                 self.update_active_buttons()
 
     def init_tool_value(self):
         ercf = self._printer.get_stat("ercf")
-        if self.ui_sel_tool == self.DUMMY and ercf['tool'] >= 0:
+        if self.ui_sel_tool == self.DUMMY and ercf['tool'] != self.TOOL_UNKNOWN:
             self.ui_sel_tool = ercf['tool']
         else:
             self.ui_sel_tool = 0
@@ -282,7 +299,6 @@ class ErcfMain(ScreenPanel):
         self._screen._ws.klippy.gcode_script(f"RESUME")
 
     def update_enabled(self):
-        logging.info(f"@@@************@@@ PAUL: update_enabled")
         enabled = self._printer.get_stat("ercf")['enabled']
         for i in range(5):
             name = (f'status{i+1}')
@@ -291,28 +307,25 @@ class ErcfMain(ScreenPanel):
             else:
                 self.labels[name].get_style_context().add_class("ercf_disabled_text")
 
-    def update_tool(self, data=None):
-        logging.info(f"@@@************@@@ PAUL: update_tool")
+    def update_tool(self):
         ercf = self._printer.get_stat("ercf")
         tool = ercf['tool']
         next_tool = ercf['next_tool']
         text = ("T%d" % tool) if tool >= 0 else "Bypass" if tool == -2 else "Unknown"
         text += (" > T%d" % next_tool) if next_tool >= 0 and next_tool != tool else ""
         self.labels['tool_label'].set_text(text)
-        if data != None and 'tool' in data:
-            if tool == self.TOOL_BYPASS:
-                self.labels['picker'].set_image(self.labels['load_bypass_img'])
-                self.labels['picker'].set_label(f"Load")
-                self.labels['eject'].set_image(self.labels['unload_bypass_img'])
-                self.labels['eject'].set_label(f"Unload")
-            else:
-                self.labels['picker'].set_image(self.labels['tool_picker_img'])
-                self.labels['picker'].set_label(f"Colors...")
-                self.labels['eject'].set_image(self.labels['eject_img'])
-                self.labels['eject'].set_label(f"Eject")
+        if tool == self.TOOL_BYPASS:
+            self.labels['picker'].set_image(self.labels['load_bypass_img'])
+            self.labels['picker'].set_label(f"Load")
+            self.labels['eject'].set_image(self.labels['unload_bypass_img'])
+            self.labels['eject'].set_label(f"Unload")
+        else:
+            self.labels['picker'].set_image(self.labels['tool_picker_img'])
+            self.labels['picker'].set_label(f"Colors...")
+            self.labels['eject'].set_image(self.labels['eject_img'])
+            self.labels['eject'].set_label(f"Eject")
 
     def update_tool_buttons(self, tool_sensitive=True):
-        logging.info(f"@@@************@@@ PAUL: update_tool_buttons")
         printer_state = self._printer.get_stat("print_stats")['state']
         ercf = self._printer.get_stat("ercf")
         num_gates = len(ercf['gate_status'])
@@ -360,7 +373,6 @@ class ErcfMain(ScreenPanel):
             self.labels['tool'].set_image(self.labels['tool_img'])
 
     def update_encoder(self, data):
-        logging.info(f"@@@************@@@ PAUL: update_encoder")
         scale = self.labels['scale']
         if 'desired_headroom' in data:
             desired_headroom = data['desired_headroom']
@@ -380,13 +392,11 @@ class ErcfMain(ScreenPanel):
             self.update_encoder_pos(data['encoder_pos'])
 
     def update_runout_mode(self, detection_mode):
-        logging.info(f"@@@************@@@ PAUL: update_runout_mode")
         detection_mode_str = " (Auto)" if detection_mode == 2 else " (Man)" if detection_mode == 1 else ""
         self.labels['runout_frame'].set_label(f'Clog{detection_mode_str}')
         self.labels['runout_frame'].set_sensitive(detection_mode)
 
     def update_encoder_pos(self, encoder_pos=None):
-        logging.info(f"@@@************@@@ PAUL: update_encoder_pos")
         if encoder_pos == None:
             encoder_pos = self._printer.get_stat('ercf_encoder ercf_encoder')['encoder_pos']
         ercf = self._printer.get_stat("ercf")
@@ -401,20 +411,22 @@ class ErcfMain(ScreenPanel):
         self.labels['filament'].set_label(f"{pos_str}")
 
     def update_filament_status(self):
-        logging.info(f"@@@************@@@ PAUL: update_filament_status")
-        filament_visual = self._printer.get_stat("ercf")['filament_visual']
-        self.labels['status5'].set_label(filament_visual)
+        if self.markup_filament:
+            self.labels['status5'].set_markup(self.get_filament_text(markup=True))
+        else:
+            self.labels['status5'].set_label(self.get_filament_text())
 
     def update_status(self):
-        logging.info(f"@@@************@@@ PAUL: update_status")
-        text, multi_tool = self.get_status_text() # PAUL multi_tool flag not yet used
+        text, multi_tool = self.get_status_text(markup=self.markup_status)
         for i in range(4):
             name = (f'status{i+1}')
-            self.labels[name].set_label(text[i])
+            if self.markup_status:
+                self.labels[name].set_markup(text[i])
+            else:
+                self.labels[name].set_label(text[i])
 
     # Dynamically update button sensitivity based on state
     def update_active_buttons(self):
-        logging.info(f"@@@************@@@ PAUL: update_active_buttons()")
         ercf = self._printer.get_stat("ercf")
         printer_state = self._printer.get_stat("print_stats")['state']
         locked = ercf['is_locked']
@@ -422,7 +434,6 @@ class ErcfMain(ScreenPanel):
         enabled = ercf['enabled']
         tool = ercf['tool']
         filament = ercf['filament']
-        logging.info(f"*-*-*-* printer_state={printer_state}, locked={locked}, is_paused={is_paused}, enabled={enabled}, tool={tool}, filament={filament}")
         ui_state = []
         if enabled:
             if printer_state == "paused" or is_paused:
@@ -457,14 +468,13 @@ class ErcfMain(ScreenPanel):
             self.labels['t_increase'].set_sensitive(False)
             self.labels['t_decrease'].set_sensitive(False)
 
-        logging.info(f"*-*-*-* >>>>> ui_state={ui_state}")
+        logging.debug(f"ercf_main: ui_state={ui_state}")
         for label in self.btn_states['all']:
             sensitive = True
             for state in ui_state:
                 if not label in self.btn_states[state]:
                     sensitive = False
                     break
-            logging.info(f"*-*-*-* >>>>> {label} > {sensitive}")
             if sensitive:
                 self.labels[label].set_sensitive(True)
             else:
@@ -473,24 +483,31 @@ class ErcfMain(ScreenPanel):
                 tool_sensitive = sensitive
         self.update_tool_buttons(tool_sensitive)
 
-    def get_status_text(self):
+    def get_status_text(self, markup=False):
         ercf = self._printer.get_stat("ercf")
         gate_status = ercf['gate_status']
         tool_to_gate_map = ercf['ttg_map']
         gate_selected = ercf['gate']
         tool_selected = ercf['tool']
+        gate_map = ercf['gate_map']
         num_gates = len(gate_status)
 
-        # │ ─ ┴ └ ┘ ┤ ├ ┼
-        # ▼ █ ╛ ╞ ╡ ╘ ▉ ═ 
         multi_tool = False
         msg_gates = "Gates: "
         msg_tools = "Tools: "
         msg_avail = "Avail: "
         msg_selct = "Selct: "
         for g in range(num_gates):
+            color = gate_map[g]['color'].lower()
+            c = Gdk.color_parse(color)
+            if c != None:
+                rgb_values = c.red / 65535., c.green / 65535., c.blue / 65535.
+                color = "#{:02x}{:02x}{:02x}".format(int(rgb_values[0]*255), int(rgb_values[1]*255), int(rgb_values[2]*255))
+            else:
+                color = ""
+            filament_icon = ("▉") if not markup or color == "" else (f"<span color='{color}'>▉</span>")
             msg_gates += ("│#%d " % g)[:4]
-            msg_avail += "│ %s " % ("▉" if gate_status[g] == self.GATE_AVAILABLE else " " if gate_status[g] == self.GATE_EMPTY else "?")
+            msg_avail += "│ %s " % (filament_icon if gate_status[g] == self.GATE_AVAILABLE else " " if gate_status[g] == self.GATE_EMPTY else "?")
             tool_str = ""
             prefix = ""
             for t in range(num_gates):
@@ -501,14 +518,83 @@ class ErcfMain(ScreenPanel):
             if tool_str == "": tool_str = "   "
             msg_tools += ("│%s " % tool_str)[:4]
             if gate_selected == g:
-                icon = "▉" if gate_status[g] == self.GATE_AVAILABLE else " " if gate_status[g] == self.GATE_EMPTY else "?"
-                msg_selct += ("┤ %s " % icon) if g != 0 else ("│ %s " % icon)
+                icon = filament_icon if gate_status[g] == self.GATE_AVAILABLE else " " if gate_status[g] == self.GATE_EMPTY else "?"
+                msg_selct += ("╡ %s " % icon) if g != 0 else ("│ %s " % icon)
             else:
-                msg_selct += "├───" if gate_selected != self.GATE_UNKNOWN and gate_selected == (g - 1) else "┴───" if g != 0 else "└───"
+                msg_selct += "╞═══" if gate_selected != self.GATE_UNKNOWN and gate_selected == (g - 1) else "╧═══" if g != 0 else "╘═══"
         msg_gates += "│"
         msg_tools += "│"
         msg_avail += "│"
-        msg_selct += "│" if gate_selected == (num_gates - 1) else "┘"
+        msg_selct += "│" if gate_selected == (num_gates - 1) else "╛"
         msg = [msg_gates, msg_tools, msg_avail, msg_selct]
         return [msg_gates, msg_tools, msg_avail, msg_selct], multi_tool
+
+    def get_filament_text(self, markup=False):
+        ercf = self._printer.get_stat("ercf")
+        tool = ercf['tool']
+        loaded_status = ercf['loaded_status']
+        filament_direction = ercf['filament_direction']
+
+        if loaded_status == self.LOADED_STATUS_FULL:
+            move_str = "LOADED"
+        elif loaded_status == self.LOADED_STATUS_UNLOADED:
+            move_str = "UNLOADED"
+        elif loaded_status == self.LOADED_STATUS_UNKNOWN:
+            move_str = "UNKNOWN"
+        elif filament_direction == self.DIRECTION_LOAD:
+            move_str = " ▶▶▶"
+        elif filament_direction == self.DIRECTION_UNLOAD:
+            move_str = " ◀◀◀"
+        else:
+            move_str = ""
+        tool_str = (f"T{tool} ")[:3] if tool >=0 else "T? "
+        sensor_str = "│Ts│" if self.has_toolhead_sensor() else ""
+        sensor_str_homed = "┫Ts│" if self.has_toolhead_sensor() else ""
+        if tool == self.TOOL_BYPASS and loaded_status == self.LOADED_STATUS_FULL:
+            visual = "BYPASS ^━━━$│En│^━━━━━━━━━━━━━━━━━━$│Nz│^━$▶ %s" % (move_str)
+        elif tool == self.TOOL_BYPASS:
+            visual = "BYPASS ^━$▶┈│En│┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈│Nz│   %s" % (move_str)
+        elif loaded_status == self.LOADED_STATUS_UNKNOWN:
+            visual     = "%s ┈┈┈│En│┈┈┈┈┈┈┈┈┈┈│Ex│┈┈┈%s┈┈│Nz│   %s" % (tool_str, sensor_str, move_str)
+        elif loaded_status == self.LOADED_STATUS_UNLOADED:
+            visual     = "%s ^━$▶┈│En│┈┈┈┈┈┈┈┈┈┈│Ex│┈┈┈%s┈┈│Nz│   %s" % (tool_str, sensor_str, move_str)
+        elif loaded_status == self.LOADED_STATUS_PARTIAL_BEFORE_ENCODER:
+            visual     = "%s ^━━$▶│En│┈┈┈┈┈┈┈┈┈┈│Ex│┈┈┈%s┈┈│Nz│   %s" % (tool_str, sensor_str, move_str)
+        elif loaded_status == self.LOADED_STATUS_PARTIAL_PAST_ENCODER:
+            visual     = "%s ^━━━$│En│^━$▶┈┈┈┈┈┈┈┈│Ex│┈┈┈%s┈┈│Nz│   %s" % (tool_str, sensor_str, move_str)
+        elif loaded_status == self.LOADED_STATUS_PARTIAL_IN_BOWDEN:
+            visual     = "%s ^━━━$│En│^━━━━$▶┈┈┈┈┈│Ex│┈┈┈%s┈┈│Nz│   %s" % (tool_str, sensor_str, move_str)
+        elif loaded_status == self.LOADED_STATUS_PARTIAL_END_OF_BOWDEN:
+            visual     = "%s ^━━━$│En│^━━━━━━━━$▶┈│Ex│┈┈┈%s┈┈│Nz│   %s" % (tool_str, sensor_str, move_str)
+        elif loaded_status == self.LOADED_STATUS_PARTIAL_HOMED_EXTRUDER:
+            visual     = "%s ^━━━$│En│^━━━━━━━━━$▶┫Ex│┈┈┈%s┈┈│Nz│   %s" % (tool_str, sensor_str, move_str)
+        elif loaded_status == self.LOADED_STATUS_PARTIAL_HOMED_SENSOR:
+            visual     = "%s ^━━━$│En│^━━━━━━━━━━$│Ex│^━━$▶%s┈┈│Nz│   %s" % (tool_str, sensor_str_homed, move_str)
+        elif loaded_status == self.LOADED_STATUS_PARTIAL_IN_EXTRUDER:
+            visual     = "%s ^━━━$│En│^━━━━━━━━━━$│Ex│^━━━$%s▶┈│Nz│   %s" % (tool_str, sensor_str, move_str)
+        elif loaded_status == self.LOADED_STATUS_FULL:
+            visual     = "%s ^━━━$│En│^━━━━━━━━━━$│Ex│^━━━$%s^━━$│Nz│^━$▶ %s" % (tool_str, sensor_str, move_str)
+
+        if filament_direction == self.DIRECTION_UNLOAD and loaded_status != self.LOADED_STATUS_UNLOADED:
+            visual = visual.replace("▶", "◀")
+        if markup:
+            gate_map = ercf['gate_map']
+            gate = ercf['gate']
+            if gate >= 0:
+                color = gate_map[gate]['color'].lower()
+                x = re.search("^#?([a-f\d]{6})$", color)
+                if x == None or x.group() != color:
+                    color = ""
+                if color != "":
+                    visual = visual.replace("^", (f"<span color='{color}'>")).replace("$", "</span>")
+                    return visual
+
+        visual = visual.replace("^", "").replace("$", "")
+        return visual
+
+    def has_toolhead_sensor(self):
+        sensor = self._printer.get_stat("filament_switch_sensor toolhead_sensor")
+        if sensor != None:
+            return sensor['enabled']
+        return False
 

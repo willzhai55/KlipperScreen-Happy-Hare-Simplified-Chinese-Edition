@@ -39,7 +39,7 @@ class ErcfManage(ScreenPanel):
                     self.has_bypass = True
                     self.min_gate = self.TOOL_BYPASS
 
-        # btn_states: the "gaps" are what functionality the state takes away
+        # btn_states: The "gaps" are what functionality the state takes away. Multiple states are combined
         self.btn_states = {
             'all':             ['gate', 'checkgate', 'recover', 'load', 'eject', 'home', 'motors_off', 'servo_up', 'servo_down', 'load_ext', 'unload_ext'],
             'not_homed':       [                     'recover',                  'home', 'motors_off', 'servo_up', 'servo_down', 'load_ext', 'unload_ext'],
@@ -50,7 +50,7 @@ class ErcfManage(ScreenPanel):
             'bypass_unknown':  ['gate', 'checkgate', 'recover', 'load', 'eject', 'home', 'motors_off', 'servo_up', 'servo_down', 'load_ext', 'unload_ext'],
             'tool_loaded':     [                     'recover',         'eject',         'motors_off', 'servo_up', 'servo_down',             'unload_ext'],
             'tool_unloaded':   ['gate', 'checkgate', 'recover', 'load',          'home', 'motors_off', 'servo_up', 'servo_down', 'load_ext', 'unload_ext'],
-            'tool_unknown':    ['gate', 'checkgate', 'recover', 'laod', 'eject', 'home', 'motors_off', 'servo_up', 'servo_down', 'load_ext', 'unload_ext'],
+            'tool_unknown':    ['gate', 'checkgate', 'recover', 'load', 'eject', 'home', 'motors_off', 'servo_up', 'servo_down', 'load_ext', 'unload_ext'],
             'disabled':        [                                                                                                                         ],
         }
 
@@ -130,8 +130,10 @@ class ErcfManage(ScreenPanel):
     def init_gate_values(self):
         # Get starting values
         ercf = self._printer.get_stat("ercf")
-        if self.ui_sel_gate == self.DUMMY:
+        if self.ui_sel_gate == self.DUMMY and ercf['gate'] != self.TOOL_UNKNOWN:
             self.ui_sel_gate = ercf['gate']
+        else:
+            self.ui_sel_gate = 0
 
     def select_gate(self, widget, param=0):
         ercf = self._printer.get_stat("ercf")
@@ -162,7 +164,7 @@ class ErcfManage(ScreenPanel):
         self._screen._ws.klippy.gcode_script(f"ERCF_CHECK_GATES GATE={current_gate}")
 
     def select_load(self, widget):
-        self._screen._ws.klippy.gcode_script(f"ERCF_LOAD TEST=0") # TEST=0 is to aid backward compatibility
+        self._screen._ws.klippy.gcode_script(f"ERCF_LOAD TEST=0") # TEST=0 is to aid backward compatibility of ERCF_LOAD command
 
     def select_eject(self, widget):
         self._screen._ws.klippy.gcode_script(f"ERCF_EJECT")
@@ -223,7 +225,7 @@ class ErcfManage(ScreenPanel):
         else:
             ui_state.append("disabled")
 
-        logging.info(f"PAUL *-*-*-* >>>>> ui_state={ui_state}")
+        logging.debug(f"ercf_manage: ui_state={ui_state}")
         for label in self.btn_states['all']:
             sensitive = True
             for state in ui_state:
@@ -276,3 +278,4 @@ class ErcfManage(ScreenPanel):
             self.labels['checkgate'].set_sensitive(False)
         elif gate_sensitive:
             self.labels['checkgate'].set_sensitive(True)
+
