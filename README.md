@@ -18,6 +18,9 @@ will natively work with [Klipper](https://github.com/kevinOConnor/klipper) and [
 <br>
 KlipperScreen "Happy Hare" Fork...
 
+# PATIENCE!!  This is not ready yet.  It's live for a couple of beta testers but is unlike to work for you without instruction.  I will release very soon via message on Discord channels..
+
+
 # KlipperScreen - ERCF Happy Hare edition
 
 [![ERCF Control](docs/img/ercf/ercf_main.png)](docs/ERCF.md)
@@ -43,7 +46,7 @@ KlipperScreen will be restarted and hopefully you are now running the enhanced v
 
 Expert tip: The last step of running './install_ks -g <num_gates>' can be run many times.. if you customize the ERCF part of the KlipperScreen menu and want to make use of the "replicator" function that will automatically replicate menu options for the configured number of gates, you can edit menus.conf and reference the templating there.
 
-Note that the base KlipperScreen is fully up-to-date (as of March 10th, 2023) with the master but includes extra functionality that can be used in the creation of custom menus.  See the generated ercf_klipperscreen.conf for clues!
+Note that the base KlipperScreen is fully up-to-date (as of March 10th, 2023) with the master but also includes extra menu functionality that can be used in the creation of your custom menus.  See the generated ercf_klipperscreen.conf for clues!
 
 ## Request
 Remember that this is current a Beta release.  I need/want your help in finding corner cases, bugs or ideas for improvement.  I can offer limited help on the Discord channels but I would prefer if you submit an issue report via github so I can manage them.  This project and Happy Hare itself have taken a lot of time. I have a lot more planned so I need your help in organizing my work.
