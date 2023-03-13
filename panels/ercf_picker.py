@@ -27,18 +27,66 @@ class ErcfPicker(ScreenPanel):
     def __init__(self, screen, title):
         super().__init__(screen, title)
 
-        self.init_tool_map()
-
         grid = Gtk.Grid()
         grid.set_column_homogeneous(True)
         grid.set_row_spacing(10)
 
         ercf = self._printer.get_stat("ercf")
         num_tools = len(ercf['gate_status'])
-        endless_spool = ercf['endless_spool']
-        gate_map = ercf['gate_map']
         for i in range(num_tools):
-            t_map = self.tool_map[i]
+            status_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
+            status = self.labels[f'status_{i}'] = self._gtk.Image()
+            available = self.labels[f'available_{i}'] = Gtk.Label("Unknown")
+            status_box.pack_start(status, True, True, 0)
+            status_box.pack_start(available, True, True, 0)
+
+            tool = self.labels[f'tool_{i}'] = self._gtk.Button('extruder', f'T{i}', 'color2')
+            tool.connect("clicked", self.select_tool)
+
+            name = self.labels[f'name_{i}'] = Gtk.Label(f'⬤')
+            name.get_style_context().add_class("ercf_color_swatch")
+            name.set_xalign(0.7)
+
+            material = self.labels[f'material_{i}'] = Gtk.Label("n/a")
+            material.get_style_context().add_class("ercf_tool_text")
+            material.set_xalign(0.1)
+
+            gate_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
+            gate = self.labels[f'gate_{i}'] = Gtk.Label("n/a")
+            gate.get_style_context().add_class("ercf_gate_text")
+            gate.set_halign(Gtk.Align.START)
+            gate.set_valign(Gtk.Align.END)
+            alt_gates = self.labels[f'alt_gates_{i}'] = Gtk.Label("n/a")
+            alt_gates.set_halign(Gtk.Align.START)
+            alt_gates.set_valign(Gtk.Align.START)
+            gate_box.pack_start(gate, True, True, 0)
+            gate_box.pack_start(alt_gates, True, True, 0)
+
+            grid.attach(status_box, 0, i, 2, 1)
+            grid.attach(tool,       2, i, 2, 1)
+            grid.attach(name,       4, i, 2, 1)
+            grid.attach(material,   6, i, 3, 1)
+            grid.attach(gate_box,   9, i, 4, 1)
+
+        self.labels['unknown_icon'] = self._gtk.Image('ercf_unknown').get_pixbuf()
+        self.labels['available_icon'] = self._gtk.Image('ercf_tick').get_pixbuf()
+        self.labels['empty_icon'] = self._gtk.Image('ercf_cross').get_pixbuf()
+
+        scroll = self._gtk.ScrolledWindow()
+        scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
+        scroll.add(grid)
+        self.content.add(scroll)
+
+    def activate(self):
+        ercf = self._printer.get_stat("ercf")
+        endless_spool = ercf['endless_spool']
+        tool_map = self.build_tool_map()
+        gate_map = ercf['gate_map']
+        gate_status = ercf['gate_status']
+        num_tools = len(gate_status)
+
+        for i in range(num_tools):
+            t_map = tool_map[i]
             g_map = gate_map[t_map['gate']]
             logging.info(f"@@@************@@@ PAUL: i={i}, t_map={t_map}, g_map={g_map}")
             color = Gdk.RGBA()
@@ -47,85 +95,61 @@ class ErcfPicker(ScreenPanel):
             gate_str = (f"Gate #{t_map['gate']}")
             alt_gate_str = ''
             if endless_spool == 1 and len(t_map['alt_gates']) > 0:
-                alt_gate_str = '+(' + ', '.join(map(str, t_map['alt_gates'][:5]))
+                alt_gate_str = '+(' + ', '.join(map(str, t_map['alt_gates'][:6]))
                 alt_gate_str += ', ...)' if len(t_map['alt_gates']) > 5 else ')'
 
-            if g_map['available'] == 1:
-                status_icon = 'ercf_tick'
+            if gate_status[i] == 1: # if g_map['available'] == 1: # TODO FUTURE
+                status_icon = 'available_icon'
                 status_str = "Available"
-            elif g_map['available'] == 0:
-                status_icon = 'ercf_cross'
+            elif gate_status[i] == 0:
+                status_icon = 'empty_icon'
                 status_str = "Empty"
             else: 
-                status_icon = 'ercf_unknown'
+                status_icon = 'unknown_icon'
                 status_str = "Unknown"
 
-            status_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
-            status = self.labels[f'status_{i}'] = self._gtk.Image(status_icon)
-            available = self.labels[f'available_{i}'] = Gtk.Label(status_str)
-            status_box.pack_start(status, True, True, 0)
-            status_box.pack_start(available, True, True, 0)
+            if endless_spool == 1 and len(t_map['alt_gates']) > 0:
+                alt_gate_str = '+(' + ', '.join(map(str, t_map['alt_gates'][:6]))
+                alt_gate_str += ', ...)' if len(t_map['alt_gates']) > 5 else ')'
 
-            tool = self.labels[f'tool_{i}'] = self._gtk.Button('extruder', '', 'color1')
-            tool.connect("clicked", self.select_tool)
-            tool.override_background_color(Gtk.StateType.NORMAL, color)
+            self.labels[f'status_{i}'].clear()
+            self.labels[f'status_{i}'].set_from_pixbuf(self.labels[f'{status_icon}'])
+            self.labels[f'available_{i}'].set_label(status_str)
+            self.labels[f'tool_{i}'].set_sensitive(gate_status[i] != self.GATE_EMPTY)
+            self.labels[f'name_{i}'].override_color(Gtk.StateType.NORMAL, color)
+            self.labels[f'material_{i}'].set_label(g_map['material'][:5])
+            self.labels[f'gate_{i}'].set_label(gate_str)
+            self.labels[f'alt_gates_{i}'].set_label(alt_gate_str)
 
-            name = self.labels[f'name_{i}'] = Gtk.Label(f'T{i}')
-            name.get_style_context().add_class("ercf_tool_text")
-            name.set_xalign(0.5)
 
-            material = self.labels[f'material_{i}'] = Gtk.Label(g_map['material'][:5])
-            material.get_style_context().add_class("ercf_tool_text")
-            material.set_xalign(0.2)
-
-            gate_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
-            gate = self.labels[f'gate_{i}'] = Gtk.Label(gate_str)
-            gate.get_style_context().add_class("ercf_gate_text")
-            gate.set_halign(Gtk.Align.START)
-            gate.set_valign(Gtk.Align.END)
-            alt_gates = self.labels[f'alt_gates_{i}'] = Gtk.Label(alt_gate_str)
-            alt_gates.set_halign(Gtk.Align.START)
-            alt_gates.set_valign(Gtk.Align.START)
-            gate_box.pack_start(gate, True, True, 0)
-            gate_box.pack_start(alt_gates, True, True, 0)
-
-            grid.attach(status_box, 0, i, 2, 1)
-            grid.attach(name,       2, i, 2, 1)
-            grid.attach(tool,       4, i, 2, 1)
-            grid.attach(material,   6, i, 3, 1)
-            grid.attach(gate_box,   9, i, 4, 1)
-
-        scroll = self._gtk.ScrolledWindow()
-        scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
-        scroll.add(grid)
-        self.content.add(scroll)
-
-    def activate(self):
-        self.init_tool_map()
-
-    def init_tool_map(self):
-        # WORK IN PROGRESS. REPLACEMENT FOR ENDLESS SPOOL GROUPS
-        # TODO Build this structure from existing endless_spool_groups
-        self.tool_map = [
-                { 'gate': 0, 'alt_gates': [3, 6] },
-                { 'gate': 1, 'alt_gates': [2, 3, 4, 5, 6, 7, 8] },
-                { 'gate': 2, 'alt_gates': []     },
-                { 'gate': 3, 'alt_gates': []     },
-                { 'gate': 4, 'alt_gates': []     },
-                { 'gate': 5, 'alt_gates': []     },
-                { 'gate': 6, 'alt_gates': []     },
-                { 'gate': 7, 'alt_gates': []     },
-                { 'gate': 8, 'alt_gates': []     }
-            ]
+    # This builds a tool_map which is a structure that doesn't exist in Happy Hare yet. It is designed to
+    # be easier to understand than endless_spool_groups.
+    # Structure will be:
+    # tool_map = [ { 'gate': <gate>, 'alt_gates': <alternative_gates> }, ... ]
+    def build_tool_map(self):
+        tool_map = []
+        ercf = self._printer.get_stat("ercf")
+        endless_spool_groups = ercf['endless_spool_groups']
+        ttg_map = ercf['ttg_map']
+        num_tools = len(ttg_map)
+        for tool in range(num_tools):
+            es_group = endless_spool_groups[tool]
+            alt_gates = []
+            for i in range(len(endless_spool_groups) - 1):
+                alt = (tool + i + 1) % num_tools
+                if endless_spool_groups[alt] == es_group:
+                    alt_gates.append(alt)
+            tool_map.append({ 'gate': ttg_map[tool], 'alt_gates': alt_gates })
+        return tool_map
 
     def process_update(self, action, data):
         if action == "notify_status_update":
-            if 'ercf' in data:
+            if 'configfile' in data:
+                return
+            elif 'ercf' in data:
                 e_data = data['ercf']
                 if 'tool' in e_data or 'gate' in e_data or 'gate_status' in e_data or 'gate_map' in e_data:
-                    pass
-                    # This doesn't work because of intial call will all the data. Maybe determine base on size of data and ignore first..
-                    #self._screen._menu_go_back() # We don't support dynamic updates on this screen so just go back
+                    self._screen._menu_go_back() # We don't support dynamic updates on this screen so just go back
 
     def select_tool(self, widget):
         ercf = self._printer.get_stat("ercf")

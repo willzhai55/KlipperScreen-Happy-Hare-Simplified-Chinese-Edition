@@ -569,6 +569,10 @@ popover button {
     font-size: 1.8em;
 }
 
+.ercf_color_swatch {
+    font-size: 3em;
+}
+
 .ercf_sel_increase {
     margin-left: 10px;
     margin-right: 25px;
