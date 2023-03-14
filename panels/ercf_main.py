@@ -86,6 +86,8 @@ class ErcfMain(ScreenPanel):
             'tool_icon': self._gtk.Image('extruder', self._gtk.img_width * 0.8, self._gtk.img_height * 0.8),
             'tool_label': self._gtk.Label('Unknown'),
             'filament': self._gtk.Label('Filament: Unknown'),
+            'sensor': self._gtk.Label('Ts:'),
+            'sensor_state': self._gtk.Label('✔  '),
             'select_bypass_img': self._gtk.Image('ercf_select_bypass'), # Alternative for tool
             'load_bypass_img': self._gtk.Image('ercf_load_bypass'),     # Alternative for picker
             'unload_bypass_img': self._gtk.Image('ercf_unload_bypass'), # Alternative for eject
@@ -117,6 +119,9 @@ class ErcfMain(ScreenPanel):
         self.labels['tool_label'].get_style_context().add_class("ercf_tool_text")
         self.labels['tool_label'].set_xalign(0)
         self.labels['filament'].set_xalign(0)
+        self.labels['sensor'].set_xalign(1)
+        self.labels['sensor_state'].set_xalign(0)
+        self.labels['sensor_state'].get_style_context().add_class("ercf_sensor_text")
         self.labels['manage'].set_valign(Gtk.Align.CENTER)
 
         scale = Gtk.Scale.new_with_range(orientation=Gtk.Orientation.VERTICAL, min=-30., max=0., step=0.1)
@@ -159,7 +164,7 @@ class ErcfMain(ScreenPanel):
         status_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
         for i in range(5):
             name = (f'status{i+1}')
-            self.labels[name] = Gtk.Label("")
+            self.labels[name] = Gtk.Label()
             self.labels[name].get_style_context().add_class("ercf_status")
             self.labels[name].set_xalign(0)
             if i < 4:
@@ -171,6 +176,9 @@ class ErcfMain(ScreenPanel):
         top_box.pack_start(self.labels['tool_icon'], False, True, 0)
         top_box.pack_start(self.labels['tool_label'], True, True, 0)
         top_box.pack_start(self.labels['filament'], True, True, 0)
+        top_box.pack_start(self.labels['sensor'], False, True, 0)
+        top_box.pack_start(self.labels['sensor_state'], False, True, 0)
+#        top_box.pack_start(Gtk.Label(), False, True, 10)
 
         top_grid = Gtk.Grid()
         top_grid.set_vexpand(False)
@@ -311,8 +319,8 @@ class ErcfMain(ScreenPanel):
         ercf = self._printer.get_stat("ercf")
         tool = ercf['tool']
         next_tool = ercf['next_tool']
-        text = ("T%d" % tool) if tool >= 0 else "Bypass" if tool == -2 else "Unknown"
-        text += (" > T%d" % next_tool) if next_tool >= 0 and next_tool != tool else ""
+        text = ("T%d " % tool) if (tool >= 0 and tool != next_tool) else "Bypass " if tool == -2 else "Unknown " if tool == -1 else ""
+        text += ("> T%d" % next_tool) if next_tool >= 0 else ""
         self.labels['tool_label'].set_text(text)
         if tool == self.TOOL_BYPASS:
             self.labels['picker'].set_image(self.labels['load_bypass_img'])
@@ -416,6 +424,27 @@ class ErcfMain(ScreenPanel):
         else:
             self.labels['status5'].set_label(self.get_filament_text())
 
+        if self.check_toolhead_sensor() != None:
+            if self.check_toolhead_sensor() == 1:
+                self.labels['sensor'].get_style_context().remove_class("ercf_disabled_text")
+                self.labels['sensor_state'].set_label("●  ")
+                c_name = "green"
+            elif self.check_toolhead_sensor() == 0:
+                self.labels['sensor'].get_style_context().remove_class("ercf_disabled_text")
+                self.labels['sensor_state'].set_label("○  ")
+                c_name = "red"
+            else:
+                self.labels['sensor'].get_style_context().add_class("ercf_disabled_text")
+                self.labels['sensor_state'].set_label("◌  ")
+                c_name = "grey"
+
+            color = Gdk.RGBA()
+            Gdk.RGBA.parse(color, c_name)
+            self.labels['sensor_state'].override_color(Gtk.StateType.NORMAL, color)
+        else:
+            self.labels['sensor'].set_label("")
+            self.labels['sensor_state'].set_label("")
+
     def update_status(self):
         text, multi_tool = self.get_status_text(markup=self.markup_status)
         for i in range(4):
@@ -489,7 +518,7 @@ class ErcfMain(ScreenPanel):
         tool_to_gate_map = ercf['ttg_map']
         gate_selected = ercf['gate']
         tool_selected = ercf['tool']
-        gate_map = ercf['gate_map']
+        gate_color = ercf['gate_color']
         num_gates = len(gate_status)
 
         multi_tool = False
@@ -498,7 +527,7 @@ class ErcfMain(ScreenPanel):
         msg_avail = "Avail: "
         msg_selct = "Selct: "
         for g in range(num_gates):
-            color = gate_map[g]['color'].lower()
+            color = gate_color[g].lower()
             c = Gdk.color_parse(color)
             if c != None:
                 rgb_values = c.red / 65535., c.green / 65535., c.blue / 65535.
@@ -548,8 +577,8 @@ class ErcfMain(ScreenPanel):
         else:
             move_str = ""
         tool_str = (f"T{tool} ")[:3] if tool >=0 else "T? "
-        sensor_str = "│Ts│" if self.has_toolhead_sensor() else ""
-        sensor_str_homed = "┫Ts│" if self.has_toolhead_sensor() else ""
+        sensor_str = "│Ts│" if self.check_toolhead_sensor() != None else ""
+        sensor_str_homed = "┫Ts│" if self.check_toolhead_sensor() != None else ""
         if tool == self.TOOL_BYPASS and loaded_status == self.LOADED_STATUS_FULL:
             visual = "BYPASS ^━━━$│En│^━━━━━━━━━━━━━━━━━━$│Nz│^━$▶ %s" % (move_str)
         elif tool == self.TOOL_BYPASS:
@@ -578,10 +607,10 @@ class ErcfMain(ScreenPanel):
         if filament_direction == self.DIRECTION_UNLOAD and loaded_status != self.LOADED_STATUS_UNLOADED:
             visual = visual.replace("▶", "◀")
         if markup:
-            gate_map = ercf['gate_map']
+            gate_color = ercf['gate_color']
             gate = ercf['gate']
             if gate >= 0:
-                color = gate_map[gate]['color'].lower()
+                color = gate_color[gate].lower()
                 x = re.search("^#?([a-f\d]{6})$", color)
                 if x == None or x.group() != color:
                     color = ""
@@ -592,9 +621,15 @@ class ErcfMain(ScreenPanel):
         visual = visual.replace("^", "").replace("$", "")
         return visual
 
-    def has_toolhead_sensor(self):
+    def check_toolhead_sensor(self):
         sensor = self._printer.get_stat("filament_switch_sensor toolhead_sensor")
-        if sensor != None:
-            return sensor['enabled']
-        return False
+        if sensor == None:
+            return None
+        if sensor['enabled']:
+            if sensor['filament_detected']:
+                return 1
+            else:
+                return 0
+        else:
+            return -1
 

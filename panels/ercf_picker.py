@@ -48,7 +48,7 @@ class ErcfPicker(ScreenPanel):
             name.set_xalign(0.7)
 
             material = self.labels[f'material_{i}'] = Gtk.Label("n/a")
-            material.get_style_context().add_class("ercf_tool_text")
+            material.get_style_context().add_class("ercf_material_text")
             material.set_xalign(0.1)
 
             gate_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
@@ -81,16 +81,15 @@ class ErcfPicker(ScreenPanel):
         ercf = self._printer.get_stat("ercf")
         endless_spool = ercf['endless_spool']
         tool_map = self.build_tool_map()
-        gate_map = ercf['gate_map']
         gate_status = ercf['gate_status']
+        gate_material = ercf['gate_material']
+        gate_color = ercf['gate_color']
         num_tools = len(gate_status)
 
         for i in range(num_tools):
             t_map = tool_map[i]
-            g_map = gate_map[t_map['gate']]
-            logging.info(f"@@@************@@@ PAUL: i={i}, t_map={t_map}, g_map={g_map}")
             color = Gdk.RGBA()
-            Gdk.RGBA.parse(color, g_map['color'])
+            Gdk.RGBA.parse(color, gate_color[i])
 
             gate_str = (f"Gate #{t_map['gate']}")
             alt_gate_str = ''
@@ -98,7 +97,7 @@ class ErcfPicker(ScreenPanel):
                 alt_gate_str = '+(' + ', '.join(map(str, t_map['alt_gates'][:6]))
                 alt_gate_str += ', ...)' if len(t_map['alt_gates']) > 5 else ')'
 
-            if gate_status[i] == 1: # if g_map['available'] == 1: # TODO FUTURE
+            if gate_status[i] == 1:
                 status_icon = 'available_icon'
                 status_str = "Available"
             elif gate_status[i] == 0:
@@ -117,7 +116,7 @@ class ErcfPicker(ScreenPanel):
             self.labels[f'available_{i}'].set_label(status_str)
             self.labels[f'tool_{i}'].set_sensitive(gate_status[i] != self.GATE_EMPTY)
             self.labels[f'name_{i}'].override_color(Gtk.StateType.NORMAL, color)
-            self.labels[f'material_{i}'].set_label(g_map['material'][:5])
+            self.labels[f'material_{i}'].set_label(gate_material[i][:6])
             self.labels[f'gate_{i}'].set_label(gate_str)
             self.labels[f'alt_gates_{i}'].set_label(alt_gate_str)
 
@@ -148,8 +147,9 @@ class ErcfPicker(ScreenPanel):
                 return
             elif 'ercf' in data:
                 e_data = data['ercf']
-                if 'tool' in e_data or 'gate' in e_data or 'gate_status' in e_data or 'gate_map' in e_data:
-                    self._screen._menu_go_back() # We don't support dynamic updates on this screen so just go back
+                if 'tool' in e_data or 'gate' in e_data or 'gate_status' in e_data or 'gate_material' in e_data or 'gate_color' in e_data:
+                    self.activate()
+                    #self._screen._menu_go_back() # We don't support dynamic updates on this screen so just go back
 
     def select_tool(self, widget):
         ercf = self._printer.get_stat("ercf")

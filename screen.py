@@ -234,8 +234,9 @@ class KlipperScreen(Gtk.Window):
                 "firmware_retraction": ["retract_length", "retract_speed", "unretract_extra_length", "unretract_speed"],
                 "motion_report": ["live_position", "live_velocity", "live_extruder_velocity"],
                 "exclude_object": ["current_object", "objects", "excluded_objects"],
-                "ercf": ["enabled", "is_locked", "is_homed", "tool", "next_tool", "gate", "clog_detection", "endless_spool", "filament", "servo",
-                    "gate_status", "endless_spool_groups", "ttg_map", "loaded_status", "filament_direction", "action", "gate_map"],
+                "ercf": ["enabled", "is_locked", "is_homed", "tool", "next_tool", "last_toolchange", "gate", "clog_detection", "endless_spool",
+                    "filament", "servo", "gate_status", "gate_material", "gate_color", "endless_spool_groups", "ttg_map",
+                    "loaded_status", "filament_direction", "action"],
             }
         }
         for extruder in self.printer.get_tools():

@@ -573,6 +573,10 @@ popover button {
     font-size: 3em;
 }
 
+.ercf_sensor_text {
+    font-size: 1.6em;
+}
+
 .ercf_sel_increase {
     margin-left: 10px;
     margin-right: 25px;
@@ -591,6 +595,10 @@ popover button {
     margin-top: 8px;
     margin-bottom: 8px;
     font-size: 1.2em;
+}
+
+.ercf_material_text {
+    font-size: 1.6em;
 }
 
 .ercf_status {

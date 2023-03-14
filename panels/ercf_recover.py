@@ -347,7 +347,7 @@ class ErcfRecovery(ScreenPanel):
     def select_reset(self, widget):
         self._screen._confirm_send_action(
             None,
-            _("This will reset persisted ERCF state to defaults including\n\nTTG map, EndlessSpool groups, gate status and selector position\n\nSure you want to continue?"),
+            _("This will reset persisted ERCF state to defaults including TTG map,\n\nEndlessSpool groups, Gate map (material and type) and current selector position\n\nSure you want to continue?"),
             "printer.gcode.script",
             {'script': "ERCF_RESET"}
         )
