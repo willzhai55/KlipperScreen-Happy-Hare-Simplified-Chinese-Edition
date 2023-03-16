@@ -240,7 +240,7 @@ class ErcfMain(ScreenPanel):
                 e_data = data['ercf']
                 if 'tool' in e_data or 'gate' in e_data or 'ttg_map' in e_data or 'gate_status' in e_data:
                     self.update_status()
-                if 'loaded_status' in e_data or 'filament_direction':
+                if 'loaded_status' in e_data or 'filament_direction' in e_data:
                     self.update_filament_status()
                 if 'tool' in e_data or 'next_tool' in e_data:
                     self.update_tool()
@@ -647,7 +647,7 @@ class ErcfMain(ScreenPanel):
 
     def check_toolhead_sensor(self):
         sensor = self._printer.get_stat("filament_switch_sensor toolhead_sensor")
-        if sensor == None:
+        if sensor == {}:
             return None
         if sensor['enabled']:
             if sensor['filament_detected']:
