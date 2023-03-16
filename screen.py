@@ -91,6 +91,7 @@ class KlipperScreen(Gtk.Window):
     reinit_count = 0
     max_retries = 4
     initialized = False
+    last_popup_msg = None
 
     def __init__(self, args, version):
         try:
@@ -234,9 +235,9 @@ class KlipperScreen(Gtk.Window):
                 "firmware_retraction": ["retract_length", "retract_speed", "unretract_extra_length", "unretract_speed"],
                 "motion_report": ["live_position", "live_velocity", "live_extruder_velocity"],
                 "exclude_object": ["current_object", "objects", "excluded_objects"],
-                "ercf": ["enabled", "is_locked", "is_homed", "tool", "next_tool", "last_toolchange", "gate", "clog_detection", "endless_spool",
-                    "filament", "servo", "gate_status", "gate_material", "gate_color", "endless_spool_groups", "ttg_map",
-                    "loaded_status", "filament_direction", "action"],
+                "ercf": ["enabled", "is_locked", "is_homed", "tool", "next_tool", "last_tool", "last_toolchange", "gate",
+                    "clog_detection", "endless_spool", "filament", "servo", "gate_status", "gate_material", "gate_color",
+                    "endless_spool_groups", "ttg_map", "loaded_status", "filament_direction", "action"],
             }
         }
         for extruder in self.printer.get_tools():
@@ -339,6 +340,9 @@ class KlipperScreen(Gtk.Window):
         self.popup_message = popup
         self.popup_message.show_all()
 
+        if level >= 2:
+            self.last_popup_msg = message
+
         if self._config.get_main_config().getboolean('autoclose_popups', True):
             GLib.timeout_add_seconds(10, self.close_popup_message)
 
@@ -349,6 +353,19 @@ class KlipperScreen(Gtk.Window):
             return
         self.popup_message.popdown()
         self.popup_message = None
+
+    def show_last_popup_message(self, extra_msg=None):
+        msg = self.last_popup_msg if self.last_popup_msg != None else ""
+        if extra_msg != None:
+            msg += (f"\n\n{extra_msg}")
+        if len(msg) > 0:
+            self.show_popup_message(msg, level=3)
+
+    def clear_last_popup_message(self):
+        self.last_popup_msg = None
+
+    def have_last_popup_message(self):
+        return (self.last_popup_msg != None)
 
     def show_error_modal(self, err, e=""):
         logging.error(f"Showing error modal: {err} {e}")
@@ -736,7 +753,10 @@ class KlipperScreen(Gtk.Window):
                     self.show_popup_message(data[3:], 3)
                 elif "unknown" in data.lower() and \
                         not ("TESTZ" in data or "MEASURE_AXES_NOISE" in data or "ACCELEROMETER_QUERY" in data or "ERCF" in data):
-                    self.show_popup_message(data)
+                    if data.starts("// "):
+                        self.show_popup_message(data[3:])
+                    else:
+                        self.show_popup_message(data)
                 elif "SAVE_CONFIG" in data and self.printer.state == "ready":
                     script = {"script": "SAVE_CONFIG"}
                     self._confirm_send_action(
@@ -745,6 +765,9 @@ class KlipperScreen(Gtk.Window):
                         "printer.gcode.script",
                         script
                     )
+        if action == "notify_status_update":
+            if 'ercf' in data:
+                logging.info(f"PAUL: GOT new ercf_data={data['ercf']}") # PAUL added for debugging
         self.process_update(action, data)
 
     def process_update(self, *args):
@@ -874,6 +897,7 @@ class KlipperScreen(Gtk.Window):
             self.printer_initializing("Error getting printer object data with extra items")
             GLib.timeout_add_seconds(3, self.init_printer)
             return
+        logging.info(f"PAUL: init_printer: process_update({data['result']['status']['ercf']})")
         self.printer.process_update(data['result']['status'])
         self.init_tempstore()
         GLib.timeout_add_seconds(2, self.init_tempstore)  # If devices changed it takes a while to register

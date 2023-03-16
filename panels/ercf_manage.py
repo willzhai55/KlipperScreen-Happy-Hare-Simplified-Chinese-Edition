@@ -22,13 +22,13 @@ class ErcfManage(ScreenPanel):
     GATE_EMPTY = 0
     GATE_AVAILABLE = 1
 
-    DUMMY = -99
+    NOT_SET = -99
 
     def __init__(self, screen, title):
         super().__init__(screen, title)
 
         # We need to keep track of just a little bit of UI state
-        self.ui_sel_gate = self.DUMMY
+        self.ui_sel_gate = self.NOT_SET
 
         self.has_bypass = False
         self.min_gate = 0
@@ -76,8 +76,8 @@ class ErcfManage(ScreenPanel):
         self.labels['checkgate'].connect("clicked", self.select_checkgate)
         self.labels['recover'].connect("clicked", self.menu_item_clicked, "recover", {
             "panel": "ercf_recover", "name": _("ERCF State Recovery")})
-        self.labels['load'].connect("clicked", self.select_load, 1)
-        self.labels['eject'].connect("clicked", self.select_eject, 1)
+        self.labels['load'].connect("clicked", self.select_load)
+        self.labels['eject'].connect("clicked", self.select_eject)
         self.labels['home'].connect("clicked", self.select_home)
         self.labels['motors_off'].connect("clicked", self.select_motors_off)
         self.labels['servo_up'].connect("clicked", self.select_servo_up)
@@ -116,7 +116,7 @@ class ErcfManage(ScreenPanel):
         self.content.add(scroll)
 
     def activate(self):
-        self.ui_sel_gate = self.DUMMY
+        self.ui_sel_gate = self.NOT_SET
         self.init_gate_values()
 
     def process_update(self, action, data):
@@ -130,7 +130,7 @@ class ErcfManage(ScreenPanel):
     def init_gate_values(self):
         # Get starting values
         ercf = self._printer.get_stat("ercf")
-        if self.ui_sel_gate == self.DUMMY and ercf['gate'] != self.TOOL_UNKNOWN:
+        if self.ui_sel_gate == self.NOT_SET and ercf['gate'] != self.TOOL_UNKNOWN:
             self.ui_sel_gate = ercf['gate']
         else:
             self.ui_sel_gate = 0

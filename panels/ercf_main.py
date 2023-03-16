@@ -36,14 +36,14 @@ class ErcfMain(ScreenPanel):
     DIRECTION_LOAD = 1
     DIRECTION_UNLOAD = -1
 
-    DUMMY = -99
+    NOT_SET = -99
 
     def __init__(self, screen, title):
         super().__init__(screen, title)
 
         # We need to keep track of just a little bit of UI state
         self.ui_runout_mark = 0.
-        self.ui_sel_tool = self.DUMMY
+        self.ui_sel_tool = self.NOT_SET
 
         self.has_bypass = False
         self.min_tool = 0
@@ -56,19 +56,20 @@ class ErcfMain(ScreenPanel):
 
         # btn_states: The "gaps" are what functionality the state takes away. Multiple states are combined
         self.btn_states = {
-            'all':             ['check_gates', 'tool', 'eject', 'picker', 'pause', 'unlock', 'resume', 'manage', 'manage', 'more'],
-            'printing':        [                                          'pause',                     'manage',           'more'],
-            'paused':          ['check_gates', 'tool', 'eject', 'picker',          'unlock', 'resume', 'manage', 'manage', 'more'],
-            'idle':            ['check_gates', 'tool', 'eject', 'picker', 'pause', 'unlock',           'manage', 'manage', 'more'],
-            'locked':          [                                                   'unlock',                               'more'],
-            'not_locked':      ['check_gates', 'tool', 'eject', 'picker', 'pause',           'resume', 'manage', 'manage', 'more'],
-            'bypass_loaded':   [                       'eject',           'pause', 'unlock', 'resume', 'manage', 'manage', 'more'],
-            'bypass_unloaded': ['check_gates', 'tool',          'picker', 'pause', 'unlock', 'resume', 'manage', 'manage', 'more'],
-            'bypass_unknown':  ['check_gates', 'tool', 'eject', 'picker', 'pause', 'unlock', 'resume', 'manage', 'manage', 'more'],
-            'tool_loaded':     ['check_gates', 'tool', 'eject', 'picker', 'pause', 'unlock', 'resume', 'manage', 'manage', 'more'],
-            'tool_unloaded':   ['check_gates', 'tool',          'picker', 'pause', 'unlock', 'resume', 'manage', 'manage', 'more'],
-            'tool_unknown':    ['check_gates', 'tool', 'eject', 'picker', 'pause', 'unlock', 'resume', 'manage', 'manage', 'more'],
-            'disabled':        [                                                                                                      ],
+            'all':             ['check_gates', 'tool', 'eject', 'picker', 'pause', 'message', 'unlock', 'resume', 'manage', 'more'],
+            'printing':        [                                          'pause',                                          'more'],
+            'paused':          ['check_gates', 'tool', 'eject', 'picker',          'message', 'unlock', 'resume', 'manage', 'more'],
+            'idle':            ['check_gates', 'tool', 'eject', 'picker', 'pause', 'message', 'unlock',           'manage', 'more'],
+            'locked':          [                                                   'message', 'unlock',                     'more'],
+            'not_locked':      ['check_gates', 'tool', 'eject', 'picker', 'pause', 'message',           'resume', 'manage', 'more'],
+            'bypass_loaded':   [                       'eject',           'pause', 'message', 'unlock', 'resume', 'manage', 'more'],
+            'bypass_unloaded': ['check_gates', 'tool',          'picker', 'pause', 'message', 'unlock', 'resume', 'manage', 'more'],
+            'bypass_unknown':  ['check_gates', 'tool', 'eject', 'picker', 'pause', 'message', 'unlock', 'resume', 'manage', 'more'],
+            'tool_loaded':     ['check_gates', 'tool', 'eject', 'picker', 'pause', 'message', 'unlock', 'resume', 'manage', 'more'],
+            'tool_unloaded':   ['check_gates', 'tool',          'picker', 'pause', 'message', 'unlock', 'resume', 'manage', 'more'],
+            'tool_unknown':    ['check_gates', 'tool', 'eject', 'picker', 'pause', 'message', 'unlock', 'resume', 'manage', 'more'],
+            'no_message':      ['check_gates', 'tool', 'eject', 'picker', 'pause',            'unlock', 'resume', 'manage', 'more'],
+            'disabled':        [                                                                                                  ],
         }
 
         self.labels = {
@@ -80,6 +81,7 @@ class ErcfMain(ScreenPanel):
             'picker': self._gtk.Button('ercf_tool_picker', _('Colors...'), 'color3'),
             'eject': self._gtk.Button('ercf_eject', _('Eject'), 'color4'),
             'pause': self._gtk.Button('pause', _('Pause'), 'color1'),
+            'message': self._gtk.Button('warning', _('Last Error'), 'color1'),
             'unlock': self._gtk.Button('ercf_unlock', _('Unlock'), 'color2'),
             'resume': self._gtk.Button('resume', _('Resume'), 'color3'),
             'more': self._gtk.Button('ercf_gear', _('More...'), 'color4'),
@@ -87,7 +89,7 @@ class ErcfMain(ScreenPanel):
             'tool_label': self._gtk.Label('Unknown'),
             'filament': self._gtk.Label('Filament: Unknown'),
             'sensor': self._gtk.Label('Ts:'),
-            'sensor_state': self._gtk.Label('✔  '),
+            'sensor_state': self._gtk.Label('   '),
             'select_bypass_img': self._gtk.Image('ercf_select_bypass'), # Alternative for tool
             'load_bypass_img': self._gtk.Image('ercf_load_bypass'),     # Alternative for picker
             'unload_bypass_img': self._gtk.Image('ercf_unload_bypass'), # Alternative for eject
@@ -105,6 +107,7 @@ class ErcfMain(ScreenPanel):
         self.labels['picker'].connect("clicked", self.select_picker)
         self.labels['eject'].connect("clicked", self.select_eject)
         self.labels['pause'].connect("clicked", self.select_pause)
+        self.labels['message'].connect("clicked", self.select_message)
         self.labels['unlock'].connect("clicked", self.select_unlock)
         self.labels['resume'].connect("clicked", self.select_resume)
         self.labels['more'].connect("clicked", self._screen._go_to_submenu, "ercf")
@@ -115,6 +118,7 @@ class ErcfMain(ScreenPanel):
         self.labels['t_decrease'].get_style_context().add_class("ercf_sel_decrease")
 
         self.labels['manage'].get_style_context().add_class("ercf_manage_button")
+        self.labels['manage'].set_valign(Gtk.Align.CENTER)
         self.labels['tool_icon'].get_style_context().add_class("ercf_tool_image")
         self.labels['tool_label'].get_style_context().add_class("ercf_tool_text")
         self.labels['tool_label'].set_xalign(0)
@@ -122,7 +126,6 @@ class ErcfMain(ScreenPanel):
         self.labels['sensor'].set_xalign(1)
         self.labels['sensor_state'].set_xalign(0)
         self.labels['sensor_state'].get_style_context().add_class("ercf_sensor_text")
-        self.labels['manage'].set_valign(Gtk.Align.CENTER)
 
         scale = Gtk.Scale.new_with_range(orientation=Gtk.Orientation.VERTICAL, min=-30., max=0., step=0.1)
         self.labels['scale'] = scale
@@ -144,7 +147,6 @@ class ErcfMain(ScreenPanel):
 
         manage_grid = Gtk.Grid()
         manage_grid.set_column_homogeneous(True)
-        manage_grid.set_row_homogeneous(True)
 
         ercf = self._printer.get_stat("ercf")
         num_gates = len(ercf['gate_status'])
@@ -178,7 +180,12 @@ class ErcfMain(ScreenPanel):
         top_box.pack_start(self.labels['filament'], True, True, 0)
         top_box.pack_start(self.labels['sensor'], False, True, 0)
         top_box.pack_start(self.labels['sensor_state'], False, True, 0)
-#        top_box.pack_start(Gtk.Label(), False, True, 10)
+
+        pause_layer = Gtk.Notebook()
+        self.labels['pause_layer'] = pause_layer
+        pause_layer.set_show_tabs(False)
+        pause_layer.insert_page(self.labels['pause'], None, 0)
+        pause_layer.insert_page(self.labels['message'], None, 1)
 
         top_grid = Gtk.Grid()
         top_grid.set_vexpand(False)
@@ -201,7 +208,7 @@ class ErcfMain(ScreenPanel):
         main_grid.attach(self.labels['picker'],       6, 0, 2, 1)
         main_grid.attach(self.labels['eject'],        8, 0, 2, 1)
         main_grid.attach(self.labels['check_gates'], 10, 0, 2, 1)
-        main_grid.attach(self.labels['pause'],        0, 1, 3, 1)
+        main_grid.attach(pause_layer,                 0, 1, 3, 1)
         main_grid.attach(self.labels['unlock'],       3, 1, 3, 1)
         main_grid.attach(self.labels['resume'],       6, 1, 3, 1)
         main_grid.attach(self.labels['more'],         9, 1, 3, 1)
@@ -217,7 +224,7 @@ class ErcfMain(ScreenPanel):
     def activate(self):
         self.markup_status = self._config.get_main_config().getboolean("ercf_color_gates", True)
         self.markup_filament = self._config.get_main_config().getboolean("ercf_color_filament", False)
-        self.ui_sel_tool = self.DUMMY
+        self.ui_sel_tool = self.NOT_SET
         self.init_tool_value()
 
     def process_update(self, action, data):
@@ -249,7 +256,7 @@ class ErcfMain(ScreenPanel):
 
     def init_tool_value(self):
         ercf = self._printer.get_stat("ercf")
-        if self.ui_sel_tool == self.DUMMY and ercf['tool'] != self.TOOL_UNKNOWN:
+        if self.ui_sel_tool == self.NOT_SET and ercf['tool'] != self.TOOL_UNKNOWN:
             self.ui_sel_tool = ercf['tool']
         else:
             self.ui_sel_tool = 0
@@ -293,12 +300,16 @@ class ErcfMain(ScreenPanel):
         ercf = self._printer.get_stat("ercf")
         tool = ercf['tool']
         if self.ui_sel_tool == self.TOOL_BYPASS:
-            self._screen._ws.klippy.gcode_script(f"ERCF_LOAD_BYPASS")
+            self._screen._ws.klippy.gcode_script(f"ERCF_LOAD EXTRUDER_ONLY=1")
         else:
             self._screen.show_panel('picker', 'ercf_picker', _("ERCF Tool Picker"), 1, False)
 
     def select_pause(self, widget):
         self._screen._ws.klippy.gcode_script(f"ERCF_PAUSE FORCE_IN_PRINT=1")
+
+    def select_message(self, widget):
+        last_toolchange = self._printer.get_stat('ercf', 'last_toolchange')
+        self._screen.show_last_popup_message(f"Last Toolchange: {last_toolchange}")
 
     def select_unlock(self, widget):
         self._screen._ws.klippy.gcode_script(f"ERCF_UNLOCK")
@@ -307,7 +318,7 @@ class ErcfMain(ScreenPanel):
         self._screen._ws.klippy.gcode_script(f"RESUME")
 
     def update_enabled(self):
-        enabled = self._printer.get_stat("ercf")['enabled']
+        enabled = self._printer.get_stat('ercf', 'enabled')
         for i in range(5):
             name = (f'status{i+1}')
             if enabled:
@@ -319,8 +330,13 @@ class ErcfMain(ScreenPanel):
         ercf = self._printer.get_stat("ercf")
         tool = ercf['tool']
         next_tool = ercf['next_tool']
-        text = ("T%d " % tool) if (tool >= 0 and tool != next_tool) else "Bypass " if tool == -2 else "Unknown " if tool == -1 else ""
-        text += ("> T%d" % next_tool) if next_tool >= 0 else ""
+        last_tool = ercf['last_tool']
+        if next_tool != self.TOOL_UNKNOWN:
+            # Change in progress
+            text = ("T%d " % last_tool) if (last_tool >= 0 and last_tool != next_tool) else "Bypass " if last_tool == -2 else "Unknown " if last_tool == -1 else ""
+            text += ("> T%d" % next_tool) if next_tool >= 0 else ""
+        else:
+            text = ("T%d " % tool) if tool >= 0 else "Bypass " if tool == -2 else "Unknown " if tool == -1 else ""
         self.labels['tool_label'].set_text(text)
         if tool == self.TOOL_BYPASS:
             self.labels['picker'].set_image(self.labels['load_bypass_img'])
@@ -344,7 +360,7 @@ class ErcfMain(ScreenPanel):
         locked = ercf['is_locked']
 
         # Set sensitivity of +/- buttons
-        if (tool == self.TOOL_BYPASS and filament != "Unloaded") or not tool_sensitive:
+        if (tool == self.TOOL_BYPASS and filament == "Loaded") or not tool_sensitive:
             self.labels['t_decrease'].set_sensitive(False)
             self.labels['t_increase'].set_sensitive(False)
         else:
@@ -469,6 +485,7 @@ class ErcfMain(ScreenPanel):
                 ui_state.append("paused")
             elif printer_state == "printing":
                 ui_state.append("printing")
+                self._screen.clear_last_popup_message()
             else:
                 ui_state.append("idle")
             ui_state.append("locked" if locked else "not_locked")
@@ -486,11 +503,18 @@ class ErcfMain(ScreenPanel):
                     ui_state.append("tool_unloaded")
                 else:
                     ui_state.append("tool_unknown")
+            if not self._screen.have_last_popup_message():
+                ui_state.append("no_message")
 
-            if "printing" in ui_state:
+            if 'printing' in ui_state:
                 self.labels['runout_layer'].set_current_page(0) # Clog display
             else:
                 self.labels['runout_layer'].set_current_page(1) # Recovery
+
+            if not 'paused' in ui_state:
+                self.labels['pause_layer'].set_current_page(0) # Pause button
+            else:
+                self.labels['pause_layer'].set_current_page(1) # Recall last error
         else:
             ui_state.append("disabled")
             self.labels['runout_layer'].set_current_page(0)
@@ -604,8 +628,8 @@ class ErcfMain(ScreenPanel):
         elif loaded_status == self.LOADED_STATUS_FULL:
             visual     = "%s ^━━━$│En│^━━━━━━━━━━$│Ex│^━━━$%s^━━$│Nz│^━$▶ %s" % (tool_str, sensor_str, move_str)
 
-        if filament_direction == self.DIRECTION_UNLOAD and loaded_status != self.LOADED_STATUS_UNLOADED:
-            visual = visual.replace("▶", "◀")
+        #if filament_direction == self.DIRECTION_UNLOAD and loaded_status != self.LOADED_STATUS_UNLOADED:
+        #    visual = visual.replace("▶", "◀")
         if markup:
             gate_color = ercf['gate_color']
             gate = ercf['gate']

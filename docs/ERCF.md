@@ -4,9 +4,11 @@
 
 ![ercf_panel_non_printing](img/ercf/ercf_main.png)
 
-This is the main screen and is accessed by clicking on the little carrot on the left navbar.   Note that you can turn off this carrot in settings in whch case buttons will automatically be added to the KlipperScreen home and print pages.  Personally I think ERCF deserves this first class link.
+This is the main screen and is accessed by clicking on the little carrot on the left navbar.   Note that you can turn off this carrot in settings in whch case buttons will automatically be added to the KlipperScreen home and print pages.  Personally I think ERCF deserves this first class link on the left bar.
 
-The philosopy behind this screen is that it works with the concept of `Tool` which is really a virtual entity in Happy Hare because of the Tool-To-Gate mapping.  When you are actually printing the panel will look a little different:
+The filament color can be displayed as shown here so long as you have your gate map ('gate_material' and 'gate_color' arrays set up either defaults in 'ercf_paramters.cfg' or set with the `ERCF_SET_GATE_MAP` command).  If you have toolhead sensor you can conveniently see the state (detected/empty/disabled) near the `Manage...` button
+
+The philosophy behind this screen is that it works with the concept of `Tool` which is really a virtual entity in Happy Hare because of the Tool-To-Gate mapping.  When you are actually printing the panel will look a little different (see below).
 
 ![ercf_panel_printing](img/ercf/ercf_main_printing.png)
 
@@ -22,7 +24,7 @@ When bypass is selected, the `Colors...` button and `Eject` button change to `Lo
 
 Oh, the textual representation mirrors that you see in the Klipper console, but this one dynamically updates!
 
-_Expert Tip: With this new level of visualization I would recommend you put Happy Hare persistence level to the maximum of `4`...  Turn on, check KlipperScreen and go..._
+_Expert Tip: With this new level of visualization I would recommend you put Happy Hare persistence level to the maximum of `4`...  Turn printer on, check KlipperScreen and go... (I almost never home ERCF anymore!)_
 
 ## Manage Panel
 

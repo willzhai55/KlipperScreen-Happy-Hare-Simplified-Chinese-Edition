@@ -43,6 +43,7 @@ class ErcfRecovery(ScreenPanel):
         # btn_states: The "gaps" are what functionality the state takes away. Multiple states are combined
         self.btn_states = {
             'all':        ['tool', 'gate', 'filament', 'manual', 'auto', 'reset'],
+            'bypass':     ['tool', 'gate', 'filament', 'manual',         'reset'],
             'disabled':   [                                                     ],
         }
 
@@ -136,7 +137,7 @@ class ErcfRecovery(ScreenPanel):
                 if 'tool' in e_data or 'gate' in e_data or 'filament' in e_data:
                     self.update_state_labels()
                     self.update_toolgate_buttons()
-                if 'enabled' in e_data:
+                if 'enabled' in e_data or 'tool' in e_data:
                     self.update_active_buttons()
 
     # Dynamically update button sensitivity based on state
@@ -145,8 +146,12 @@ class ErcfRecovery(ScreenPanel):
         printer_state = self._printer.get_stat("print_stats")['state']
         servo = ercf['servo']
         enabled = ercf['enabled']
+        tool = ercf['tool']
         ui_state = []
-        if not enabled:
+        if enabled:
+            if tool == self.TOOL_BYPASS:
+                ui_state.append("bypass")
+        else:
             ui_state.append("disabled")
 
         for label in self.btn_states['all']:
