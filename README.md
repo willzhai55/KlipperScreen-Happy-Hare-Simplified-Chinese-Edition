@@ -60,5 +60,5 @@ I have only tested on a single screen.  A 640x480 resolution BTT TFT5.0.   I am 
 
 *All screen shots are taken with the "Colorize" theme.  The default is z-bolt and looks slightly different (which I actually prefer)*
 
-Now go read the [rest of the doc here](docs/ERCF.md)...
+## Now go read the [rest of the doc here](docs/ERCF.md)...
 
