@@ -25,6 +25,8 @@ KlipperScreen "Happy Hare" Fork...
 
 [![ERCF Control](docs/img/ercf/ercf_main.png)](docs/ERCF.md)
 
+Read more on how [ERCF Panels work...](docs/ERCF.md)
+
 ## Introduction
 KlipperScreen ERCF Happy Hare edition is quite a mouthful!  It is a forked version of KlipperScreen designed to run/manage ERCF using the Happy Hare driver software.
 
