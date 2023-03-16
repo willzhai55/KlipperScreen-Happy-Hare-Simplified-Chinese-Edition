@@ -16,6 +16,10 @@ The top left button is replaced with a live monitor of Happy Hare clog/runout de
 
 _Perhaps someone can help me... now you can visualize when clog detection is triggered, can you figure out what is being done in the wipe tower -- I'll let you see for yourselves..._
 
+When an ERCF error occurs in print the `Pause` button (which can manually force an ERCF error/pause condition) will change to `Last Error`.  This will conveniently recall the last error so you don't have to go to the console and well as displaying the tool change that was in progress at the time - very useful before correcting the issue).
+
+![ercf_panel_bypass](img/ercf/last_error.png)
+
 If you have a bypass (aka passthrough) installed, and I think they are very useful, then clicking "to the left of" `T0` will bring you to the bypass selector:
 
 ![ercf_panel_bypass](img/ercf/ercf_main_bypass.png)
