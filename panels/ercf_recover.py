@@ -55,9 +55,9 @@ class ErcfRecovery(ScreenPanel):
             'gate': self._gtk.Label("Gate #0"),
             'g_increase': self._gtk.Button('increase', None, scale=self.bts * 1.2),
             'filament': Gtk.CheckButton("Filament: Unknown"),
-            'reset': self._gtk.Button('ercf_reset', _('Reset ERCF'), 'color1'),
-            'auto': self._gtk.Button('ercf_recover_auto', _('Auto Recover'), 'color2'),
-            'manual': self._gtk.Button('ercf_recover_manual', _('Set State'), 'color1'),
+            'reset': self._gtk.Button('ercf_reset', 'Reset ERCF', 'color1'),
+            'auto': self._gtk.Button('ercf_recover_auto', 'Auto Recover', 'color2'),
+            'manual': self._gtk.Button('ercf_recover_manual', 'Set State', 'color1'),
         }
 
         self.labels['t_decrease'].connect("clicked", self.select_toolgate, 'tool', -1)
@@ -336,7 +336,7 @@ class ErcfRecovery(ScreenPanel):
             sel_loaded = 0 # Assume unloaded
         self._screen._confirm_send_action(
             None,
-            _("This will set the ERCF state to:\n\n" + summary + warning + "\n\nSure you want to continue?"),
+            "This will set the ERCF state to:\n\n" + summary + warning + "\n\nSure you want to continue?",
             "printer.gcode.script",
             {'script': f"ERCF_RECOVER TOOL={self.ui_sel_tool} GATE={self.ui_sel_gate} LOADED={self.ui_sel_loaded}"}
         )
@@ -344,7 +344,7 @@ class ErcfRecovery(ScreenPanel):
     def select_auto(self, widget):
         self._screen._confirm_send_action(
             None,
-            _("This will automatically attempt to reset the ERCF filament state\n\nSure you want to continue?"),
+            "This will automatically attempt to reset the ERCF filament state\n\nSure you want to continue?",
             "printer.gcode.script",
             {'script': "ERCF_RECOVER"}
         )
@@ -352,7 +352,7 @@ class ErcfRecovery(ScreenPanel):
     def select_reset(self, widget):
         self._screen._confirm_send_action(
             None,
-            _("This will reset persisted ERCF state to defaults including TTG map,\n\nEndlessSpool groups, Gate map (material and type) and current selector position\n\nSure you want to continue?"),
+            "This will reset persisted ERCF state to defaults including TTG map,\n\nEndlessSpool groups, Gate map (material and type) and current selector position\n\nSure you want to continue?",
             "printer.gcode.script",
             {'script': "ERCF_RESET"}
         )

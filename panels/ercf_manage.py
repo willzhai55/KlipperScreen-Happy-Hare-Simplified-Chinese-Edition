@@ -56,18 +56,18 @@ class ErcfManage(ScreenPanel):
 
         self.labels = {
             'g_decrease': self._gtk.Button('decrease', None, scale=self.bts * 1.2),
-            'gate': self._gtk.Button('ercf_select_gate', _('Gate'), 'color4'),
+            'gate': self._gtk.Button('ercf_select_gate', 'Gate', 'color4'),
             'g_increase': self._gtk.Button('increase', None, scale=self.bts * 1.2),
-            'home': self._gtk.Button('home', _('Home'), 'color3'),
-            'motors_off': self._gtk.Button('motor-off', _('Motors Off'), 'color4'),
-            'checkgate': self._gtk.Button('ercf_checkgates', _('Check Gate'), 'color1'),
-            'recover': self._gtk.Button('ercf_maintenance', _('Recover State...'), 'color2'),
-            'servo_up': self._gtk.Button('arrow-up', _('Servo Up'), 'color3'),
-            'servo_down': self._gtk.Button('arrow-down', _('Servo Down'), 'color4'),
-            'load': self._gtk.Button('ercf_load', _('Load'), 'color1'),
-            'eject': self._gtk.Button('ercf_eject', _('Eject'), 'color2'),
-            'load_ext': self._gtk.Button('ercf_load_extruder', _('Load Extruder'), 'color3'),
-            'unload_ext': self._gtk.Button('ercf_unload_extruder', _('Unoad Extruder'), 'color4'),
+            'home': self._gtk.Button('home', 'Home', 'color3'),
+            'motors_off': self._gtk.Button('motor-off', 'Motors Off', 'color4'),
+            'checkgate': self._gtk.Button('ercf_checkgates', 'Check Gate', 'color1'),
+            'recover': self._gtk.Button('ercf_maintenance', 'Recover State...', 'color2'),
+            'servo_up': self._gtk.Button('arrow-up', 'Servo Up', 'color3'),
+            'servo_down': self._gtk.Button('arrow-down', 'Servo Down', 'color4'),
+            'load': self._gtk.Button('ercf_load', 'Load', 'color1'),
+            'eject': self._gtk.Button('ercf_eject', 'Eject', 'color2'),
+            'load_ext': self._gtk.Button('ercf_load_extruder', 'Load Extruder', 'color3'),
+            'unload_ext': self._gtk.Button('ercf_unload_extruder', 'Unoad Extruder', 'color4'),
         }
 
         self.labels['g_decrease'].connect("clicked", self.select_gate, -1)
@@ -75,7 +75,7 @@ class ErcfManage(ScreenPanel):
         self.labels['g_increase'].connect("clicked", self.select_gate, 1)
         self.labels['checkgate'].connect("clicked", self.select_checkgate)
         self.labels['recover'].connect("clicked", self.menu_item_clicked, "recover", {
-            "panel": "ercf_recover", "name": _("ERCF State Recovery")})
+            "panel": "ercf_recover", "name": "ERCF State Recovery"})
         self.labels['load'].connect("clicked", self.select_load)
         self.labels['eject'].connect("clicked", self.select_eject)
         self.labels['home'].connect("clicked", self.select_home)
@@ -175,7 +175,7 @@ class ErcfManage(ScreenPanel):
     def select_motors_off(self, widget):
         self._screen._confirm_send_action(
             None,
-            _("This will reset ERCF positional state and require re-homing\n\nSure you want to continue?"),
+            "This will reset ERCF positional state and require re-homing\n\nSure you want to continue?",
             "printer.gcode.script",
             {'script': "ERCF_MOTORS_OFF"}
         )

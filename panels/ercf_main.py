@@ -73,18 +73,18 @@ class ErcfMain(ScreenPanel):
         }
 
         self.labels = {
-            'check_gates': self._gtk.Button('ercf_checkgates', _("Gates"), 'color1'),
-            'manage': self._gtk.Button('ercf_manage', _("Manage..."),'color2'),
+            'check_gates': self._gtk.Button('ercf_checkgates', "Gates", 'color1'),
+            'manage': self._gtk.Button('ercf_manage', "Manage...",'color2'),
             't_decrease': self._gtk.Button('decrease', None, scale=self.bts * 1.2),
-            'tool': self._gtk.Button('extruder', _('Load T0'), 'color2'),
+            'tool': self._gtk.Button('extruder', 'Load T0', 'color2'),
             't_increase': self._gtk.Button('increase', None, scale=self.bts * 1.2),
-            'picker': self._gtk.Button('ercf_tool_picker', _('Tools...'), 'color3'),
-            'eject': self._gtk.Button('ercf_eject', _('Eject'), 'color4'),
-            'pause': self._gtk.Button('pause', _('ERCF Pause'), 'color1'),
-            'message': self._gtk.Button('warning', _('Last Error'), 'color1'),
-            'unlock': self._gtk.Button('ercf_unlock', _('Unlock'), 'color2'),
-            'resume': self._gtk.Button('resume', _('Resume'), 'color3'),
-            'more': self._gtk.Button('ercf_more', _('More...'), 'color4'),
+            'picker': self._gtk.Button('ercf_tool_picker', 'Tools...', 'color3'),
+            'eject': self._gtk.Button('ercf_eject', 'Eject', 'color4'),
+            'pause': self._gtk.Button('pause', 'ERCF Pause', 'color1'),
+            'message': self._gtk.Button('warning', 'Last Error', 'color1'),
+            'unlock': self._gtk.Button('ercf_unlock', 'Unlock', 'color2'),
+            'resume': self._gtk.Button('resume', 'Resume', 'color3'),
+            'more': self._gtk.Button('ercf_more', 'More...', 'color4'),
             'tool_icon': self._gtk.Image('extruder', self._gtk.img_width * 0.8, self._gtk.img_height * 0.8),
             'tool_label': self._gtk.Label('Unknown'),
             'filament': self._gtk.Label('Filament: Unknown'),
@@ -100,7 +100,7 @@ class ErcfMain(ScreenPanel):
 
         self.labels['check_gates'].connect("clicked", self.select_check_gates)
         self.labels['manage'].connect("clicked", self.menu_item_clicked, "manage", {
-            "panel": "ercf_manage", "name": _("ERCF Management")})
+            "panel": "ercf_manage", "name": "ERCF Management"})
         self.labels['t_decrease'].connect("clicked", self.select_tool, -1)
         self.labels['tool'].connect("clicked", self.select_tool, 0)
         self.labels['t_increase'].connect("clicked", self.select_tool, 1)
@@ -267,7 +267,7 @@ class ErcfMain(ScreenPanel):
     def select_check_gates(self, widget):
         self._screen._confirm_send_action(
             None,
-            _("Check filament availabily in all ERCF gates?\n\nAre you sure you want to continue?"),
+            "Check filament availabily in all ERCF gates?\n\nAre you sure you want to continue?",
             "printer.gcode.script",
             {'script': "ERCF_CHECK_GATES"}
         )
@@ -302,7 +302,7 @@ class ErcfMain(ScreenPanel):
         if self.ui_sel_tool == self.TOOL_BYPASS:
             self._screen._ws.klippy.gcode_script(f"ERCF_LOAD EXTRUDER_ONLY=1")
         else:
-            self._screen.show_panel('picker', 'ercf_picker', _("ERCF Tool Picker"), 1, False)
+            self._screen.show_panel('picker', 'ercf_picker', "ERCF Tool Picker", 1, False)
 
     def select_pause(self, widget):
         self._screen._ws.klippy.gcode_script(f"ERCF_PAUSE FORCE_IN_PRINT=1")

@@ -167,5 +167,5 @@ class ErcfPicker(ScreenPanel):
 
     def select_edit(self, widget, sel_tool):
         sel_tool = self._printer.get_stat('ercf', 'ttg_map')[sel_tool]
-        self._screen.show_panel('toolmap', 'ercf_toolmap', _("ERCF TTG/EndlessSpool Editor"), 1, False, tool=sel_tool)
+        self._screen.show_panel('toolmap', 'ercf_toolmap', "ERCF TTG/EndlessSpool Editor", 1, False, tool=sel_tool)
 
