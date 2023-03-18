@@ -52,13 +52,29 @@ One note: If you move the selector on the Manage panel you will change the gate 
 
 ![ercf_picker](img/ercf/ercf_picker.png)
 
-Ooops, did I include that?!? ;-)  Check back later, but rest assured, Bambu Labs AMS will not have the advantage for long!
+This is another way to select a tool.  It makes it clear which gate will be loaded and the filament type and color.
 
 ## User extensible management panel
 
 ![ercf_manage_menu](img/ercf/ercf_user_manage_menu.png)
 
 The bottom left `More...` button brings up this panel.  This one is not custom but uses the KlipperScreen menu concept. Therefore it is extensible by users. If included a lot of useful stuff and have replicated some functionality found elsewhere as individual descrete buttons (like load tool or select gate).  Some might prefer this but feel free to comment it out if you don't like duplication.  Also you can use the menu logic that is there as a guide to add you own special macros.
+
+Although this is hooked into KlipperScreen via the menuing system, the top left `Filaments...` button brings up another custom panel for editing the filaments loaded in the gates...
+
+## Filament Editor
+
+![ercf_filament_editor1](img/ercf/ercf_filament_editor1.png)
+
+This lists the filaments loaded by GATE.  For help it shows the mapping to tool, which will usually be the same, but with tool-to-gate mapping each gate can actually support more than one tool!
+
+The filament color is display together with the filament type.  Click on the `Edit...` button to edit a gate...
+
+![ercf_filament_editor1](img/ercf/ercf_filament_editor2.png)
+
+Here you can choose filament color by string name or RBG picker.  You can edit the material type but only capital letters A-Z, numbers 0-9, and `+`, `-`, `_` can be used (spaces are not allowed).
+
+Also note that you can update ERCF of a filament availability to save running an automatic gate check (although I always recommend that).
 
 ## User extensible calibration/test panel
 
