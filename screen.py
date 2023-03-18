@@ -310,7 +310,7 @@ class KlipperScreen(Gtk.Window):
             self.panels[panel_name].activate()
         self.show_all()
 
-    def show_popup_message(self, message, level=3):
+    def show_popup_message(self, message, level=3, save=True):
         self.close_screensaver()
         if self.popup_message is not None:
             self.close_popup_message()
@@ -340,7 +340,7 @@ class KlipperScreen(Gtk.Window):
         self.popup_message = popup
         self.popup_message.show_all()
 
-        if level >= 2:
+        if level >= 2 and save:
             self.last_popup_msg = message
 
         if self._config.get_main_config().getboolean('autoclose_popups', True):
@@ -359,7 +359,7 @@ class KlipperScreen(Gtk.Window):
         if extra_msg != None:
             msg += (f"\n\n{extra_msg}")
         if len(msg) > 0:
-            self.show_popup_message(msg, level=3)
+            self.show_popup_message(msg, level=3, save=False)
 
     def clear_last_popup_message(self):
         self.last_popup_msg = None

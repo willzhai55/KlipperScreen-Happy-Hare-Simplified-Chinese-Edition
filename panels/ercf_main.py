@@ -78,13 +78,13 @@ class ErcfMain(ScreenPanel):
             't_decrease': self._gtk.Button('decrease', None, scale=self.bts * 1.2),
             'tool': self._gtk.Button('extruder', _('Load T0'), 'color2'),
             't_increase': self._gtk.Button('increase', None, scale=self.bts * 1.2),
-            'picker': self._gtk.Button('ercf_tool_picker', _('Colors...'), 'color3'),
+            'picker': self._gtk.Button('ercf_tool_picker', _('Tools...'), 'color3'),
             'eject': self._gtk.Button('ercf_eject', _('Eject'), 'color4'),
-            'pause': self._gtk.Button('pause', _('Pause'), 'color1'),
+            'pause': self._gtk.Button('pause', _('ERCF Pause'), 'color1'),
             'message': self._gtk.Button('warning', _('Last Error'), 'color1'),
             'unlock': self._gtk.Button('ercf_unlock', _('Unlock'), 'color2'),
             'resume': self._gtk.Button('resume', _('Resume'), 'color3'),
-            'more': self._gtk.Button('ercf_gear', _('More...'), 'color4'),
+            'more': self._gtk.Button('ercf_more', _('More...'), 'color4'),
             'tool_icon': self._gtk.Image('extruder', self._gtk.img_width * 0.8, self._gtk.img_height * 0.8),
             'tool_label': self._gtk.Label('Unknown'),
             'filament': self._gtk.Label('Filament: Unknown'),
@@ -345,7 +345,7 @@ class ErcfMain(ScreenPanel):
             self.labels['eject'].set_label(f"Unload")
         else:
             self.labels['picker'].set_image(self.labels['tool_picker_img'])
-            self.labels['picker'].set_label(f"Colors...")
+            self.labels['picker'].set_label(f"Tools...")
             self.labels['eject'].set_image(self.labels['eject_img'])
             self.labels['eject'].set_label(f"Eject")
 

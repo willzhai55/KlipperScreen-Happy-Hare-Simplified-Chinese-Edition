@@ -40,7 +40,7 @@ Install and setup a base KlipperScreen from the original source. Get it working.
     > git pull
    
     > cd ~/KlipperScreen/happy_hare
-    > ./install_ks -g <num_gates>
+    > ./install_ks.sh -g <num_gates>
    
 (where <num_gates> is the number of selectors you built with, e.g. 9)
    

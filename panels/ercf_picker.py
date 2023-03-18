@@ -43,9 +43,9 @@ class ErcfPicker(ScreenPanel):
             tool = self.labels[f'tool_{i}'] = self._gtk.Button('extruder', f'T{i}', 'color2')
             tool.connect("clicked", self.select_tool)
 
-            name = self.labels[f'name_{i}'] = Gtk.Label(f'⬤')
-            name.get_style_context().add_class("ercf_color_swatch")
-            name.set_xalign(0.7)
+            color = self.labels[f'color_{i}'] = Gtk.Label(f'⬤')
+            color.get_style_context().add_class("ercf_color_swatch")
+            color.set_xalign(0.7)
 
             material = self.labels[f'material_{i}'] = Gtk.Label("n/a")
             material.get_style_context().add_class("ercf_material_text")
@@ -62,11 +62,16 @@ class ErcfPicker(ScreenPanel):
             gate_box.pack_start(gate, True, True, 0)
             gate_box.pack_start(alt_gates, True, True, 0)
 
-            grid.attach(status_box, 0, i, 2, 1)
-            grid.attach(tool,       2, i, 2, 1)
-            grid.attach(name,       4, i, 2, 1)
-            grid.attach(material,   6, i, 3, 1)
-            grid.attach(gate_box,   9, i, 4, 1)
+            edit = self.labels[f'edit_{i}'] = self._gtk.Button('ercf_gear', f'Edit', 'color4')
+            edit.connect("clicked", self.select_edit, i)
+            edit.set_sensitive(False) # TODO... for editing TTG map and EndlessSpool
+
+            grid.attach(status_box, 0, i, 3, 1)
+            grid.attach(tool,       3, i, 3, 1)
+            grid.attach(color,      6, i, 2, 1)
+            grid.attach(material,   8, i, 3, 1)
+            grid.attach(gate_box,  11, i, 3, 1)
+            grid.attach(edit,      14, i, 2, 1)
 
         self.labels['unknown_icon'] = self._gtk.Image('ercf_unknown').get_pixbuf()
         self.labels['available_icon'] = self._gtk.Image('ercf_tick').get_pixbuf()
@@ -88,35 +93,33 @@ class ErcfPicker(ScreenPanel):
 
         for i in range(num_tools):
             t_map = tool_map[i]
+            gate = t_map['gate']
             color = Gdk.RGBA()
-            Gdk.RGBA.parse(color, gate_color[i])
+            if not Gdk.RGBA.parse(color, gate_color[gate]):
+                Gdk.RGBA.parse(color, '#' + gate_color[gate])
 
             gate_str = (f"Gate #{t_map['gate']}")
             alt_gate_str = ''
             if endless_spool == 1 and len(t_map['alt_gates']) > 0:
-                alt_gate_str = '+(' + ', '.join(map(str, t_map['alt_gates'][:6]))
-                alt_gate_str += ', ...)' if len(t_map['alt_gates']) > 5 else ')'
+                alt_gate_str = '+(' + ', '.join(map(str, t_map['alt_gates'][:3]))
+                alt_gate_str += ', ...)' if len(t_map['alt_gates']) > 3 else ')'
 
-            if gate_status[i] == 1:
+            if gate_status[gate] == 1:
                 status_icon = 'available_icon'
                 status_str = "Available"
-            elif gate_status[i] == 0:
+            elif gate_status[gate] == 0:
                 status_icon = 'empty_icon'
                 status_str = "Empty"
             else: 
                 status_icon = 'unknown_icon'
                 status_str = "Unknown"
 
-            if endless_spool == 1 and len(t_map['alt_gates']) > 0:
-                alt_gate_str = '+(' + ', '.join(map(str, t_map['alt_gates'][:6]))
-                alt_gate_str += ', ...)' if len(t_map['alt_gates']) > 5 else ')'
-
             self.labels[f'status_{i}'].clear()
             self.labels[f'status_{i}'].set_from_pixbuf(self.labels[f'{status_icon}'])
             self.labels[f'available_{i}'].set_label(status_str)
             self.labels[f'tool_{i}'].set_sensitive(gate_status[i] != self.GATE_EMPTY)
-            self.labels[f'name_{i}'].override_color(Gtk.StateType.NORMAL, color)
-            self.labels[f'material_{i}'].set_label(gate_material[i][:6])
+            self.labels[f'color_{i}'].override_color(Gtk.StateType.NORMAL, color)
+            self.labels[f'material_{i}'].set_label(gate_material[gate][:6])
             self.labels[f'gate_{i}'].set_label(gate_str)
             self.labels[f'alt_gates_{i}'].set_label(alt_gate_str)
 
@@ -161,4 +164,8 @@ class ErcfPicker(ScreenPanel):
         else:
             self._screen._ws.klippy.gcode_script(f"T{tool}")
             self._screen._menu_go_back()
+
+    def select_edit(self, widget, sel_tool):
+        sel_tool = self._printer.get_stat('ercf', 'ttg_map')[sel_tool]
+        self._screen.show_panel('toolmap', 'ercf_toolmap', _("ERCF TTG/EndlessSpool Editor"), 1, False, tool=sel_tool)
 

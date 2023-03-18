@@ -549,7 +549,6 @@ popover button {
     background-color: darkred;
 }
 
-/* PAUL added vvv */
 .ercf_runout slider, .ercf_runout highlight, .ercf_runout fill {
     min-height: 0;
 }
@@ -564,6 +563,12 @@ popover button {
 }
 
 .ercf_tool_text {
+    margin-top: 6px;
+    margin-bottom: 6px;
+    font-size: 1.8em;
+}
+
+.ercf_entry_text {
     margin-top: 6px;
     margin-bottom: 6px;
     font-size: 1.8em;

@@ -211,7 +211,7 @@ class KlippyGtk:
             logging.info("Removing Dialog")
             self.screen.dialogs.remove(dialog)
             return
-        logging.debug(f"Cannot remove dialog {dialog}")
+        logging.d=ebug(f"Cannot remove dialog {dialog}")
 
     @staticmethod
     def HomogeneousGrid(width=None, height=None):

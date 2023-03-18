@@ -77,18 +77,20 @@ class MenuPanel(ScreenPanel):
         show_list = []
         for item in items:
             key = list(item)[0]
-            if not self.evaluate_enable(item[key]['enable']):
-                if item[key]['show_disabled']:
-                    # Show but make inactive
+
+            if item[key]['show_disabled'] and self.evaluate_enable(item[key]['show_disabled']):
+                show_list.append(key)
+                if self.evaluate_enable(item[key]['enable']):
+                    self.labels[key].set_sensitive(True)
+                else:
                     self.labels[key].set_sensitive(False)
+            else:
+                if self.evaluate_enable(item[key]['enable']):
                     show_list.append(key)
+                    self.labels[key].set_sensitive(True)
                 else:
                     # Just don't show the button
                     logging.debug(f"X > {key}")
-                    continue
-            else:
-                self.labels[key].set_sensitive(True)
-                show_list.append(key)
 
         length = len(show_list)
         if columns == 4:

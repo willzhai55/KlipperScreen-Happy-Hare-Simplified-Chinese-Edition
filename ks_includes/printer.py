@@ -236,7 +236,7 @@ class Printer:
                 "ercf": self.get_stat("ercf").copy() # PAUL may not be needed .. only for menu screens.. TEMP.. move
             }
         }
-        # PAUL WHY??       "pause_resume": {"is_paused": self.state == "paused"},
+        # PAUL WHY WAS THIS THE ORIGINAL CODE??       "pause_resume": {"is_paused": self.state == "paused"},
 
         sections = ["bed_mesh", "bltouch", "probe", "quad_gantry_level", "z_tilt"]
         for section in sections:
