@@ -7,7 +7,6 @@
 #
 # Screen Capture: scrot -s -D :0.0
 #
-KLIPPER_HOME="${HOME}/klipper"
 KLIPPER_CONFIG_HOME="${HOME}/klipper_config"
 PRINTER_DATA_CONFIG_HOME="${HOME}/printer_data/config"
 
@@ -66,10 +65,6 @@ check_klipper() {
 }
 
 verify_home_dirs() {
-    if [ ! -d "${KLIPPER_HOME}" ]; then
-        echo -e "${ERROR}Klipper home directory (${KLIPPER_HOME}) not found. Use '-k <dir>' option to override"
-        exit -1
-    fi
     if [ ! -d "${KLIPPER_CONFIG_HOME}" ]; then
         if [ ! -d "${PRINTER_DATA_CONFIG_HOME}" ]; then
             echo -e "${ERROR}Klipper config directory (${KLIPPER_CONFIG_HOME} or ${PRINTER_DATA_CONFIG_HOME}) not found. Use '-c <dir>' option to override"
@@ -93,7 +88,7 @@ install_klipper_screen() {
     fi
 
     # Ensure KlipperScreen.conf includes Happy Hare menus
-    cat << EOF > /tmp/KlipperScreen.conf
+    cat << EOF > /tmp/KlipperScreen.conf.tmp
 # 
 # ERCF "Happy Hare edition" menus
 #
@@ -104,12 +99,12 @@ EOF
     if [ -f "${ks_config}" ]; then
         update_section=$(grep -c '\[include ercf_klipperscreen.conf\]' ${ks_config} || true)
         if [ "${update_section}" -eq 0 ]; then
-            cat ${ks_config} >> /tmp/KlipperScreen.conf && cp /tmp/KlipperScreen.conf ${ks_config}
+            cat ${ks_config} >> /tmp/KlipperScreen.conf.tmp && cp /tmp/KlipperScreen.conf.tmp ${ks_config}
         else
             echo -e "${INFO}KlipperScreen ERCF include already exists in conf. Skipping install"
         fi
     else
-        cp /tmp/KlipperScreen.conf ${ks_config}
+        cp /tmp/KlipperScreen.conf.tmp ${ks_config}
     fi
 
     echo -e "${INFO}Installing Happy Hare menus..."
@@ -123,7 +118,7 @@ EOF
             cat ${SRCDIR}/${token}.conf | sed -e "s/{i}/${i}/g"
         done)
         expanded="# Generated menus for each tool/gate...\n${expanded}"
-        awk -v r="$expanded" "{gsub(/^ERCF_${token}/,r)}1" "${hh_config}" > /tmp/ercf_klipperscreen.conf && mv /tmp/ercf_klipperscreen.conf "${hh_config}"
+        awk -v r="$expanded" "{gsub(/^ERCF_${token}/,r)}1" "${hh_config}" > /tmp/ercf_klipperscreen.conf.tmp && mv /tmp/ercf_klipperscreen.conf.tmp "${hh_config}"
     done
 
     # Always ensure images are linked for every style
@@ -148,8 +143,9 @@ clear
 # Find SRCDIR from the pathname of this script
 SRCDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )"/ && pwd )"
 
-while getopts "g:" arg; do
+while getopts "c:g:" arg; do
     case $arg in
+        c) KLIPPER_CONFIG_HOME=${OPTARG};;
         g) num_gates=$OPTARG;;
     esac
 done
