@@ -536,14 +536,12 @@ class ErcfMain(ScreenPanel):
                 tool_sensitive = sensitive
         self.update_tool_buttons(tool_sensitive)
 
-    def get_rgb_color(self, color):
-        color = color.lower()
-        c = Gdk.color_parse(color)
-        if c != None:
-            rgb_values = c.red / 65535., c.green / 65535., c.blue / 65535.
-            rgb_color = "#{:02x}{:02x}{:02x}".format(int(rgb_values[0]*255), int(rgb_values[1]*255), int(rgb_values[2]*255))
-        else:
-            rgb_color = ""
+    def get_rgb_color(self, gate_color):
+        color = Gdk.RGBA()
+        if not Gdk.RGBA.parse(color, gate_color.lower()):
+            if not Gdk.RGBA.parse(color, '#' + gate_color):
+                return ""
+        rgb_color = "#{:02x}{:02x}{:02x}".format(int(color.red * 255), int(color.green * 255), int(color.blue * 255))
         return rgb_color
 
     def get_status_text(self, markup=False):
