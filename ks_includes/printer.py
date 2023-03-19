@@ -73,7 +73,6 @@ class Printer:
                     self.fancount += 1
             if x.startswith('output_pin ') and not x.split()[1].startswith("_"):
                 self.output_pin_count += 1
-        logging.info(f"PAUL: calling process_update() from reinit()")
         self.process_update(data)
 
         logging.info(f"Klipper version: {printer_info['software_version']}")
@@ -93,18 +92,12 @@ class Printer:
         for x in data:
             if x == "configfile":
                 continue
-            if x == "ercf":
-                logging.info(f"PAUL: In process_update. GOT NEW DATA ercf={data['ercf']}")
-# PAUL                if 'ercf' in self.data:
-# PAUL                   logging.info(f"PAUL: In process_update. CURRENT self.data[ercf]={self.data['ercf']}")
             if x not in self.data:
                 self.data[x] = {}
             self.data[x].update(data[x])
-# PAUL            if x == "ercf":
-# PAUL                logging.info(f"PAUL: In process_update. AFTER UPDATE self.data[ercf]={self.data['ercf']}")
 
         if "webhooks" in data or "print_stats" in data or "idle_timeout" in data:
-            self.process_status_update()# PAUL perhaps should consider "pause_resume" for status update..
+            self.process_status_update() # PAUL perhaps should consider "pause_resume" for status update..
 
     def register_callback(self, var, method, arg):
         if var in self.printer_callbacks:
@@ -221,7 +214,7 @@ class Printer:
                 return self.get_config_section(probe_type)
         return None
 
-# PAUL called only from main menu and generic menu panels for variable evaluation
+    # Called only from main menu and generic menu panels for variable evaluation
     def get_printer_status_data(self):
         data = {
             "printer": {
@@ -233,7 +226,7 @@ class Printer:
                 "idle_timeout": self.get_stat("idle_timeout").copy(),
                 "pause_resume": self.get_stat("pause_resume").copy(),
                 "power_devices": {"count": len(self.get_power_devices())},
-                "ercf": self.get_stat("ercf").copy() # PAUL may not be needed .. only for menu screens.. TEMP.. move
+                "ercf": self.get_stat("ercf").copy() # PAUL may not be needed .. only for menu screens..
             }
         }
         # PAUL WHY WAS THIS THE ORIGINAL CODE??       "pause_resume": {"is_paused": self.state == "paused"},

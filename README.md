@@ -18,9 +18,6 @@ will natively work with [Klipper](https://github.com/kevinOConnor/klipper) and [
 <br>
 KlipperScreen "Happy Hare" Fork...
 
-# PATIENCE!!  This is not ready yet.  It's live for a couple of beta testers but is unlikely to work for you without instruction and a new Happy Hare driver which you don't have.  I will release very soon via message on Discord channels..
-
-
 # KlipperScreen - ERCF Happy Hare edition
 
 [![ERCF Control](docs/img/ercf/ercf_main.png)](docs/ERCF.md)

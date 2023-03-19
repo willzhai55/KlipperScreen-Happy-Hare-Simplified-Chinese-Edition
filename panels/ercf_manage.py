@@ -161,7 +161,7 @@ class ErcfManage(ScreenPanel):
     def select_checkgate(self, widget):
         ercf = self._printer.get_stat("ercf")
         current_gate = ercf['gate']
-        self._screen._ws.klippy.gcode_script(f"ERCF_CHECK_GATES GATE={current_gate}")
+        self._screen._ws.klippy.gcode_script(f"ERCF_CHECK_GATES GATE={current_gate} QUIET=1")
 
     def select_load(self, widget):
         self._screen._ws.klippy.gcode_script(f"ERCF_LOAD TEST=0") # TEST=0 is to aid backward compatibility of ERCF_LOAD command

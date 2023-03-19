@@ -238,7 +238,7 @@ class ErcfMain(ScreenPanel):
 
             if 'ercf' in data:
                 e_data = data['ercf']
-                if 'tool' in e_data or 'gate' in e_data or 'ttg_map' in e_data or 'gate_status' in e_data:
+                if 'tool' in e_data or 'gate' in e_data or 'ttg_map' in e_data or 'gate_status' in e_data or 'gate_color' in e_data:
                     self.update_status()
                 if 'loaded_status' in e_data or 'filament_direction' in e_data:
                     self.update_filament_status()
@@ -269,7 +269,7 @@ class ErcfMain(ScreenPanel):
             None,
             "Check filament availabily in all ERCF gates?\n\nAre you sure you want to continue?",
             "printer.gcode.script",
-            {'script': "ERCF_CHECK_GATES"}
+            {'script': "ERCF_CHECK_GATES QUIET=1"}
         )
 
     def select_tool(self, widget, param=0):
@@ -288,7 +288,7 @@ class ErcfMain(ScreenPanel):
             if self.ui_sel_tool == self.TOOL_BYPASS:
                 self._screen._ws.klippy.gcode_script(f"ERCF_SELECT_BYPASS")
             elif self.ui_sel_tool != tool or ercf['filament'] != "Loaded":
-                self._screen._ws.klippy.gcode_script(f"T{self.ui_sel_tool}")
+                self._screen._ws.klippy.gcode_script(f"ERCF_CHANGE_TOOL TOOL={self.ui_sel_tool} QUIET=1")
             return
         self.update_tool_buttons()
 
@@ -536,6 +536,16 @@ class ErcfMain(ScreenPanel):
                 tool_sensitive = sensitive
         self.update_tool_buttons(tool_sensitive)
 
+    def get_rgb_color(self, color):
+        color = color.lower()
+        c = Gdk.color_parse(color)
+        if c != None:
+            rgb_values = c.red / 65535., c.green / 65535., c.blue / 65535.
+            rgb_color = "#{:02x}{:02x}{:02x}".format(int(rgb_values[0]*255), int(rgb_values[1]*255), int(rgb_values[2]*255))
+        else:
+            rgb_color = ""
+        return rgb_color
+
     def get_status_text(self, markup=False):
         ercf = self._printer.get_stat("ercf")
         gate_status = ercf['gate_status']
@@ -551,13 +561,7 @@ class ErcfMain(ScreenPanel):
         msg_avail = "Avail: "
         msg_selct = "Selct: "
         for g in range(num_gates):
-            color = gate_color[g].lower()
-            c = Gdk.color_parse(color)
-            if c != None:
-                rgb_values = c.red / 65535., c.green / 65535., c.blue / 65535.
-                color = "#{:02x}{:02x}{:02x}".format(int(rgb_values[0]*255), int(rgb_values[1]*255), int(rgb_values[2]*255))
-            else:
-                color = ""
+            color = self.get_rgb_color(gate_color[g])
             filament_icon = ("▉") if not markup or color == "" else (f"<span color='{color}'>▉</span>")
             msg_gates += ("│#%d " % g)[:4]
             msg_avail += "│ %s " % (filament_icon if gate_status[g] == self.GATE_AVAILABLE else " " if gate_status[g] == self.GATE_EMPTY else "?")
@@ -634,14 +638,10 @@ class ErcfMain(ScreenPanel):
             gate_color = ercf['gate_color']
             gate = ercf['gate']
             if gate >= 0:
-                color = gate_color[gate].lower()
-                x = re.search("^#?([a-f\d]{6})$", color)
-                if x == None or x.group() != color:
-                    color = ""
+                color = self.get_rgb_color(gate_color[gate])
                 if color != "":
                     visual = visual.replace("^", (f"<span color='{color}'>")).replace("$", "</span>")
                     return visual
-
         visual = visual.replace("^", "").replace("$", "")
         return visual
 

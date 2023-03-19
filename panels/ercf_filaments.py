@@ -343,7 +343,7 @@ class ErcfPicker(ScreenPanel):
 
     def select_save(self, widget):
         self._screen.remove_keyboard()
-        self._screen._ws.klippy.gcode_script(f"ERCF_SET_GATE_MAP GATE={self.ui_sel_gate} COLOR={self.ui_gate_color} MATERIAL={self.ui_gate_material} AVAILABLE={self.ui_gate_status}")
+        self._screen._ws.klippy.gcode_script(f"ERCF_SET_GATE_MAP GATE={self.ui_sel_gate} COLOR={self.ui_gate_color} MATERIAL={self.ui_gate_material} AVAILABLE={self.ui_gate_status} QUIET=1")
         self.labels['layers'].set_current_page(0) # Gate list layer
 
     def select_cancel_edit(self, widget):

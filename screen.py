@@ -340,7 +340,7 @@ class KlipperScreen(Gtk.Window):
         self.popup_message = popup
         self.popup_message.show_all()
 
-        if level >= 2 and save:
+        if level >= 3 and save:
             self.last_popup_msg = message
 
         if self._config.get_main_config().getboolean('autoclose_popups', True):
@@ -765,9 +765,9 @@ class KlipperScreen(Gtk.Window):
                         "printer.gcode.script",
                         script
                     )
-        if action == "notify_status_update":
-            if 'ercf' in data:
-                logging.info(f"PAUL: GOT new ercf_data={data['ercf']}") # PAUL added for debugging
+                elif "ERCF Statistics:" in data:
+                    msg = data.replace("// ", "")
+                    self.show_popup_message(msg, level=1)
         self.process_update(action, data)
 
     def process_update(self, *args):
@@ -897,7 +897,6 @@ class KlipperScreen(Gtk.Window):
             self.printer_initializing("Error getting printer object data with extra items")
             GLib.timeout_add_seconds(3, self.init_printer)
             return
-        logging.info(f"PAUL: init_printer: process_update({data['result']['status']['ercf']})")
         self.printer.process_update(data['result']['status'])
         self.init_tempstore()
         GLib.timeout_add_seconds(2, self.init_tempstore)  # If devices changed it takes a while to register

@@ -166,7 +166,7 @@ class KlipperScreenConfig:
                 bools = (
                     'invert_x', 'invert_y', 'invert_z', '24htime', 'only_heaters', 'show_cursor', 'confirm_estop',
                     'autoclose_popups', 'use_dpms', 'use_default_menu', 'side_macro_shortcut',
-                    'side_ercf_shortcut', 'ercf_color_selector', 'ercf_color_filament',
+                    'side_ercf_shortcut', 'ercf_color_gates', 'ercf_color_filament',
                     'use-matchbox-keyboard', 'show_heater_power'
                 )
                 strs = (

@@ -162,10 +162,10 @@ class ErcfPicker(ScreenPanel):
             # Should not of got here but do nothing for safety
             pass
         else:
-            self._screen._ws.klippy.gcode_script(f"T{tool}")
+            self._screen._ws.klippy.gcode_script(f"ERCF_CHANGE_TOOL TOOL={tool}")
             self._screen._menu_go_back()
 
     def select_edit(self, widget, sel_tool):
         sel_tool = self._printer.get_stat('ercf', 'ttg_map')[sel_tool]
-        self._screen.show_panel('toolmap', 'ercf_toolmap', "ERCF TTG/EndlessSpool Editor", 1, False, tool=sel_tool)
+        self._screen.show_panel('toolmap', 'ercf_toolmap', "ERCF TTG/EndlessSpool Editor", 1, False, tool=sel_tool) # TODO
 
