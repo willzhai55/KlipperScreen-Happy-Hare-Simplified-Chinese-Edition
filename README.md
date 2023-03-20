@@ -50,7 +50,7 @@ KlipperScreen will be restarted and hopefully you are now running the enhanced v
 
 ![ercf_panel_printing](docs/img/ercf/moonraker_warning.png)
 
-This is simply because I didn't want to call my software by the original name "KlipperScreen".  The fix this, click on the bell icon and select "Never" so the warning never appears again.  Note that the functionality of restarting "KlipperScreen" is still available via Mainsail.
+This is simply because I didn't want to call my software by the original name "KlipperScreen".  The fix this, click on the bell icon with line through it and select "Never" so the warning never appears again.  Note that the functionality of restarting "KlipperScreen" is still available via Mainsail.
 
 2. If you are installing on a rpi without Klipper and printer attached the install will not be able to find the Klipper "config" directory where the `KlipperScreen.conf` and `ercf_klipperscreen.conf` should be placed.  To fix this, specify a `-c <config_dir>` option to the install line and specify a valid directory where KlipperScreen is expecting to see its config files.
 
