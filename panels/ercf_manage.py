@@ -67,7 +67,7 @@ class ErcfManage(ScreenPanel):
             'load': self._gtk.Button('ercf_load', 'Load', 'color1'),
             'eject': self._gtk.Button('ercf_eject', 'Eject', 'color2'),
             'load_ext': self._gtk.Button('ercf_load_extruder', 'Load Extruder', 'color3'),
-            'unload_ext': self._gtk.Button('ercf_unload_extruder', 'Unoad Extruder', 'color4'),
+            'unload_ext': self._gtk.Button('ercf_unload_extruder', 'Unload Extruder', 'color4'),
         }
 
         self.labels['g_decrease'].connect("clicked", self.select_gate, -1)
