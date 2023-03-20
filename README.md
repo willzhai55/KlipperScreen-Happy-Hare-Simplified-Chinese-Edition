@@ -36,6 +36,7 @@ Install and setup a base KlipperScreen from the original source. Get it working.
 
     > cd ~/KlipperScreen
     > git remote set-url origin https://github.com/moggieuk/KlipperScreen-Happy-Hare-Edition.git
+    > git config pull.rebase false
     > git pull
    
     > cd ~/KlipperScreen/happy_hare
