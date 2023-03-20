@@ -30,6 +30,8 @@ KlipperScreen ERCF Happy Hare edition is quite a mouthful!  It is a forked versi
 KlipperScreen is an amazing piece of software but unfortunally lacks the level of plugin integration I needed for this project.  I hope in the future to have changes integrated so that this becomes a layered install at most.  Until then you must follow these install directions closely:
 
 ## Installation
+**Firstly, make sure Happy Hare software is completely up-to-date. Features were added to support this KlipperScreen add on.**
+
 Install and setup a base KlipperScreen from the original source. Get it working. Don't skip this step because I cannot help with basic KlipperScreen and system setup.  Once you have that installed and working, log into you Rasberry Pi and execute the following commands. You can cut'n'paste...
 
     > cd ~/KlipperScreen
