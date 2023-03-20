@@ -45,6 +45,15 @@ Install and setup a base KlipperScreen from the original source. Get it working.
    
 KlipperScreen will be restarted and hopefully you are now running the enhanced version!
 
+**Notes:**
+1. The install updates moonraker so that KlipperScreen-happy_hare can be upgraded with update-manager. It comments out the original and inserts Happy Hare specific logic.  The one consequence of this is that you may see the following warning from Moonraker:
+![ercf_panel_printing](docs/img/ercf/moonraker_warning.png)
+
+This is simply because I didn't want to call my software by the original name "KlipperScreen".  The fix this, click on the bell icon and select "Never" so the warning never appears again.  Note that the functionality of restarting "KlipperScreen" is still available via Mainsail.
+
+2. If you are installing on a rpi without Klipper and printer attached the install will not be able to find the Klipper "config" directory where the `KlipperScreen.conf` and `ercf_klipperscreen.conf` should be placed.  To fix this, specify a `-c <config_dir>` option to the install line and specify a valid directory where KlipperScreen is expecting to see its config files.
+
+
 Expert tip: The last step of running './install_ks -g <num_gates>' can be run many times.. if you customize the ERCF part of the KlipperScreen menu and want to make use of the "replicator" function that will automatically replicate menu options for the configured number of gates, you can edit menus.conf and reference the templating there.
 
 Note that the base KlipperScreen is fully up-to-date (as of March 10th, 2023) with the master but also includes extra menu functionality that can be used in the creation of your custom menus.  See the generated ercf_klipperscreen.conf for clues!
