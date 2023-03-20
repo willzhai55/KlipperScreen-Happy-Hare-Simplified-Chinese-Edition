@@ -77,8 +77,8 @@ verify_home_dirs() {
 install_klipper_screen() {
     echo -e "${INFO}Adding KlipperScreen support for ERCF"
     do_install=0
-    ks_config="$KLIPPER_CONFIG_HOME/KlipperScreen.conf"
-    hh_config="$KLIPPER_CONFIG_HOME/ercf_klipperscreen.conf"
+    ks_config="${KLIPPER_CONFIG_HOME}/KlipperScreen.conf"
+    hh_config="${KLIPPER_CONFIG_HOME}/ercf_klipperscreen.conf"
 
     # Backup old Klippersreen Happy Hare menus
     if [ -f "${hh_config}" ]; then
@@ -131,9 +131,43 @@ EOF
     restart_klipperscreen
 }
 
+install_update_manager() {
+    echo -e "${INFO}Adding update manager to moonraker.conf"
+    echo "${KLIPPER_CONFIG_HOME}/moonraker.conf"
+    if [ -f "${KLIPPER_CONFIG_HOME}/moonraker.conf" ]; then
+        orig_section=$(grep -c '\[update_manager KlipperScreen\]' \
+            ${KLIPPER_CONFIG_HOME}/moonraker.conf || true)
+        if [ "${orig_section}" -ne 0 ]; then
+            echo -e "${WARNING}Original [update_manager KlipperScreen] commented out in moonraker.conf"
+            cat ${KLIPPER_CONFIG_HOME}/moonraker.conf | sed -e " \
+                /^\[update_manager KlipperScreen\]/,+7 s/^/#/; \
+                    " > /tmp/moonraker.conf.tmp && mv /tmp/moonraker.conf.tmp ${KLIPPER_CONFIG_HOME}/moonraker.conf
+        fi
+        update_section=$(grep -c '\[update_manager KlipperScreen-happy_hare\]' \
+            ${KLIPPER_CONFIG_HOME}/moonraker.conf || true)
+        if [ "${update_section}" -eq 0 ]; then
+            echo "" >> ${KLIPPER_CONFIG_HOME}/moonraker.conf
+            while read -r line; do
+                echo -e "${line}" >> ${KLIPPER_CONFIG_HOME}/moonraker.conf
+            done < "${SRCDIR}/moonraker_update.txt"
+            echo "" >> ${KLIPPER_CONFIG_HOME}/moonraker.conf
+            restart_moonraker
+        else
+            echo -e "${WARNING}[update_manager KlipperScreen-happy_hare] already exist in moonraker.conf - skipping install"
+        fi
+    else
+        echo -e "${WARNING}Moonraker.conf not found!"
+    fi
+}
+
 restart_klipperscreen() {
     echo -e "${INFO}Restarting KlipperScreen..."
     sudo systemctl restart KlipperScreen
+}
+
+restart_moonraker() {
+    echo -e "${INFO}Restarting Moonraker..."
+    sudo systemctl restart moonraker
 }
 
 # Force script to exit if an error occurs
@@ -157,4 +191,13 @@ fi
 verify_not_root
 verify_home_dirs
 install_klipper_screen
+install_update_manager
+
+echo -e "${EMPHASIZE}"
+echo "Done.  Enjoy KlipperScreen Happy Hare Edition!"
+echo -e "${INFO}"
+echo '(\_/)'
+echo '( *,*)'
+echo '(")_(") ERCF Ready'
+echo
 
