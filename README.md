@@ -47,6 +47,7 @@ KlipperScreen will be restarted and hopefully you are now running the enhanced v
 
 **Notes:**
 1. The install updates moonraker so that KlipperScreen-happy_hare can be upgraded with update-manager. It comments out the original and inserts Happy Hare specific logic.  The one consequence of this is that you may see the following warning from Moonraker:
+
 ![ercf_panel_printing](docs/img/ercf/moonraker_warning.png)
 
 This is simply because I didn't want to call my software by the original name "KlipperScreen".  The fix this, click on the bell icon and select "Never" so the warning never appears again.  Note that the functionality of restarting "KlipperScreen" is still available via Mainsail.
