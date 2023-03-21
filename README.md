@@ -48,7 +48,7 @@ KlipperScreen will be restarted and hopefully you are now running the enhanced v
 
 **Notes:**
 
-1: Depending on what you have done with git before on your rpi, the `git pull` operation may require two more steps (you will see in the warning):
+**1:** Depending on what you have done with git before on your rpi, the `git pull` operation may require two more steps (you will see in the warning):
 
     > git config --global user.email "you@example.com"
     > git config --global user.name "First Last"
@@ -56,13 +56,24 @@ KlipperScreen will be restarted and hopefully you are now running the enhanced v
 
 (CTRL-X out of any editor that pops up -- you can ignore this and the identification doesn't have to be real)
 
-2: The install updates moonraker so that KlipperScreen-happy_hare can be upgraded with update-manager. It comments out the original and inserts Happy Hare specific logic.  The one consequence of this is that you may see the following warning from Moonraker:
+**2:** The install updates moonraker so that KlipperScreen-happy_hare can be upgraded with update-manager. It comments out the original and inserts Happy Hare specific logic.  The one consequence of this is that you may see the following warning from Moonraker:
 
 ![ercf_panel_printing](docs/img/ercf/moonraker_warning.png)
 
 This is simply because I didn't want to call my software by the original name "KlipperScreen".  The fix this, click on the bell icon with line through it and select "Never" so the warning never appears again.  Note that the functionality of restarting "KlipperScreen" is still available via Mainsail.
 
-3: If you are installing on a rpi without Klipper and printer attached the install will not be able to find the Klipper "config" directory where the `KlipperScreen.conf` and `ercf_klipperscreen.conf` should be placed.  To fix this, specify a `-c <config_dir>` option to the install line and specify a valid directory where KlipperScreen is expecting to see its config files.
+JFYI the installer will comment out the existing original entry in moonraker if it exists and add the following:
+
+    [update_manager KlipperScreen-happy_hare]
+    type: git_repo
+    path: /home/pi/KlipperScreen
+    origin: https://github.com/moggieuk/KlipperScreen-Happy-Hare-Edition.git
+    env: /home/pi/.KlipperScreen-env/bin/python
+    requirements: scripts/KlipperScreen-requirements.txt
+    install_script: scripts/KlipperScreen-install.sh
+    managed_services: KlipperScreen
+
+**3:** If you are installing on a rpi without Klipper and printer attached the install will not be able to find the Klipper "config" directory where the `KlipperScreen.conf` and `ercf_klipperscreen.conf` should be placed.  To fix this, specify a `-c <config_dir>` option to the install line and specify a valid directory where KlipperScreen is expecting to see its config files.
 
 **Expert tip:**
 The last step of running './install_ks -g <num_gates>' can be run many times.. if you customize the ERCF part of the KlipperScreen menu and want to make use of the "replicator" function that will automatically replicate menu options for the configured number of gates, you can edit menus.conf and reference the templating there.
@@ -70,7 +81,7 @@ The last step of running './install_ks -g <num_gates>' can be run many times.. i
 Note that the base KlipperScreen is fully up-to-date (and I will continue to pull updates) with changes in the original but also includes extra menu functionality that can be used in the creation of your custom menus.  See the generated ercf_klipperscreen.conf for clues!
 
 ## Request
-Remember that this is current a Beta release.  I need/want your help in finding corner cases, bugs or ideas for improvement.  I can offer limited help on the Discord channels but I would prefer if you submit an issue report via github so I can manage them.  This project and Happy Hare itself have taken a lot of time. I have a lot more planned so I need your help in organizing my work.
+Remember that this is v1.0, no doubt there are cornmer cases that I haven't considered and I'd like your feedback.  I can offer limited help on the Discord channels so would prefer if you submit an issue report via github so I can manage them.  This project and Happy Hare itself have taken a lot of time. I have a lot more planned so I need your help in organizing my work.
 
 Also, some folks have asked about making a donation to cover the cost of the all the coffee I'm drinking.  I'm not doing this for any financial reward but it you feel inclined a donation to PayPal https://www.paypal.me/moggieuk will certainly be spent making your life with ERCF more enjoyable.
 
