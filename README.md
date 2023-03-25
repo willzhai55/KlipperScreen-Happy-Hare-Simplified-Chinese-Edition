@@ -56,7 +56,25 @@ KlipperScreen will be restarted and hopefully you are now running the enhanced v
 
 (CTRL-X out of any editor that pops up -- you can ignore this and the identification doesn't have to be real)
 
-**2:** The install updates moonraker so that KlipperScreen-happy_hare can be upgraded with update-manager. It comments out the original and inserts Happy Hare specific logic.  The one consequence of this is that you may see the following warning from Moonraker:
+**2:** If you are installing on a rpi without Klipper and printer attached the install will not be able to find the Klipper "config" directory where the `KlipperScreen.conf` and `ercf_klipperscreen.conf` should be placed.  To fix this, specify a `-c <config_dir>` option to the install line and specify a valid directory where KlipperScreen is expecting to see its config files.
+
+**Expert tip:**
+The last step of running './install_ks -g <num_gates>' can be run many times.. if you customize the ERCF part of the KlipperScreen menu and want to make use of the "replicator" function that will automatically replicate menu options for the configured number of gates, you can edit menus.conf and reference the templating there.
+
+Note that the base KlipperScreen is fully up-to-date (and I will continue to pull updates) with changes in the original but also includes extra menu functionality that can be used in the creation of your custom menus.  See the generated ercf_klipperscreen.conf for clues!
+
+## Request
+Remember that this is v1.0, no doubt there are cornmer cases that I haven't considered and I'd like your feedback.  I can offer limited help on the Discord channels so would prefer if you submit an issue report via github so I can manage them.  This project and Happy Hare itself have taken a lot of time. I have a lot more planned so I need your help in organizing my work.
+
+Also, some folks have asked about making a donation to cover the cost of the all the coffee I'm drinking.  I'm not doing this for any financial reward but it you feel inclined a donation to PayPal https://www.paypal.me/moggieuk will certainly be spent making your life with ERCF more enjoyable.
+
+Thank you!
+
+## Caveats & Possible problems / workarounds
+I have only tested on a single screen.  A 640x480 resolution BTT TFT5.0.   I am not a UI programming expert and it is possible that you might find layout problems on other (likely smaller) displays.  Also, I have only tested in and optimized for horizonal orientation.  I doubt it will be effective in vertical but I don't know of any Voron owners with vertically mounted panels.
+
+### Moonraker warning
+The install updates moonraker so that KlipperScreen-happy_hare can be upgraded with update-manager. It comments out the original and inserts Happy Hare specific logic.  The one consequence of this is that you may see the following warning from Moonraker:
 
 ![ercf_panel_printing](docs/img/ercf/moonraker_warning.png)
 
@@ -73,22 +91,40 @@ JFYI the installer will comment out the existing original entry in moonraker if 
     install_script: scripts/KlipperScreen-install.sh
     managed_services: KlipperScreen
 
-**3:** If you are installing on a rpi without Klipper and printer attached the install will not be able to find the Klipper "config" directory where the `KlipperScreen.conf` and `ercf_klipperscreen.conf` should be placed.  To fix this, specify a `-c <config_dir>` option to the install line and specify a valid directory where KlipperScreen is expecting to see its config files.
+### Font problems:
+The CSS style only specifies a "Free Mono" font to be used (this is the same as original KlipperScreen") for all textual displays.  I use the Unicode Box character set in that font to render the selector status, filament positins and TTG map. A couple of users have reported correction of this part of the display, either not appearing or not spaced correctly.  E.g.
 
-**Expert tip:**
-The last step of running './install_ks -g <num_gates>' can be run many times.. if you customize the ERCF part of the KlipperScreen menu and want to make use of the "replicator" function that will automatically replicate menu options for the configured number of gates, you can edit menus.conf and reference the templating there.
+![ercf_panel_printing](docs/img/ercf/font_problem.jpg)
 
-Note that the base KlipperScreen is fully up-to-date (and I will continue to pull updates) with changes in the original but also includes extra menu functionality that can be used in the creation of your custom menus.  See the generated ercf_klipperscreen.conf for clues!
+If this occurs the first thing to try is:
+First thing to try is to run the following, then restart KlipperScreen:
 
-## Request
-Remember that this is v1.0, no doubt there are cornmer cases that I haven't considered and I'd like your feedback.  I can offer limited help on the Discord channels so would prefer if you submit an issue report via github so I can manage them.  This project and Happy Hare itself have taken a lot of time. I have a lot more planned so I need your help in organizing my work.
+    sudo apt install fontconfig
+    fc-cache -f -v
+    sudo systemctl restart KlipperScreen
 
-Also, some folks have asked about making a donation to cover the cost of the all the coffee I'm drinking.  I'm not doing this for any financial reward but it you feel inclined a donation to PayPal https://www.paypal.me/moggieuk will certainly be spent making your life with ERCF more enjoyable.
+If this doesn't fix the problem I suggest installing a new font set:
+Download the JetBrains fonts from (www.jetbrains.com).  Extract the zip.  Copy all the `*.ttf` fonts (you will find them under fonts/ttf in the extracted zip) into `/usr/share/fonts/truetype` directory (you will have to sudo cp else you will likely get permission denied), then cache these fonts:
 
-Thank you!
+    cd ..to where you extracted font files../fonts/ttf
+    sudo cp *.ttf /usr/share/fonts/truetype
+    fc-cache -f -v
+     
+Then finally update the font reference in the KlipperScreen css file:
 
-## Caveats
-I have only tested on a single screen.  A 640x480 resolution BTT TFT5.0.   I am not a UI programming expert and it is possible that you might find layout problems on other (likely smaller) displays.  Also, I have only tested in and optimized for horizonal orientation.  I doubt it will be effective in vertical but I don't know of any Voron owners with vertically mounted panels. 
+    cd ~/KlipperScreen/styles
+
+Edit `base.css` file.  Find the css entry for `.ercf_status`, then change the font-family to:
+
+    font-family:      JetBrains Mono;
+
+(it will by default be `font-family:     Free Mono;`)
+
+Then restart KlipperScreen
+
+    sudo systemctl restart KlipperScreen
+
+If you have to do like, please let me know with details about the operating system you are running on and how you installed KlipperScreen in the first place.
 
 *All screen shots are taken with the "Colorize" theme (my preference because the buttons are more defined).  The default is z-bolt and looks slightly different*
 
