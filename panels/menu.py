@@ -128,7 +128,7 @@ class MenuPanel(ScreenPanel):
             icon = env.from_string(item['icon']).render(printer) if item['icon'] else None
             style = env.from_string(item['style']).render(printer) if item['style'] else None
 
-            b = self._gtk.Button(icon, name, (style if style else f"color{(i % 4) + 1}"))
+            b = self._gtk.Button(icon, name, style or f"color{i % 4 + 1}")
 
             if item['panel'] is not None:
                 panel = env.from_string(item['panel']).render(printer)
