@@ -76,6 +76,14 @@ Here you can choose filament color by string name or RBG picker.  You can edit t
 
 Also note that you can update ERCF of a filament availability to save running an automatic gate check (although I always recommend that).
 
+## TTG (Tool-to-gate) Map and EndlessSpool Editor
+
+![ercf_toolmap](img/ercf/ercf_toolmap.png)
+
+This panel allows for the creation of sophisticated TTG maps and also the definition or editing of EndlessSpool groups.  There is a lot going on on this panel but basically you select the tool you are interested in editing, then you can change teh gate that it maps two (note that multiple tools can point to the same gate).  The "grouping graphic" to the right of the map shows the associated EndlessSpool group and can be managed at the botton of the screen. The lower left `+/-` buttons allow editing of other EndlessSpool groups which are symbolically named with letters A,B,C,...  You can save the entire map you can created with a single push of the `Save` button.  Finally, the `Reset` button will default TTG map and EndlessSpool groups to you defined defaults.
+
+In the example panel shown, tool T0 is selected and maps to Gate #1 and is a member of an EndlessSpool group that combines Gates #0,1,2,3; Tools T2-T5 are all mapped to Gate #5; etc.
+
 ## User extensible calibration/test panel
 
 ![ercf_klipperscreen](img/ercf/klipperscreen_config.png)
