@@ -62,16 +62,11 @@ class ErcfPicker(ScreenPanel):
             gate_box.pack_start(gate, True, True, 0)
             gate_box.pack_start(alt_gates, True, True, 0)
 
-            edit = self.labels[f'edit_{i}'] = self._gtk.Button('ercf_gear', f'Edit', 'color4')
-            edit.connect("clicked", self.select_edit, i)
-            edit.set_sensitive(False) # TODO... for editing TTG map and EndlessSpool
-
             grid.attach(status_box, 0, i, 3, 1)
             grid.attach(tool,       3, i, 3, 1)
             grid.attach(color,      6, i, 2, 1)
             grid.attach(material,   8, i, 3, 1)
-            grid.attach(gate_box,  11, i, 3, 1)
-            grid.attach(edit,      14, i, 2, 1)
+            grid.attach(gate_box,  11, i, 5, 1)
 
         self.labels['unknown_icon'] = self._gtk.Image('ercf_unknown').get_pixbuf()
         self.labels['available_icon'] = self._gtk.Image('ercf_tick').get_pixbuf()
@@ -101,8 +96,8 @@ class ErcfPicker(ScreenPanel):
             gate_str = (f"Gate #{t_map['gate']}")
             alt_gate_str = ''
             if endless_spool == 1 and len(t_map['alt_gates']) > 0:
-                alt_gate_str = '+(' + ', '.join(map(str, t_map['alt_gates'][:3]))
-                alt_gate_str += ', ...)' if len(t_map['alt_gates']) > 3 else ')'
+                alt_gate_str = '+(' + ', '.join(map(str, t_map['alt_gates'][:6]))
+                alt_gate_str += ', ...)' if len(t_map['alt_gates']) > 6 else ')'
 
             if gate_status[gate] == 1:
                 status_icon = 'available_icon'
@@ -124,9 +119,7 @@ class ErcfPicker(ScreenPanel):
             self.labels[f'alt_gates_{i}'].set_label(alt_gate_str)
 
 
-    # This builds a tool_map which is a structure that doesn't exist in Happy Hare yet. It is designed to
-    # be easier to understand than endless_spool_groups.
-    # Structure will be:
+    # Structure is:
     # tool_map = [ { 'gate': <gate>, 'alt_gates': <alternative_gates> }, ... ]
     def build_tool_map(self):
         tool_map = []
@@ -152,7 +145,6 @@ class ErcfPicker(ScreenPanel):
                 e_data = data['ercf']
                 if 'tool' in e_data or 'gate' in e_data or 'gate_status' in e_data or 'gate_material' in e_data or 'gate_color' in e_data:
                     self.activate()
-                    #self._screen._menu_go_back() # We don't support dynamic updates on this screen so just go back
 
     def select_tool(self, widget):
         ercf = self._printer.get_stat("ercf")
@@ -164,8 +156,4 @@ class ErcfPicker(ScreenPanel):
         else:
             self._screen._ws.klippy.gcode_script(f"ERCF_CHANGE_TOOL TOOL={tool}")
             self._screen._menu_go_back()
-
-    def select_edit(self, widget, sel_tool):
-        sel_tool = self._printer.get_stat('ercf', 'ttg_map')[sel_tool]
-        self._screen.show_panel('toolmap', 'ercf_toolmap', "ERCF TTG/EndlessSpool Editor", 1, False, tool=sel_tool) # TODO
 

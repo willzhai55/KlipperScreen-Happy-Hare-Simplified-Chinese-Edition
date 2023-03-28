@@ -632,17 +632,16 @@ popover button {
     color: grey;
 }
 
-/* PAUL TESTING ONLY */
-.ercf_test_red {
-    background: red;
+.ercf_es_gate {
+    border: .15em transparent;
+    margin-left: 0;
+    margin-right: 0;
+    border-top-left-radius: .5em;
+    border-bottom-left-radius: .5em;
+    border-top-right-radius: .5em;
+    border-bottom-right-radius: .5em;
+    min-height: 2em;
 }
-.ercf_test_blue {
-    background: blue;
-}
-.ercf_test_green {
-    background: green;
-}
-
 
 /* Hardcoded values until creation of dynamic CSS updates */
 .graph_label_hidden {padding-left: .9em;} /* .4em on top of normal button padding */
