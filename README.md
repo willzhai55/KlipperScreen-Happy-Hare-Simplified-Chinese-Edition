@@ -126,6 +126,13 @@ Then restart KlipperScreen
 
 If you have to do like, please let me know with details about the operating system you are running on and how you installed KlipperScreen in the first place.
 
+### Blank Screen after system update
+It has come to my attention that sometimes a system (OS) update can break KlipperScreen.  This is nothing to do with KlipperScreen but rather the installation of a slightly broken video driver `fbturbo`.  Luckily the fix is simple.  After OS upgrade run:
+
+    sudo apt purge xserver-xorg-video-fbturbo
+
+Then restart KlipperScreen.
+
 *All screen shots are taken with the "Colorize" theme (my preference because the buttons are more defined).  The default is z-bolt and looks slightly different*
 
 ## Now go read the [rest of the doc here](docs/ERCF.md)...

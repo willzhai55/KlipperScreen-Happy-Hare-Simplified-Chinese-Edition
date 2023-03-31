@@ -14,8 +14,6 @@ The philosophy behind this screen is that it works with the concept of `Tool` wh
 
 The top left button is replaced with a live monitor of Happy Hare clog/runout detection.  This "thermonitor" usually will sit at the bottom of the scale.  As the difference between extruder and encoder measured movement increases the "temperature" will rise.  If it hits the top a runout condition will be triggered.  The configurable check mark on the side is the 'headroom' used by the automatic tuning option and represents a safe gap to avoid accidental firing.  The detection length (and headroom) are all tunable, but with automatic, they will be updated at least every tool change.
 
-_Perhaps someone can help me... now you can visualize when clog detection is triggered, can you figure out what is being done in the wipe tower -- I'll let you see for yourselves..._
-
 When an ERCF error occurs in print the `Pause` button (which can manually force an ERCF error/pause condition) will change to `Last Error`.  This will conveniently recall the last error so you don't have to go to the console and well as displaying the tool change that was in progress at the time - very useful before correcting the issue).
 
 ![ercf_panel_bypass](img/ercf/last_error.png)
@@ -80,9 +78,9 @@ Also note that you can update ERCF of a filament availability to save running an
 
 ![ercf_toolmap](img/ercf/ercf_toolmap.png)
 
-This panel allows for the creation of sophisticated TTG maps and also the definition or editing of EndlessSpool groups.  There is a lot going on on this panel but basically you select the tool you are interested in editing, then you can change teh gate that it maps two (note that multiple tools can point to the same gate).  The "grouping graphic" to the right of the map shows the associated EndlessSpool group and can be managed at the botton of the screen. The lower left `+/-` buttons allow editing of other EndlessSpool groups which are symbolically named with letters A,B,C,...  You can save the entire map you can created with a single push of the `Save` button.  Finally, the `Reset` button will default TTG map and EndlessSpool groups to you defined defaults.
+This panel allows for the creation of sophisticated TTG maps and also the definition or editing of EndlessSpool groups.  There is a lot going on on this panel but basically you select the tool you are interested in editing, then you can change teh gate that it maps two (note that multiple tools can point to the same gate).  The "grouping graphic" to the right of the map shows the associated EndlessSpool group and can be managed at the botton of the screen. The lower left `+/-` buttons allow editing of other EndlessSpool groups which are symbolically named with letters A,B,C,...  You can save the entire map you can created with a single push of the `Save` button.  The `Reset` button will default TTG map and EndlessSpool groups to you defined defaults. Finally, you are able to turn the endless spool feature on/off with the little checkbutton next to the EndlessSpool group.
 
-In the example panel shown, tool T0 is selected and maps to Gate #1 and is a member of an EndlessSpool group that combines Gates #0,1,2,3; Tools T2-T5 are all mapped to Gate #5; etc.
+In the example panel shown, tool T0 is selected and maps to Gate #0 and is a member of an EndlessSpool group that combines Gates #0,1,2,3; Tools T2-T5 are all mapped to Gate #5; etc.
 
 ## User extensible calibration/test panel
 

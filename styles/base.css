@@ -643,6 +643,10 @@ popover button {
     min-height: 2em;
 }
 
+.ercf_endless_spool_toogle {
+    padding-bottom: 0.5em;
+}
+
 /* Hardcoded values until creation of dynamic CSS updates */
 .graph_label_hidden {padding-left: .9em;} /* .4em on top of normal button padding */
 .graph_label_extruder {border-left-width: .4em; border-left-style: solid;}

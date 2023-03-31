@@ -40,7 +40,7 @@ class ErcfToolmap(ScreenPanel):
         super().__init__(screen, title)
 
         # We need to keep track of just a little bit of UI state
-        self.ui_sel_tool = self.ui_sel_es_group = 0
+        self.ui_sel_tool = self.ui_sel_es_group = self.ui_es_enabled = 0
         self.ui_endless_spool_groups = self.ui_ttg_map = None
 
         ercf = self._printer.get_stat("ercf")
@@ -58,6 +58,7 @@ class ErcfToolmap(ScreenPanel):
             'es_group': self._gtk.Label("EndlessSpool - Editing ES Group: A"),
             'es_increase': self._gtk.Button('increase', None, scale=self.bts * 0.6),
             'reset': self._gtk.Button('refresh', 'Reset', scale=self.bts, position=Gtk.PositionType.LEFT, lines=1),
+            'endless_spool': Gtk.CheckButton(""),
         }
 
         self.labels['t_decrease'].connect("clicked", self.select_toolgate, 'tool', -1)
@@ -68,6 +69,7 @@ class ErcfToolmap(ScreenPanel):
         self.labels['es_increase'].connect("clicked", self.select_es, 1)
         self.labels['save'].connect("clicked", self.select_reset_save, "save")
         self.labels['reset'].connect("clicked", self.select_reset_save, "reset")
+        self.labels['endless_spool'].connect("notify::active", self.select_es_toggle)
 
         self.labels['tool'].get_style_context().add_class("ercf_tool_text")
         self.labels['gate'].get_style_context().add_class("ercf_gate_text")
@@ -78,6 +80,8 @@ class ErcfToolmap(ScreenPanel):
         self.labels['reset'].set_halign(Gtk.Align.CENTER)
         self.labels['reset'].set_valign(Gtk.Align.START)
         self.labels['reset'].set_vexpand(False)
+        self.labels['es_group'].set_xalign(0)
+        self.labels['endless_spool'].get_style_context().add_class("ercf_endless_spool_toggle")
 
         tool_grid = Gtk.Grid()
         tool_grid.set_row_homogeneous(True)
@@ -118,6 +122,11 @@ class ErcfToolmap(ScreenPanel):
         es_box.pack_start(self.labels['es_decrease'], False, True, 0)
         es_box.pack_start(self.labels['es_increase'], False, True, 0)
 
+        es_grp_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=0)
+        es_grp_box.set_vexpand(False)
+        es_grp_box.pack_start(self.labels['endless_spool'], False, False, 0)
+        es_grp_box.pack_start(self.labels['es_group'], True, True, 0)
+
         grid = Gtk.Grid()
         grid.set_column_homogeneous(True)
 
@@ -126,21 +135,18 @@ class ErcfToolmap(ScreenPanel):
         mid_pad = Gtk.Box()
         mid_pad.set_vexpand(True)
 
-        save_box = Gtk.Box()
-        save_box.pack_start(self.labels['save'], True, True, 20)
-
-        grid.attach(top_pad,                  0, 0, 14, 1)
-        grid.attach(Gtk.Box(),                0, 1,  1, 1)
-        grid.attach(tool_grid,                1, 1,  2, 2)
-        grid.attach(ttg_box,                  3, 1,  8, 1)
-        grid.attach(gate_grid,               11, 1,  2, 2)
-        grid.attach(Gtk.Box(),               13, 1,  1, 1)
-        grid.attach(self.labels['reset'],     3, 2,  8, 1)
-        grid.attach(mid_pad,                  0, 3, 14, 1)
-        grid.attach(es_box,                   0, 4,  2, 3)
-        grid.attach(self.labels['es_group'],  2, 4,  9, 1)
-        grid.attach(save_box,                11, 4,  3, 3)
-        grid.attach(es_flowbox,               2, 5,  9, 2)
+        grid.attach(top_pad,              0, 0, 14, 1)
+        grid.attach(Gtk.Box(),            0, 1,  1, 1)
+        grid.attach(tool_grid,            1, 1,  2, 2)
+        grid.attach(ttg_box,              3, 1,  8, 1)
+        grid.attach(gate_grid,           11, 1,  2, 2)
+        grid.attach(Gtk.Box(),           13, 1,  1, 1)
+        grid.attach(self.labels['reset'], 3, 2,  8, 1)
+        grid.attach(mid_pad,              0, 3, 14, 1)
+        grid.attach(es_box,               0, 4,  2, 3)
+        grid.attach(es_grp_box,           2, 4,  9, 1)
+        grid.attach(self.labels['save'], 12, 4,  2, 3)
+        grid.attach(es_flowbox,           2, 5,  9, 2)
 
         scroll = self._gtk.ScrolledWindow()
         scroll.add(grid)
@@ -151,6 +157,8 @@ class ErcfToolmap(ScreenPanel):
         self.ui_ttg_map = ercf['ttg_map']
         self.ui_endless_spool_groups = self.map_unique_groups(ercf['endless_spool_groups'])
         self.ui_sel_es_group = self.ui_endless_spool_groups[self.ui_ttg_map[self.ui_sel_tool]]
+        self.ui_es_enabled = ercf['endless_spool']
+        self.labels['endless_spool'].set_active(self.ui_es_enabled == 1)
         self.update_map()
         self.update_es_group()
 
@@ -245,8 +253,12 @@ class ErcfToolmap(ScreenPanel):
                 self.labels[f"es_gate{g}"].get_style_context().add_class("distbutton_active")
             else:
                 self.labels[f"es_gate{g}"].get_style_context().remove_class("distbutton_active")
+            self.labels[f"es_gate{g}"].set_sensitive(self.ui_es_enabled == 1)
         grp = self.convert_number_to_letter(self.ui_sel_es_group)
-        self.labels['es_group'].set_label(f"EndlessSpool - Editing ES Group: {grp}")
+        self.labels['es_group'].set_markup(f"EndlessSpool - Editing <b>ES Group: {grp}</b>")
+        self.labels['es_group'].set_sensitive(self.ui_es_enabled == 1)
+        self.labels['es_decrease'].set_sensitive(self.ui_es_enabled == 1 and self.ui_sel_es_group > 0)
+        self.labels['es_increase'].set_sensitive(self.ui_es_enabled == 1 and self.ui_sel_es_group < len(self.ui_ttg_map) - 1)
 
     def process_update(self, action, data):
         if action == "notify_status_update":
@@ -254,7 +266,7 @@ class ErcfToolmap(ScreenPanel):
                 return
             elif 'ercf' in data:
                 e_data = data['ercf']
-                if 'ttg_map' in e_data or 'endless_spool_groups' in e_data:
+                if 'ttg_map' in e_data or 'endless_spool_groups' in e_data or 'endless_spool' in e_data:
                     self.activate()
 
     def select_toolgate(self, widget, toolgate, param=0):
@@ -296,6 +308,14 @@ class ErcfToolmap(ScreenPanel):
         self.update_map()
         self.update_es_group()
 
+    def select_es_toggle(self, widget, param=0):
+        if self.labels['endless_spool'].get_active():
+            self.ui_es_enabled = 1
+        else:
+            self.ui_es_enabled = 0
+
+        self.update_es_group()
+
     def select_reset_save(self, widget, action):
         label = Gtk.Label()
         label.set_hexpand(True)
@@ -329,5 +349,5 @@ class ErcfToolmap(ScreenPanel):
                 ttg_map=",".join(map(str,self.ui_ttg_map))
                 groups=",".join(map(str,self.ui_endless_spool_groups))
                 self._screen._ws.klippy.gcode_script(f"ERCF_REMAP_TTG MAP={ttg_map} QUIET=1")
-                self._screen._ws.klippy.gcode_script(f"ERCF_ENDLESS_SPOOL GROUPS={groups} QUIET=1")
+                self._screen._ws.klippy.gcode_script(f"ERCF_ENDLESS_SPOOL GROUPS={groups} QUIET=1 ENABLE={self.ui_es_enabled}")
 
