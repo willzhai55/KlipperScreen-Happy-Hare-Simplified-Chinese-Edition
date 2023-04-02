@@ -224,6 +224,7 @@ class ErcfMain(ScreenPanel):
     def activate(self):
         self.markup_status = self._config.get_main_config().getboolean("ercf_color_gates", True)
         self.markup_filament = self._config.get_main_config().getboolean("ercf_color_filament", False)
+        self.bold_filament = self._config.get_main_config().getboolean("ercf_bold_filament", False)
         self.ui_sel_tool = self.NOT_SET
         self.init_tool_value()
 
@@ -436,9 +437,9 @@ class ErcfMain(ScreenPanel):
 
     def update_filament_status(self):
         if self.markup_filament:
-            self.labels['status5'].set_markup(self.get_filament_text(markup=True))
+            self.labels['status5'].set_markup(self.get_filament_text(markup=True, bold=self.bold_filament))
         else:
-            self.labels['status5'].set_label(self.get_filament_text())
+            self.labels['status5'].set_label(self.get_filament_text(bold=self.bold_filament))
 
         if self.check_toolhead_sensor() != None:
             if self.check_toolhead_sensor() == 1:
@@ -584,7 +585,7 @@ class ErcfMain(ScreenPanel):
         msg = [msg_gates, msg_tools, msg_avail, msg_selct]
         return [msg_gates, msg_tools, msg_avail, msg_selct], multi_tool
 
-    def get_filament_text(self, markup=False):
+    def get_filament_text(self, markup=False, bold=False):
         ercf = self._printer.get_stat("ercf")
         tool = ercf['tool']
         loaded_status = ercf['loaded_status']
@@ -597,13 +598,13 @@ class ErcfMain(ScreenPanel):
         elif loaded_status == self.LOADED_STATUS_UNKNOWN:
             move_str = "UNKNOWN"
         elif filament_direction == self.DIRECTION_LOAD:
-            move_str = " ▶▶▶"
+            move_str = " ▷▷▷"
         elif filament_direction == self.DIRECTION_UNLOAD:
-            move_str = " ◀◀◀"
+            move_str = " ◁◁◁"
         else:
             move_str = ""
         tool_str = (f"T{tool} ")[:3] if tool >=0 else "T? "
-        sensor_str = "│Ts│" if self.check_toolhead_sensor() != None else ""
+        sensor_str = "│Ts│" if (self.check_toolhead_sensor() != None and self.check_toolhead_sensor() != -1) else ""
         sensor_str_homed = "┫Ts│" if self.check_toolhead_sensor() != None else ""
         if tool == self.TOOL_BYPASS and loaded_status == self.LOADED_STATUS_FULL:
             visual = "BYPASS ^━━━$│En│^━━━━━━━━━━━━━━━━━━$│Nz│^━$▶ %s" % (move_str)
@@ -632,6 +633,8 @@ class ErcfMain(ScreenPanel):
 
         #if filament_direction == self.DIRECTION_UNLOAD and loaded_status != self.LOADED_STATUS_UNLOADED:
         #    visual = visual.replace("▶", "◀")
+        if bold:
+            visual = visual.replace("━", "█")
         if markup:
             gate_color = ercf['gate_color']
             gate = ercf['gate']

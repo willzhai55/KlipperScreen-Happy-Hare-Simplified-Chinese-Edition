@@ -702,9 +702,6 @@ class KlipperScreen(Gtk.Window):
     def toggle_macro_shortcut(self, value):
         self.base_panel.show_macro_shortcut(value)
 
-    def toggle_ercf_shortcut(self, value):
-        self.base_panel.show_ercf_shortcut(value)
-
     def change_language(self, lang):
         self._config.install_language(lang)
         self.lang_ltr = set_text_direction(lang)
