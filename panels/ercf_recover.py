@@ -176,7 +176,7 @@ class ErcfRecovery(ScreenPanel):
         if self.ui_sel_gate == self.DUMMY:
             self.ui_sel_gate = ercf['gate']
         if self.ui_sel_loaded == self.DUMMY:
-            self.ui_sel_loaded = 0 if ercf['filament'] == "Unloaded" else 1 if ercf['filament'] == "Loaded" else -1
+            self.ui_sel_loaded = 0 if ercf['filament'] == "Unloaded" else 1
 
     def get_possible_gates(self, tool):
         ercf = self._printer.get_stat("ercf")

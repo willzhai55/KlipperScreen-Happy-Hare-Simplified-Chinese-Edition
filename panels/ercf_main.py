@@ -634,7 +634,7 @@ class ErcfMain(ScreenPanel):
         #if filament_direction == self.DIRECTION_UNLOAD and loaded_status != self.LOADED_STATUS_UNLOADED:
         #    visual = visual.replace("▶", "◀")
         if bold:
-            visual = visual.replace("━", "█")
+            visual = visual.replace("━", "█").replace("▶", "▌")
         if markup:
             gate_color = ercf['gate_color']
             gate = ercf['gate']

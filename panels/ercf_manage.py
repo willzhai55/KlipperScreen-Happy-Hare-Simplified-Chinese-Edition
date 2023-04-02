@@ -42,7 +42,7 @@ class ErcfManage(ScreenPanel):
         # btn_states: The "gaps" are what functionality the state takes away. Multiple states are combined
         self.btn_states = {
             'all':             ['gate', 'checkgate', 'recover', 'load', 'eject', 'home', 'motors_off', 'servo_up', 'servo_down', 'load_ext', 'unload_ext'],
-            'not_homed':       [                     'recover',                  'home', 'motors_off', 'servo_up', 'servo_down', 'load_ext', 'unload_ext'],
+            'not_homed':       [                     'recover',         'eject', 'home', 'motors_off', 'servo_up', 'servo_down', 'load_ext', 'unload_ext'],
             'servo_up':        ['gate', 'checkgate', 'recover', 'load', 'eject', 'home', 'motors_off',             'servo_down', 'load_ext', 'unload_ext'],
             'servo_down':      ['gate', 'checkgate', 'recover', 'load', 'eject', 'home', 'motors_off', 'servo_up',               'load_ext', 'unload_ext'],
             'bypass_loaded':   [                     'recover',         'eject',         'motors_off', 'servo_up', 'servo_down',             'unload_ext'],
