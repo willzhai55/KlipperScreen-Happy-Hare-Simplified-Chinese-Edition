@@ -88,8 +88,8 @@ class ErcfRecovery(ScreenPanel):
             self.labels[i].set_xalign(0.5 if i.endswith("state") else 0)
             self.labels[i].set_yalign(0.7 if i.endswith("state") else 0.5)
             self.labels[i].get_style_context().add_class("ercf_recover")
-        self.labels['current_state'].set_label("Current ERCF State:")
-        self.labels['future_state'].set_label("Reset State To:")
+        self.labels['current_state'].set_label("Current ERCF state:")
+        self.labels['future_state'].set_label("Reset state to:")
 
         status_grid = Gtk.Grid()
         status_grid.set_column_homogeneous(True)

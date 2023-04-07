@@ -55,10 +55,10 @@ class ErcfToolmap(ScreenPanel):
             'g_increase': self._gtk.Button('increase', None, 'color2', scale=self.bts * 1.2),
             'save': self._gtk.Button('ercf_save', 'Save', 'color3'),
             'es_decrease': self._gtk.Button('decrease', None, scale=self.bts * 0.6),
-            'es_group': self._gtk.Label("EndlessSpool - Editing ES Group: A"),
+            'es_group': self._gtk.Label("ES Group: A"),
             'es_increase': self._gtk.Button('increase', None, scale=self.bts * 0.6),
             'reset': self._gtk.Button('refresh', 'Reset', scale=self.bts, position=Gtk.PositionType.LEFT, lines=1),
-            'endless_spool': Gtk.CheckButton(""),
+            'endless_spool': Gtk.CheckButton("EndlessSpool - Editing"),
         }
 
         self.labels['t_decrease'].connect("clicked", self.select_toolgate, 'tool', -1)
@@ -81,6 +81,7 @@ class ErcfToolmap(ScreenPanel):
         self.labels['reset'].set_valign(Gtk.Align.START)
         self.labels['reset'].set_vexpand(False)
         self.labels['es_group'].set_xalign(0)
+        self.labels['es_group'].get_style_context().add_class("ercf_endless_spool_toggle")
         self.labels['endless_spool'].get_style_context().add_class("ercf_endless_spool_toggle")
 
         tool_grid = Gtk.Grid()
@@ -110,6 +111,7 @@ class ErcfToolmap(ScreenPanel):
             ttg_box.pack_start(self.labels[name], False, True, 0)
 
         es_flowbox = Gtk.FlowBox(orientation=Gtk.Orientation.HORIZONTAL)
+        es_flowbox.set_selection_mode(Gtk.SelectionMode.NONE)
         es_flowbox.set_vexpand(False)
         for i in range(num_tools):
             g = self.labels[f'es_gate{i}'] = self._gtk.Button(label=str(i))
@@ -255,7 +257,7 @@ class ErcfToolmap(ScreenPanel):
                 self.labels[f"es_gate{g}"].get_style_context().remove_class("distbutton_active")
             self.labels[f"es_gate{g}"].set_sensitive(self.ui_es_enabled == 1)
         grp = self.convert_number_to_letter(self.ui_sel_es_group)
-        self.labels['es_group'].set_markup(f"EndlessSpool - Editing <b>ES Group: {grp}</b>")
+        self.labels['es_group'].set_markup(f"<b>ES Group: {grp}</b>")
         self.labels['es_group'].set_sensitive(self.ui_es_enabled == 1)
         self.labels['es_decrease'].set_sensitive(self.ui_es_enabled == 1 and self.ui_sel_es_group > 0)
         self.labels['es_increase'].set_sensitive(self.ui_es_enabled == 1 and self.ui_sel_es_group < len(self.ui_ttg_map) - 1)
