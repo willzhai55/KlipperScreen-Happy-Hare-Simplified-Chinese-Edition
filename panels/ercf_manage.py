@@ -166,6 +166,8 @@ class ErcfManage(ScreenPanel):
             if self.ui_sel_gate == self.TOOL_UNKNOWN:
                 self.ui_sel_gate = 0
         elif param == 0:
+            self.ui_action_button_name = 'gate'
+            self.ui_action_button_label = self.labels[self.ui_action_button_name].get_label()
             if self.ui_sel_gate == self.TOOL_BYPASS:
                 self._screen._ws.klippy.gcode_script(f"ERCF_SELECT_BYPASS")
             elif ercf['filament'] != "Loaded":
@@ -281,6 +283,7 @@ class ErcfManage(ScreenPanel):
         gate = ercf['gate']
         filament = ercf['filament']
         num_gates = len(ercf['gate_status'])
+        action = ercf['action']
         if (gate == self.TOOL_BYPASS and filament != "Unloaded") or not gate_sensitive:
             self.labels['g_decrease'].set_sensitive(False)
             self.labels['g_increase'].set_sensitive(False)
@@ -295,20 +298,24 @@ class ErcfManage(ScreenPanel):
             else:
                 self.labels['g_increase'].set_sensitive(True)
 
-        if self.ui_sel_gate >= 0:
-            self.labels['gate'].set_label(f"Gate #{self.ui_sel_gate}")
-            if ercf['gate'] == self.ui_sel_gate:
-                self.labels['gate'].set_sensitive(False)
+        if action == "Idle":
+            if self.ui_sel_gate >= 0:
+                self.labels['gate'].set_label(f"Gate #{self.ui_sel_gate}")
+                if ercf['gate'] == self.ui_sel_gate:
+                    self.labels['gate'].set_sensitive(False)
+                else:
+                    self.labels['gate'].set_sensitive(True)
+            elif self.ui_sel_gate == self.TOOL_BYPASS:
+                self.labels['gate'].set_label(f"Bypass")
+                if ercf['gate'] == self.ui_sel_gate:
+                    self.labels['gate'].set_sensitive(False)
+                else:
+                    self.labels['gate'].set_sensitive(True)
             else:
-                self.labels['gate'].set_sensitive(True)
-        elif self.ui_sel_gate == self.TOOL_BYPASS:
-            self.labels['gate'].set_label(f"Bypass")
-            if ercf['gate'] == self.ui_sel_gate:
-                self.labels['gate'].set_sensitive(False)
-            else:
-                self.labels['gate'].set_sensitive(True)
+                self.labels['gate'].set_label(f"Unknown")
         else:
-            self.labels['gate'].set_label(f"Unknown")
+            self.labels['tool'].set_label(action)
+            self.labels['tool'].set_sensitive(False)
 
         if self.ui_sel_gate == self.TOOL_BYPASS:
             self.labels['checkgate'].set_sensitive(False)
