@@ -41,7 +41,7 @@ class ErcfPicker(ScreenPanel):
             status_box.pack_start(available, True, True, 0)
 
             tool = self.labels[f'tool_{i}'] = self._gtk.Button('extruder', f'T{i}', 'color2')
-            tool.connect("clicked", self.select_tool)
+            tool.connect("clicked", self.select_tool, i)
 
             color = self.labels[f'color_{i}'] = Gtk.Label(f'⬤')
             color.get_style_context().add_class("ercf_color_swatch")
@@ -146,7 +146,7 @@ class ErcfPicker(ScreenPanel):
                 if 'tool' in e_data or 'gate' in e_data or 'gate_status' in e_data or 'gate_material' in e_data or 'gate_color' in e_data:
                     self.activate()
 
-    def select_tool(self, widget):
+    def select_tool(self, widget, selected_tool):
         ercf = self._printer.get_stat("ercf")
         tool = ercf['tool']
         filament = ercf['filament']
@@ -154,6 +154,6 @@ class ErcfPicker(ScreenPanel):
             # Should not of got here but do nothing for safety
             pass
         else:
-            self._screen._ws.klippy.gcode_script(f"ERCF_CHANGE_TOOL TOOL={tool}")
+            self._screen._ws.klippy.gcode_script(f"ERCF_CHANGE_TOOL TOOL={selected_tool}")
             self._screen._menu_go_back()
 

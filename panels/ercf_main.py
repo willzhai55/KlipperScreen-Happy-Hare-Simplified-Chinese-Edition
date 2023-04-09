@@ -69,6 +69,7 @@ class ErcfMain(ScreenPanel):
             'tool_unloaded':   ['check_gates', 'tool',          'picker', 'pause', 'message', 'unlock', 'resume', 'manage', 'more'],
             'tool_unknown':    ['check_gates', 'tool', 'eject', 'picker', 'pause', 'message', 'unlock', 'resume', 'manage', 'more'],
             'no_message':      ['check_gates', 'tool', 'eject', 'picker', 'pause',            'unlock', 'resume', 'manage', 'more'],
+            'busy':            [                                                                                  'manage', 'more'],
             'disabled':        [                                                                                                  ],
         }
 
@@ -391,6 +392,7 @@ class ErcfMain(ScreenPanel):
                 self.labels['tool'].set_sensitive(True)
         else:
             self.labels['tool'].set_label(action)
+            self.labels['tool'].set_sensitive(False)
 
         if self.ui_sel_tool == self.TOOL_BYPASS:
             self.labels['tool'].set_image(self.labels['select_bypass_img'])
@@ -427,7 +429,7 @@ class ErcfMain(ScreenPanel):
         ercf = self._printer.get_stat("ercf")
         filament = ercf['filament']
         action = ercf['action']
-        if action == "Idle" or action == "Busy":
+        if action == "Idle":
             pos_str = (f"Filament: {encoder_pos}mm") if filament != "Unloaded" else "Filament: Unloaded"
         elif action == "Loading" or action == "Unloading":
             pos_str = (f"{action}: {encoder_pos}mm")
@@ -479,6 +481,7 @@ class ErcfMain(ScreenPanel):
         is_paused = self._printer.get_stat("pause_resume")['is_paused']
         enabled = ercf['enabled']
         tool = ercf['tool']
+        action = ercf['action']
         filament = ercf['filament']
         ui_state = []
         if enabled:
@@ -516,6 +519,9 @@ class ErcfMain(ScreenPanel):
                 self.labels['pause_layer'].set_current_page(0) # Pause button
             else:
                 self.labels['pause_layer'].set_current_page(1) # Recall last error
+
+            if action != "Idle" and action != "Unknown":
+                ui_state.append("busy")
         else:
             ui_state.append("disabled")
             self.labels['runout_layer'].set_current_page(0)

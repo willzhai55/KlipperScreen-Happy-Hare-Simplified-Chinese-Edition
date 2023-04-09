@@ -29,6 +29,7 @@ class ErcfManage(ScreenPanel):
 
         # We need to keep track of just a little bit of UI state
         self.ui_sel_gate = self.NOT_SET
+        self.ui_action_button_name = self.ui_action_button_label = None
 
         self.has_bypass = False
         self.min_gate = 0
@@ -51,6 +52,7 @@ class ErcfManage(ScreenPanel):
             'tool_loaded':     [                     'recover',         'eject',         'motors_off', 'servo_up', 'servo_down',             'unload_ext'],
             'tool_unloaded':   ['gate', 'checkgate', 'recover', 'load',          'home', 'motors_off', 'servo_up', 'servo_down', 'load_ext', 'unload_ext'],
             'tool_unknown':    ['gate', 'checkgate', 'recover', 'load', 'eject', 'home', 'motors_off', 'servo_up', 'servo_down', 'load_ext', 'unload_ext'],
+            'busy':            [                                                                                                                         ],
             'disabled':        [                                                                                                                         ],
         }
 
@@ -118,6 +120,10 @@ class ErcfManage(ScreenPanel):
     def activate(self):
         self.ui_sel_gate = self.NOT_SET
         self.init_gate_values()
+        if self.ui_action_button_name != None:
+            self.labels[self.ui_action_button_name].set_label(self.ui_action_button_label)
+        self.ui_action_button_name = None
+        self.ui_action_button_label = ""
 
     def process_update(self, action, data):
         if action == "notify_status_update":
@@ -125,6 +131,18 @@ class ErcfManage(ScreenPanel):
                 e_data = data['ercf']
                 if 'gate' in e_data:
                     self.ui_sel_gate = e_data['gate']
+                    if e_data['gate'] >= 0:
+                        self.labels['load'].set_label(f"Load #{e_data['gate']}")
+                    else:
+                        self.labels['load'].set_label(f"Load")
+                if 'action' in e_data:
+                    action = e_data['action']
+                    if self.ui_action_button_name != None:
+                        if action == "Idle" or action == "Unknown":
+                            self.labels[self.ui_action_button_name].set_label(self.ui_action_button_label) # Restore original button label
+                            self.ui_action_button_name = None
+                        else:
+                            self.labels[self.ui_action_button_name].set_label(action) # Use button to convey action status
                 self.update_active_buttons()
 
     def init_gate_values(self):
@@ -156,20 +174,30 @@ class ErcfManage(ScreenPanel):
         self.update_gate_buttons()
 
     def select_gatebutton(self, widget):
+        self.ui_action_button_name = 'gate'
+        self.ui_action_button_label = self.labels[self.ui_action_button_name].get_label()
         self._screen._ws.klippy.gcode_script(f"ERCF_SELECT GATE={self.ui_sel_gate}")
 
     def select_checkgate(self, widget):
+        self.ui_action_button_name = 'checkgate'
+        self.ui_action_button_label = self.labels[self.ui_action_button_name].get_label()
         ercf = self._printer.get_stat("ercf")
         current_gate = ercf['gate']
         self._screen._ws.klippy.gcode_script(f"ERCF_CHECK_GATES GATE={current_gate} QUIET=1")
 
     def select_load(self, widget):
+        self.ui_action_button_name = 'load'
+        self.ui_action_button_label = self.labels[self.ui_action_button_name].get_label()
         self._screen._ws.klippy.gcode_script(f"ERCF_LOAD TEST=0") # TEST=0 is to aid backward compatibility of ERCF_LOAD command
 
     def select_eject(self, widget):
+        self.ui_action_button_name = 'eject'
+        self.ui_action_button_label = self.labels[self.ui_action_button_name].get_label()
         self._screen._ws.klippy.gcode_script(f"ERCF_EJECT")
 
     def select_home(self, widget):
+        self.ui_action_button_name = 'home'
+        self.ui_action_button_label = self.labels[self.ui_action_button_name].get_label()
         self._screen._ws.klippy.gcode_script(f"ERCF_HOME")
 
     def select_motors_off(self, widget):
@@ -187,9 +215,13 @@ class ErcfManage(ScreenPanel):
         self._screen._ws.klippy.gcode_script(f"ERCF_SERVO_DOWN")
 
     def select_load_extruder(self, widget):
+        self.ui_action_button_name = 'load_ext'
+        self.ui_action_button_label = self.labels[self.ui_action_button_name].get_label()
         self._screen._ws.klippy.gcode_script(f"ERCF_LOAD EXTRUDER_ONLY=1")
 
     def select_unload_extruder(self, widget):
+        self.ui_action_button_name = 'unload_ext'
+        self.ui_action_button_label = self.labels[self.ui_action_button_name].get_label()
         self._screen._ws.klippy.gcode_script(f"ERCF_EJECT EXTRUDER_ONLY=1")
 
     # Dynamically update button sensitivity based on state
@@ -201,6 +233,7 @@ class ErcfManage(ScreenPanel):
         is_homed = ercf['is_homed']
         gate = ercf['gate']
         tool = ercf['tool']
+        action = ercf['action']
         filament = ercf['filament']
         ui_state = []
         if enabled:
@@ -222,6 +255,9 @@ class ErcfManage(ScreenPanel):
                     ui_state.append("tool_unloaded")
                 else:
                     ui_state.append("tool_unknown")
+
+            if action != "Idle" and action != "Unknown":
+                ui_state.append("busy")
         else:
             ui_state.append("disabled")
 
