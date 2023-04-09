@@ -92,12 +92,11 @@ JFYI the installer will comment out the existing original entry in moonraker if 
     managed_services: KlipperScreen
 
 ### Font problems:
-The CSS style only specifies a "Free Mono" font to be used (this is the same as original KlipperScreen") for all textual displays.  I use the Unicode Box character set in that font to render the selector status, filament positins and TTG map. A couple of users have reported correction of this part of the display, either not appearing or not spaced correctly.  E.g.
+The CSS style only specifies a "Free Mono" font to be used (this is the same as original KlipperScreen") for all textual displays.  I use the Unicode Box character set in that font to render the selector status, filament positions and TTG map. A couple of users have reported issues with this part of the display, either not appearing or not spaced correctly.  E.g.
 
 ![ercf_panel_printing](docs/img/ercf/font_problem.jpg)
 
-If this occurs the first thing to try is:
-First thing to try is to run the following, then restart KlipperScreen:
+If this occurs the first thing to try is to run the following, then restart KlipperScreen:
 
     sudo apt install fontconfig
     fc-cache -f -v
@@ -124,7 +123,7 @@ Then restart KlipperScreen
 
     sudo systemctl restart KlipperScreen
 
-If you have to do like, please let me know with details about the operating system you are running on and how you installed KlipperScreen in the first place.
+If you have to do this, please let me know the details about the operating system you are running on and how you installed KlipperScreen in the first place... if I can locate the source of the issue I might be able to workaround in the future.
 
 ### Blank Screen after system update
 It has come to my attention that sometimes a system (OS) update can break KlipperScreen.  This is nothing to do with KlipperScreen but rather the installation of a slightly broken video driver `fbturbo`.  Luckily the fix is simple.  After OS upgrade run:
