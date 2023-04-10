@@ -97,7 +97,7 @@ class Printer:
             self.data[x].update(data[x])
 
         if "webhooks" in data or "print_stats" in data or "idle_timeout" in data:
-            self.process_status_update() # PAUL perhaps should consider "pause_resume" for status update..
+            self.process_status_update() # PAUL TODO perhaps should consider "pause_resume" for status update..
 
     def register_callback(self, var, method, arg):
         if var in self.printer_callbacks:
@@ -224,12 +224,11 @@ class Printer:
                 "output_pins": {"count": self.output_pin_count},
                 "gcode_macros": {"count": len(self.get_gcode_macros())},
                 "idle_timeout": self.get_stat("idle_timeout").copy(),
-                "pause_resume": self.get_stat("pause_resume").copy(),
+                "pause_resume": self.get_stat("pause_resume").copy(), # PAUL TODO: Origin code was?? "pause_resume": {"is_paused": self.state == "paused"},
                 "power_devices": {"count": len(self.get_power_devices())},
-                "ercf": self.get_stat("ercf").copy() # PAUL may not be needed .. only for menu screens..
+                "ercf": self.get_stat("ercf")
             }
         }
-        # PAUL WHY WAS THIS THE ORIGINAL CODE??       "pause_resume": {"is_paused": self.state == "paused"},
 
         sections = ["bed_mesh", "bltouch", "probe", "quad_gantry_level", "z_tilt"]
         for section in sections:
