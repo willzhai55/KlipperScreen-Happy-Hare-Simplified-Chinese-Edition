@@ -918,7 +918,7 @@ class KlipperScreen(Gtk.Window):
 
     def base_panel_show_all(self):
         self.base_panel.show_macro_shortcut(self._config.get_main_config().getboolean('side_macro_shortcut', True))
-        self.base_panel.show_ercf_shortcut(self._config.get_main_config().getboolean('side_ercf_shortcut', True))
+        self.base_panel.show_ercf_shortcut((self._config.get_main_config().getboolean('side_ercf_shortcut', True)) and self.printer.has_ercf)
         self.base_panel.show_heaters(True)
         self.base_panel.show_estop(True)
 

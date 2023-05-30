@@ -20,6 +20,7 @@ class Printer:
         self.tempdevcount = 0
         self.fancount = 0
         self.output_pin_count = 0
+        self.has_ercf = False
         self.store_timeout = None
         self.tempstore = {}
         self.busy_cb = busy_cb
@@ -35,6 +36,7 @@ class Printer:
         self.tempdevcount = 0
         self.fancount = 0
         self.output_pin_count = 0
+        self.has_ercf = False
         self.tempstore = {}
         self.busy = False
         if not self.store_timeout:
@@ -73,6 +75,8 @@ class Printer:
                     self.fancount += 1
             if x.startswith('output_pin ') and not x.split()[1].startswith("_"):
                 self.output_pin_count += 1
+            if x == 'ercf':
+                self.has_ercf = True
         self.process_update(data)
 
         logging.info(f"Klipper version: {printer_info['software_version']}")
@@ -80,6 +84,7 @@ class Printer:
         logging.info(f"# Temperature devices: {self.tempdevcount}")
         logging.info(f"# Fans: {self.fancount}")
         logging.info(f"# Output pins: {self.output_pin_count}")
+        logging.info(f"# Has ERCF: {self.has_ercf}")
 
     def process_update(self, data):
         if self.data is None:
@@ -224,11 +229,13 @@ class Printer:
                 "output_pins": {"count": self.output_pin_count},
                 "gcode_macros": {"count": len(self.get_gcode_macros())},
                 "idle_timeout": self.get_stat("idle_timeout").copy(),
-                "pause_resume": self.get_stat("pause_resume").copy(), # PAUL TODO: Origin code was?? "pause_resume": {"is_paused": self.state == "paused"},
-                "power_devices": {"count": len(self.get_power_devices())},
-                "ercf": self.get_stat("ercf")
+                "pause_resume": self.get_stat("pause_resume").copy(), # PAUL TODO: Original code was?? "pause_resume": {"is_paused": self.state == "paused"},
+                "power_devices": {"count": len(self.get_power_devices())}
             }
         }
+
+        if self.has_ercf:
+            data["printer"]["ercf"] = self.get_stat("ercf")
 
         sections = ["bed_mesh", "bltouch", "probe", "quad_gantry_level", "z_tilt"]
         for section in sections:
