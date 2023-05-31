@@ -250,7 +250,7 @@ class KlipperScreen(Gtk.Window):
         for f in self.printer.get_filament_sensors():
             requested_updates['objects'][f] = ["enabled", "filament_detected"]
         for e in self.printer.get_ercf_encoders():
-            requested_updates['objects'][e] = ["encoder_pos", "detection_length", "min_headroom", "headroom", "desired_headroom", "detection_mode", "enabled"]
+            requested_updates['objects'][e] = ["encoder_pos", "detection_length", "min_headroom", "headroom", "desired_headroom", "detection_mode", "enabled", "flow_rate"]
         for p in self.printer.get_output_pins():
             requested_updates['objects'][p] = ["value"]
 

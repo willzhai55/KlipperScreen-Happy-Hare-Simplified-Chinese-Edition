@@ -88,7 +88,7 @@ class ErcfMain(ScreenPanel):
             'more': self._gtk.Button('ercf_more', 'More...', 'color4'),
             'tool_icon': self._gtk.Image('extruder', self._gtk.img_width * 0.8, self._gtk.img_height * 0.8),
             'tool_label': self._gtk.Label('Unknown'),
-            'filament': self._gtk.Label('Filament: Unknown'),
+            'filament': self._gtk.Label('Filament: Unknown ▷ Flow: 100%'),
             'sensor': self._gtk.Label('Ts:'),
             'sensor_state': self._gtk.Label('   '),
             'select_bypass_img': self._gtk.Image('ercf_select_bypass'), # Alternative for tool
@@ -431,6 +431,9 @@ class ErcfMain(ScreenPanel):
         action = ercf['action']
         if action == "Idle":
             pos_str = (f"Filament: {encoder_pos}mm") if filament != "Unloaded" else "Filament: Unloaded"
+            if self._printer.get_stat("print_stats")['state'] == "printing":
+                flow_rate = self._printer.get_stat('ercf_encoder ercf_encoder')['flow_rate']
+                pos_str += f"  ➥ {flow_rate}%"
         elif action == "Loading" or action == "Unloading":
             pos_str = (f"{action}: {encoder_pos}mm")
         else:
