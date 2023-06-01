@@ -7,8 +7,8 @@
 #
 # Screen Capture: scrot -s -D :0.0
 #
-KLIPPER_CONFIG_HOME="${HOME}/klipper_config"
-PRINTER_DATA_CONFIG_HOME="${HOME}/printer_data/config"
+KLIPPER_CONFIG_HOME="${HOME}/printer_data/config"
+OLD_KLIPPER_CONFIG_HOME="${HOME}/klipper_config"
 
 declare -A PIN 2>/dev/null || {
     echo "Please run this script with ./bash $0"
@@ -66,12 +66,13 @@ check_klipper() {
 
 verify_home_dirs() {
     if [ ! -d "${KLIPPER_CONFIG_HOME}" ]; then
-        if [ ! -d "${PRINTER_DATA_CONFIG_HOME}" ]; then
-            echo -e "${ERROR}Klipper config directory (${KLIPPER_CONFIG_HOME} or ${PRINTER_DATA_CONFIG_HOME}) not found. Use '-c <dir>' option to override"
+        if [ ! -d "${OLD_KLIPPER_CONFIG_HOME}" ]; then
+            echo -e "${ERROR}Klipper config directory (${KLIPPER_CONFIG_HOME} or ${OLD_KLIPPER_CONFIG_HOME}) not found. Use '-c <dir>' option to override"
             exit -1
         fi
-        KLIPPER_CONFIG_HOME="${PRINTER_DATA_CONFIG_HOME}"
+        KLIPPER_CONFIG_HOME="${OLD_KLIPPER_CONFIG_HOME}"
     fi
+    echo -e "${INFO}Klipper config directory (${KLIPPER_CONFIG_HOME}) found"
 }
 
 install_klipper_screen() {
