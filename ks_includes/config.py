@@ -11,11 +11,13 @@ import locale
 from io import StringIO
 
 SCREEN_BLANKING_OPTIONS = [
-    300,  # 5 Minutes
-    900,  # 15 Minutes
-    1800,  # 30 Minutes
-    3600,  # 1 Hour
-    7200,  # 2 Hours
+    60,     # 1 Minute
+    120,    # 2 Minutes
+    300,    # 5 Minutes
+    900,    # 15 Minutes
+    1800,   # 30 Minutes
+    3600,   # 1 Hour
+    7200,   # 2 Hours
     14400,  # 4 Hours
 ]
 
@@ -237,7 +239,7 @@ class KlipperScreenConfig:
 
         self.configurable_options = [
             {"language": {
-                "section": "main", "name": _("Language"), "type": "dropdown", "value": "system_lang",
+                "section": "main", "name": _("Language"), "type": None, "value": "system_lang",
                 "callback": screen.change_language, "options": [
                     {"name": _("System") + " " + _("(default)"), "value": "system_lang"}]}},
             {"theme": {
@@ -308,10 +310,6 @@ class KlipperScreenConfig:
 
         self.configurable_options.extend(panel_options)
 
-        lang_opt = self.configurable_options[0]['language']['options']
-        for lang in self.lang_list:
-            lang_opt.append({"name": lang, "value": lang})
-
         t_path = os.path.join(klipperscreendir, 'styles')
         themes = [d for d in os.listdir(t_path) if (not os.path.isfile(os.path.join(t_path, d)) and d != "z-bolt")]
         themes.sort()
@@ -324,10 +322,11 @@ class KlipperScreenConfig:
             [i for i in self.configurable_options if list(i)[0] == "screen_blanking"][0])
         for num in SCREEN_BLANKING_OPTIONS:
             hour = num // 3600
+            minute = num / 60
             if hour > 0:
                 name = f'{hour} ' + ngettext("hour", "hours", hour)
             else:
-                name = f'{num / 60:.0f} ' + _("minutes")
+                name = f'{minute:.0f} ' + ngettext("minute", "minutes", minute)
             self.configurable_options[index]['screen_blanking']['options'].append({
                 "name": name,
                 "value": f"{num}"

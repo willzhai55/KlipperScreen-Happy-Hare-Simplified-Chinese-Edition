@@ -5,726 +5,727 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Czech\n"
+"Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-05-07 07:02-0600\n"
-"PO-Revision-Date: 2023-01-29 09:27-0600\n"
-"Last-Translator: \n"
-"Language-Team: Jan Stanka (stanky@email.cz)\n"
-"Language: cs\n"
+"PO-Revision-Date: 2023-05-07 18:50+0200\n"
+"Last-Translator: Thijs Triemstra <info@collab.nl>\n"
+"Language-Team: \n"
+"Language: nl_NL\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n>=2 && n<=4 ? 1 : 2);\n"
-"X-Generator: Poedit 2.4.2\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.2.2\n"
 
 #, python-format
 msgid "%s will be updated to version"
-msgstr "%s bude aktualizováno na verzi"
+msgstr "%s zal worden ge-update naar versie"
 
 msgid "(default)"
-msgstr ""
+msgstr "(standaard)"
 
 msgid "24 Hour Time"
-msgstr "24 hod formát"
+msgstr "24 Uurs Tijd"
 
 msgid "A FIRMWARE_RESTART may fix the issue."
-msgstr "FW restart může fixnout chyby."
+msgstr "Een FIRMWARE_RESTART kan het probleem oplossen."
 
 msgid "ADXL Not Configured"
-msgstr "ADXL není nastaven"
+msgstr "ADXL Niet Geconfigureerd"
 
 msgid "Abort"
-msgstr "Zrušit"
+msgstr "Annuleer"
 
 msgid "Acceleration:"
-msgstr "Zrychlení:"
+msgstr "Acceleratie:"
 
 msgid "Accept"
-msgstr "Přijmout"
+msgstr "Accepteer"
 
 msgid "Actions"
-msgstr "Akce"
+msgstr "Acties"
 
 msgid "Add profile"
-msgstr "Přidat profil"
+msgstr "Profiel toevoegen"
 
 msgid "Apply"
-msgstr "Použít"
+msgstr "Toepassen"
 
 #, python-format
 msgid "Apply %s%.3f offset to Endstop?"
-msgstr ""
+msgstr "Gebruik %s%.3f offset voor Eindstop?"
 
 #, python-format
 msgid "Apply %s%.3f offset to Probe?"
-msgstr ""
+msgstr "Gebruik %s%.3f offset voor Probe?"
 
 msgid "Are you sure do you want to exclude the object?"
-msgstr "Opravdu chceš vyjmout objekt?"
+msgstr "Weet je zeker dat je het object wilt uitsluiten?"
 
 msgid "Are you sure you want to run Emergency Stop?"
-msgstr "Opravdu okamžitě zastavit?"
+msgstr "Weet je zeker dat je de Nood Stop wilt inschakelen?"
 
 msgid "Are you sure you wish to cancel this print?"
-msgstr "Opravdu chcete zrušit tisk?"
+msgstr "Weet je zeker dat je deze print wilt annuleren?"
 
 msgid "Are you sure you wish to disable motors?"
-msgstr "Opravdu chcete uvolnit motory?"
+msgstr "Weet je zeker dat je de motors wilt uitschakelen?"
 
 msgid "Are you sure you wish to reboot the system?"
-msgstr "Opravdu chcete rebootovat systém?"
+msgstr "Weet je zeker dat je het systeem wilt herstarten?"
 
 msgid "Are you sure you wish to shutdown the system?"
-msgstr "Opravdu chcete vypnout systém?"
+msgstr "Weet je zeker dat je het systeem wilt afsluiten?"
 
 msgid "Auto"
 msgstr "Auto"
 
 msgid "Auto-calibrate"
-msgstr "Auto-kalibrace"
+msgstr "Auto-kalibreren"
 
 msgid "Auto-close notifications"
-msgstr "Automaticky zavřít upozornění"
+msgstr "Auto-sluit notificaties"
 
 msgid "Auto-scroll"
-msgstr "Auto posun"
+msgstr "Auto-scroll"
 
 msgid "Bed Level"
-msgstr "Vyrovnání podložky"
+msgstr "Bed Level"
 
 msgid "Bed Mesh"
-msgstr "Mapa podložky"
+msgstr "Bed Mesh"
 
 msgid "Bed screw configuration:"
-msgstr "Vyrovnání šroubů podložky:"
+msgstr "Bed schroef configuratie:"
 
 msgid "Calibrate"
-msgstr "Kalibrace"
+msgstr "Kalibreer"
 
 msgid "Calibrated"
-msgstr "Zkalibrováno"
+msgstr "Gekalibreerd"
 
 msgid "Calibrating"
-msgstr "Kalibruji"
+msgstr "Kalibreren"
 
 msgid "Camera"
-msgstr ""
+msgstr "Camera"
 
 msgid "Can't set above the maximum:"
-msgstr "Nemohu nastavit víc než max:"
+msgstr "Kan niet boven maximum instellen:"
 
 msgid "Cancel"
-msgstr "Zrušit"
+msgstr "Annuleer"
 
 msgid "Cancel Print"
-msgstr "Zrušit tisk"
+msgstr "Annuleer Print"
 
 msgid "Cancelled"
-msgstr "Zrušeno"
+msgstr "Geannuleerd"
 
 msgid "Cancelling"
-msgstr "Ruším"
+msgstr "Annuleren"
 
 msgid "Cannot connect to Moonraker"
-msgstr "Nelze se připojit k Moonraker"
+msgstr "Kan geen verbinding met Moonraker maken"
 
 msgid "Channel"
-msgstr "Kanál"
+msgstr "Kanaal"
 
 msgid "Check ADXL Wiring"
-msgstr "Zkontroluj zapojení ADXL"
+msgstr "Controleer AXDL Bedrading"
 
 msgid "Checking for updates, please wait..."
-msgstr "Kontrola aktualizací, čekej ..."
+msgstr "Bezig met controleren van updates, moment geduld.."
 
 msgid "Clear"
-msgstr "Vymaž"
+msgstr "Leegmaken"
 
 msgid "Close"
-msgstr "Zavřít"
+msgstr "Sluiten"
 
 msgid "Complete"
-msgstr "Hotovo"
+msgstr "Voltooid"
 
 msgid "Configuration"
-msgstr "Konfigurace"
+msgstr "Configuratie"
 
 msgid "Confirm Emergency Stop"
-msgstr "Potvrzovat Emergency Stop"
+msgstr "Bevestig Nood Stop"
 
 msgid "Connected"
-msgstr "Připojeno"
+msgstr "Verbonden"
 
 #, python-format
 msgid "Connecting to %s"
-msgstr "Připojování k %s"
+msgstr "Verbinden met %s"
 
 msgid "Console"
-msgstr "Konsole"
+msgstr "Console"
 
 msgid "Continue"
-msgstr "Pokračuj"
+msgstr "Doorgaan"
 
 msgid "Cooldown"
-msgstr "Zchladit"
+msgstr "Afkoelen"
 
 msgid "Date"
 msgstr "Datum"
 
 msgid "Delete Directory?"
-msgstr ""
+msgstr "Verwijder directory?"
 
 msgid "Delete File?"
-msgstr "Smazat soubor?"
+msgstr "Verwijder bestand?"
 
 msgid "Deselect"
-msgstr "Odznačit"
+msgstr "Deselecteer"
 
 msgid "Disable Motors"
-msgstr "Uvolnit motory"
+msgstr "Motors Uitschakelen"
 
 msgid "Disable XY"
-msgstr "Uvolnit XY"
+msgstr "XY Uitschakelen"
 
 msgid "Distance (mm)"
-msgstr "Vzdálenost (mm)"
+msgstr "Afstand (mm)"
 
 #, python-format
 msgid "Do you want to recover %s?"
-msgstr "Obnovit %s?"
+msgstr "Wil je %s herstellen?"
 
 msgid "Elapsed:"
-msgstr "Uplynulo:"
+msgstr "Verstreken:"
 
 msgid "Error"
-msgstr "Chyba"
+msgstr "Error"
 
 msgid "Estimated Time Method"
-msgstr "Výpočet doby tisku"
+msgstr "Schatting Tijd Methode"
 
 msgid "Exclude Object"
-msgstr "Vyloučit objekt"
+msgstr "Uitsluiten Object"
 
 msgid "Extra Large"
-msgstr "Extra velký"
+msgstr "Extra Groot"
 
 msgid "Extrude"
-msgstr "Extruze"
+msgstr "Extrude"
 
 msgid "Extrusion +"
-msgstr "Extruze +"
+msgstr "Extrusion +"
 
 msgid "Extrusion -"
-msgstr "Extruze -"
+msgstr "Extrusion -"
 
 msgid "Failed, adjust position first"
-msgstr "Chyba, nastav nejprve pozici"
+msgstr "Mislukt, wijzig positie eerst"
 
 msgid "Fan"
-msgstr "Větrák"
+msgstr "Ventilator"
 
 msgid "Filament Used"
-msgstr "Typ filamentu"
+msgstr "Filament Gebruikt"
 
 msgid "Filament total:"
-msgstr "Filament celkem:"
+msgstr "Filament totaal:"
 
 msgid "Filament used:"
-msgstr "Použitý filament:"
+msgstr "Filament gebruikt:"
 
 msgid "Filament:"
 msgstr "Filament:"
 
 msgid "File"
-msgstr "Soubor"
+msgstr "Bestand"
 
 msgid "File:"
-msgstr "Soubor:"
+msgstr "Bestand:"
 
 msgid "Finding ADXL"
-msgstr "Hledání ADXL"
+msgstr "Zoekt ADXL"
 
 msgid "Fine Tuning"
-msgstr "Ladění"
+msgstr "Fine Tuning"
 
 msgid "Finish"
-msgstr "Konec"
+msgstr "Voltooi"
 
 msgid "Firmware Restart"
-msgstr "Firmware Restart"
+msgstr "Firmware Herstarten"
 
 msgid "Flow:"
-msgstr "Tok:"
+msgstr "Flow:"
 
 msgid "Flowrate:"
-msgstr "Rychlost toku:"
+msgstr "Flowrate:"
 
 msgid "Font Size"
-msgstr "Velikost fontu"
+msgstr "Lettertype Grootte"
 
 msgid "Full Update"
-msgstr "Úplný update"
+msgstr "Volledige Update"
 
 msgid "Fullscreen"
-msgstr ""
+msgstr "Volledig Scherm"
 
 msgid "Go Back"
-msgstr "Zpět"
+msgstr "Ga Terug"
 
 msgid "Height:"
-msgstr "Výška:"
+msgstr "Hoogte:"
 
 msgid "Hidden"
-msgstr "Skrytý"
+msgstr "Verborgen"
 
 msgid "Hide"
-msgstr "Skrýt"
+msgstr "Verberg"
 
 msgid "Hide sensors in Temp."
-msgstr "Skrýt senzory v Temp."
+msgstr "Verberg sensoren in Temp."
 
 msgid "Hide temp."
-msgstr "Skrýt teplotu"
+msgstr "Verberg temp."
 
 msgid "Home All"
-msgstr "Zaparkovat XYZ"
+msgstr "Home alles"
 
 msgid "Home X"
-msgstr "Zaparkovat X"
+msgstr "Home X"
 
 msgid "Home XY"
-msgstr "Zaparkovat XY"
+msgstr "Home XY"
 
 msgid "Home Y"
-msgstr "Zaparkovat Y"
+msgstr "Home Y"
 
 msgid "Home Z"
-msgstr "Zaparkovat Z"
+msgstr "Home Z"
 
 msgid "Homing"
-msgstr "Domů"
+msgstr "Homing"
 
 msgid "Host"
 msgstr "Host"
 
 msgid "Hostname"
-msgstr "Hostname"
+msgstr "Hostnaam"
 
 msgid "Icon Theme"
-msgstr "Sada ikon"
+msgstr "Icoon Thema"
 
 msgid "Initializing printer..."
-msgstr "Startuji tiskárnu ..."
+msgstr "Initialiseren printer…"
 
 msgid "Input Shaper"
-msgstr ""
+msgstr "Input Shaper"
 
 msgid "Interface"
-msgstr "Rozhraní"
+msgstr "Interface"
 
 msgid "Invalid"
-msgstr "Špatně"
+msgstr "Ongeldig"
 
 msgid "Invalid password"
-msgstr "Špatné heslo"
+msgstr "Ongeldig wachtwoord"
 
 msgid "Invert X"
-msgstr "Otočit X"
+msgstr "Invert X"
 
 msgid "Invert Y"
-msgstr "Otočit Y"
+msgstr "Invert Y"
 
 msgid "Invert Z"
-msgstr "Otočit Z"
+msgstr "Invert Z"
 
 msgid "Klipper Restart"
-msgstr "Klipper Restart"
+msgstr "Klipper Herstarten"
 
 msgid "Klipper has disconnected"
-msgstr "Klipper odpojen"
+msgstr "Klipper verbinding verbroken"
 
 msgid "Klipper has encountered an error."
-msgstr "Klipper zaznamenal chybu."
+msgstr "Klipper heeft een fout ontdekt."
 
 msgid "Klipper has shutdown"
-msgstr "Klipper zastaven"
+msgstr "Klipper is afgesloten"
 
 msgid "Klipper is attempting to start"
-msgstr "Klipper startuje"
+msgstr "Klipper probeert te starten"
 
 msgid "Klipper will reboot"
-msgstr "Klipper se restartuje"
+msgstr "Klipper zal herstarten"
 
 msgid "KlipperScreen will reboot"
-msgstr "KlipperScreen se restartuje"
+msgstr "KlipperScreen zal herstarten"
 
 msgid "Language"
-msgstr "Jazyk"
+msgstr "Taal"
 
 msgid "Large"
-msgstr "Velký"
+msgstr "Groot"
 
 msgid "Layer:"
-msgstr "Vrstva:"
+msgstr "Laag:"
 
 msgid "Left:"
-msgstr "Zbývá:"
+msgstr "Links:"
 
 msgid "Limits"
-msgstr "Limity"
+msgstr "Limieten"
 
 msgid "Load"
-msgstr "Zasuň"
+msgstr "Laad"
 
 msgid "Lower Nozzle"
-msgstr "Trysku níž"
+msgstr "Onderste Nozzle"
 
 msgid "Macro shortcut on sidebar"
-msgstr "Macro shortcut on sidebar"
+msgstr "Macro snelkoppeling in sidebar"
 
 msgid "Macros"
-msgstr "Makra"
+msgstr "Macros"
 
 msgid "Main Menu"
-msgstr "Hlavní menu"
+msgstr "Hoofd Menu"
 
 msgid "Max"
 msgstr "Max"
 
 msgid "Max Acceleration"
-msgstr "Max. zrychlení"
+msgstr "Max Acceleratie"
 
 msgid "Max Acceleration to Deceleration"
-msgstr "Z max. zrychlení do zpomalení"
+msgstr "Max Acceleratie naar De-acceleratie"
 
 msgid "Max Velocity"
-msgstr "Max. rychlost"
+msgstr "Max Velocity"
 
 msgid "Maximum"
 msgstr "Maximum"
 
 msgid "Measure Both"
-msgstr "Změřit oboje"
+msgstr "Meet Beide"
 
 msgid "Measure X"
-msgstr "Změřit X"
+msgstr "Meet X"
 
 msgid "Measure Y"
-msgstr "Změřit Y"
+msgstr "Meet Y"
 
 msgid "Medium"
-msgstr "Střední"
+msgstr "Medium"
 
 msgid "Menu"
 msgstr "Menu"
 
 msgid "Mesh calibrate"
-msgstr "Kalibrace sítě"
+msgstr "Mesh kalibreren"
 
 msgid "Modified"
-msgstr "Změněno"
+msgstr "Aangepast"
 
 msgid "Moonraker: connected"
-msgstr "Moonraker: připojen"
+msgstr "Moonraker: verbonden"
 
 msgid "Move"
-msgstr "Posun"
+msgstr "Beweeg"
 
 msgid "Move Distance (mm)"
-msgstr "Vzdálenost posunu (mm)"
+msgstr "Beweeg Afstand (mm)"
 
 msgid "Name"
-msgstr "Jméno"
+msgstr "Naam"
 
 msgid "Network"
-msgstr "Síť"
+msgstr "Netwerk"
 
 msgid "Never"
-msgstr "Nikdy"
+msgstr "Nooit"
 
 msgid "New"
-msgstr "Nový"
+msgstr "Nieuw"
 
 msgid ""
 "Not supported for auto-detection, it needs to be configured in klipperscreen."
 "conf"
-msgstr "Nepodporováno autodetekcí, nakonfiguruj v klipperscreen.conf"
+msgstr ""
+"Niet ondersteunt voor auto-detectie, dit moet worden geconfigureerd in "
+"klipperscreen.conf"
 
 msgid "Nothing selected"
-msgstr "Nevybráno nic"
+msgstr "Niets geselecteerd"
 
 #, python-format
 msgid "Outdated by %d"
-msgstr "Zastaralý %d"
+msgstr "Verouderd sinds %d"
 
 msgid "PSK for"
-msgstr "PSK pro"
+msgstr "PSK voor"
 
 msgid "Package will be updated"
 msgid_plural "Packages will be updated"
-msgstr[0] "Balíček bude aktualizován"
-msgstr[1] "Balíčky budou aktualizovány"
-msgstr[2] ""
+msgstr[0] "Pakket word ge-update"
+msgstr[1] "Pakketten worden ge-update"
 
 msgid "Part Fan"
-msgstr "Částečný ofuk"
+msgstr "Part Ventilator"
 
 msgid "Password saved"
-msgstr "Heslo uloženo"
+msgstr "Wachtwoord opgeslagen"
 
 msgid "Pause"
-msgstr "Pauza"
+msgstr "Pauzeer"
 
 msgid "Paused"
-msgstr "Pozastaveno"
+msgstr "Gepauzeerd"
 
 msgid "Perform a full upgrade?"
-msgstr "Úplně aktualizovat?"
+msgstr "Volledige upgrade uitvoeren?"
 
 msgid "Pins"
-msgstr "Piny"
+msgstr "Pinnen"
 
 msgid "Please recompile and flash the micro-controller."
-msgstr "Znovu přelož a flashni micro-controller."
+msgstr "Hercompileer en flash de micro-controller aub."
 
 msgid "Power"
-msgstr "Zdroj"
+msgstr "Stroom"
 
 msgid "Power On Printer"
-msgstr "Zapni tiskárnu"
+msgstr "Printer Aanzetten"
 
 msgid "Pressure Advance:"
 msgstr "Pressure Advance:"
 
 msgid "Print"
-msgstr "Tisk"
+msgstr "Print"
 
 msgid "Print Control"
-msgstr "Nastavení tisku"
+msgstr "Print Control"
 
 msgid "Print Time"
-msgstr "Čas tisku"
+msgstr "Print Tijd"
 
 msgid "Printer"
-msgstr "Tiskárna"
+msgstr "Printer"
 
 msgid "Printer Connections"
-msgstr "Připojení"
+msgstr "Printer Verbindingen"
 
 msgid "Printer Select"
-msgstr "Výběr tiskárny"
+msgstr "Printer Selecteren"
 
 msgid "Printing"
-msgstr "Probíhá tisk"
+msgstr "Bezig met printen"
 
 msgid "Probe Offset"
-msgstr "Offset sondy"
+msgstr "Probe Offset"
 
 msgid "Profile Name:"
-msgstr "Jméno profilu:"
+msgstr "Profiel Naam:"
 
 msgid "Provide KlipperScreen.log when asking for help.\n"
-msgstr "Provide KlipperScreen.log when asking for help.\n"
+msgstr "Stuur ook KlipperScreen.log als je vraagt om hulp.\n"
 
 msgid "Quad Gantry Level"
 msgstr "Quad Gantry Level"
 
 msgid "Raise Nozzle"
-msgstr "Zvedni trysku"
+msgstr "Nozzle omhoog"
 
 msgid "Recover"
-msgstr "Recover"
+msgstr "Herstellen"
 
 msgid "Recover Hard"
-msgstr "Recover Hard"
+msgstr "Hard Herstel"
 
 msgid "Recover Soft"
-msgstr "Recover Soft"
+msgstr "Soft Herstel"
 
 msgid "Reference"
-msgstr "Reference"
+msgstr "Referentie"
 
 msgid "Refresh"
-msgstr "Obnovit"
+msgstr "Refresh"
 
 msgid "Rename/Move:"
-msgstr ""
+msgstr "Hernoem/beweeg:"
 
 msgid "Restart"
-msgstr "Restart"
+msgstr "Herstarten"
 
 msgid "Resume"
-msgstr "Pokračuj"
+msgstr "Hervatten"
 
 msgid "Retract"
-msgstr "Retrakce"
+msgstr "Retract"
 
 msgid "Retraction"
-msgstr "Retrakce"
+msgstr "Retraction"
 
 msgid "Retraction Length"
-msgstr "Délka retrakce"
+msgstr "Retraction Lengte"
 
 msgid "Retraction Speed"
-msgstr "Rychlost retrakce"
+msgstr "Retraction Snelheid"
 
 msgid "Retry"
-msgstr "Znovu"
+msgstr "Opnieuw"
 
 msgid "Retrying"
-msgstr "Zkouším znovu"
+msgstr "Probeert opnieuw"
 
 msgid "Save"
-msgstr "Uložit"
+msgstr "Opslaan"
 
 msgid "Save Config"
-msgstr "Ulož nastavení"
+msgstr "Config Opslaan"
 
 msgid "Save Z"
-msgstr "Uložit Z"
+msgstr "Z Opslaan"
 
 msgid "Save configuration?"
-msgstr "Uložit nastavení?"
+msgstr "Configuratie opslaan?"
 
 msgid "Saved"
-msgstr "Uloženo"
+msgstr "Opgeslagen"
 
 #, python-format
 msgid "Saved offset: %s"
-msgstr "Uložený offset: %s"
+msgstr "Offset opgeslagen: %s"
 
 msgid "Screen DPMS"
-msgstr "Screen DPMS"
+msgstr "Scherm DPMS"
 
 msgid "Screen Power Off Time"
-msgstr "Čas vypnutí displeje"
+msgstr "Scherm Uitschakelen Tijd"
 
 msgid "Screws Adjust"
-msgstr "Nastavit šrouby"
+msgstr "Schroeven Aanpassen"
 
 msgid "Select"
-msgstr "Vyber"
+msgstr "Selecteer"
 
 msgid "Send"
-msgstr "Odeslat"
+msgstr "Verstuur"
 
 msgid "Set Temp"
-msgstr "Nastav teplotu"
+msgstr "Verander Temp"
 
 msgid "Settings"
-msgstr "Nastavení"
+msgstr "Instellingen"
 
 msgid "Show"
-msgstr "Ukaž"
+msgstr "Toon"
 
 msgid "Show Heater Power"
-msgstr "Ukaž odběr topení"
+msgstr "Toon Heater Stroom"
 
 msgid "Shutdown"
-msgstr "Shutdown"
+msgstr "Afsluiten"
 
 msgid "Size"
-msgstr "Velikost"
+msgstr "Afmetingen"
 
 msgid "Slicer"
 msgstr "Slicer"
 
 msgid "Slicer Time correction (%)"
-msgstr "Časová korekce Sliceru  (%)"
+msgstr "Slicer Tijd correctie (%)"
 
 msgid "Slicer:"
 msgstr "Slicer:"
 
 msgid "Small"
-msgstr "Malý"
+msgstr "Klein"
 
 msgid "Speed (mm/s)"
-msgstr "Rychlost (mm/s)"
+msgstr "Snelheid (mm/s)"
 
 msgid "Speed +"
-msgstr "Rychlost ₊"
+msgstr "Snelheid +"
 
 msgid "Speed -"
-msgstr "Rychlost -"
+msgstr "Snelheid -"
 
 msgid "Speed:"
-msgstr "Rychlost:"
+msgstr "Snelheid:"
 
 msgid "Square Corner Velocity"
-msgstr ""
+msgstr "Square Corner Velocity"
 
 msgid "Start"
 msgstr "Start"
 
 msgid "Starting WiFi Association"
-msgstr "Připojování k WiFi"
+msgstr "WiFi Association starten"
 
 msgid "Starting recovery for"
-msgstr "Obnovuji"
+msgstr "Herstel starten voor"
 
 msgid "Starting update for"
-msgstr "Aktualizuji"
+msgstr "Update starten voor"
 
 msgid "System"
-msgstr "Systém"
+msgstr "Systeem"
 
 msgid "System Restart"
-msgstr "Restart systému"
+msgstr "Systeem Herstarten"
 
 msgid "System Shutdown"
-msgstr "Vypnutí"
+msgstr "Systeem Afsluiten"
 
 msgid "Temp (°C)"
-msgstr "Teplota (°C)"
+msgstr "Temp (°C)"
 
 msgid "Temperature"
-msgstr "Teplota"
+msgstr "Temperatuur"
 
 msgid "Total:"
-msgstr "Total:"
+msgstr "Totaal:"
 
 msgid "Unknown Heater"
-msgstr "Neznámé topení"
+msgstr "Onbekende Heater"
 
 msgid "Unknown screw position"
-msgstr "Neznámé nastavení šroubů"
+msgstr "Onbekende schroef positie"
 
 msgid "Unload"
-msgstr "Vysuň"
+msgstr "Uitladen"
 
 msgid "Unretract Extra Length"
-msgstr "Vysuň extra délku"
+msgstr "Unretract Extra Lengte"
 
 msgid "Unretract Speed"
-msgstr "Vysunovací rychlost"
+msgstr "Unretract Snelheid"
 
 msgid "Up To Date"
-msgstr "Aktuální"
+msgstr "Up To Date"
 
 msgid "Update"
-msgstr "Aktualizuj"
+msgstr "Update"
 
 msgid "Updating"
-msgstr "Aktualizuji"
+msgstr "Bezig met updaten"
 
 msgid "Uploaded"
-msgstr "Nahrané"
+msgstr "Geupload"
 
 msgid "XY Move Speed (mm/s)"
-msgstr "Rychlost pohybu XY  (mm/s)"
+msgstr "XY Move Snelheid (mm/s)"
 
 msgid "XY Speed (mm/s)"
-msgstr "Rychlost XY (mm/s)"
+msgstr "XY Snelheid (mm/s)"
 
 msgid "Z Calibrate"
-msgstr "Kalibrace Z"
+msgstr "Z Kalibratie"
 
 msgid "Z Move Speed (mm/s)"
-msgstr "Rychlost pohybu Z (mm/s)"
+msgstr "Z Move Snelheid (mm/s)"
 
 msgid "Z Speed (mm/s)"
-msgstr "Rychlost pohybu Z  (mm/s)"
+msgstr "Z Snelheid (mm/s)"
 
 msgid "Z Tilt"
 msgstr "Z Tilt"
@@ -734,24 +735,21 @@ msgstr "Z offset:"
 
 msgid "commit"
 msgid_plural "commits"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "commit"
+msgstr[1] "commits"
 
 msgid "dBm"
 msgstr "dBm"
 
 msgid "hour"
 msgid_plural "hours"
-msgstr[0] "hodina"
-msgstr[1] "hodiny"
-msgstr[2] "hodin"
+msgstr[0] "uur"
+msgstr[1] "uren"
 
 msgid "minute"
 msgid_plural "minutes"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "minuut"
+msgstr[1] "minuten"
 
 msgid "mm"
 msgstr "mm"
@@ -764,16 +762,3 @@ msgstr "mm/s²"
 
 msgid "mm³/s"
 msgstr "mm³/s"
-
-#~ msgid "Calibrated, save configuration to make it permanent"
-#~ msgstr "Zkalibrováno, uložit změny jako trvalé"
-
-#~ msgid "Decrease"
-#~ msgstr "Snížit"
-
-#~ msgid "Increase"
-#~ msgstr "Zvětšit"
-
-#, python-format
-#~ msgid "Sending Power ON signal to: %s"
-#~ msgstr "Odeslat ZAP do %s"

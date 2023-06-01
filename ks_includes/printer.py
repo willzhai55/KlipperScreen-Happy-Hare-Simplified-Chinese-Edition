@@ -1,5 +1,5 @@
 import logging
-
+import contextlib
 import gi
 
 gi.require_version("Gtk", "3.0")
@@ -77,6 +77,15 @@ class Printer:
                 self.output_pin_count += 1
             if x == 'ercf':
                 self.has_ercf = True
+            if x.startswith('bed_mesh '):
+                r = self.config[x]
+                r['x_count'] = int(r['x_count'])
+                r['y_count'] = int(r['y_count'])
+                r['max_x'] = float(r['max_x'])
+                r['min_x'] = float(r['min_x'])
+                r['max_y'] = float(r['max_y'])
+                r['min_y'] = float(r['min_y'])
+                r['points'] = [[float(j.strip()) for j in i.split(",")] for i in r['points'].strip().split("\n")]
         self.process_update(data)
 
         logging.info(f"Klipper version: {printer_info['software_version']}")
@@ -102,7 +111,7 @@ class Printer:
             self.data[x].update(data[x])
 
         if "webhooks" in data or "print_stats" in data or "idle_timeout" in data:
-            self.process_status_update() # PAUL TODO perhaps should consider "pause_resume" for status update..
+            self.process_status_update()
 
     def register_callback(self, var, method, arg):
         if var in self.printer_callbacks:
@@ -114,7 +123,6 @@ class Printer:
         # webhooks states: startup, ready, shutdown, error
         # print_stats: standby, printing, paused, error, complete
         # idle_timeout: Idle, Printing, Ready
-        # PAUL maybe incorporate 'pause_resume' here... if exists it overrides print_stats for pause state?
         if self.data['webhooks']['state'] == "ready" and self.data['print_stats']:
             if self.data['print_stats']['state'] == 'paused':
                 return "paused"
@@ -328,20 +336,21 @@ class Printer:
             return True
 
     def init_temp_store(self, tempstore):
-        if tempstore and 'result' in tempstore:
-            if self.tempstore and list(self.tempstore) != list(tempstore['result']):
-                logging.debug("Tempstore has changed")
-                self.tempstore = tempstore['result']
-                self.change_state(self.state)
-            else:
-                self.tempstore = tempstore['result']
-            for device in self.tempstore:
-                for x in self.tempstore[device]:
-                    length = len(self.tempstore[device][x])
-                    if length < self.tempstore_size:
-                        for i in range(1, self.tempstore_size - length):
-                            self.tempstore[device][x].insert(0, 0)
-            logging.info(f"Temp store: {list(self.tempstore)}")
+        if not tempstore or 'result' not in tempstore:
+            return
+        if self.tempstore and list(self.tempstore) != list(tempstore['result']):
+            logging.debug("Tempstore has changed")
+            self.tempstore = tempstore['result']
+            self.change_state(self.state)
+        else:
+            self.tempstore = tempstore['result']
+        for device in self.tempstore:
+            for x in self.tempstore[device]:
+                length = len(self.tempstore[device][x])
+                if length < self.tempstore_size:
+                    for _ in range(1, self.tempstore_size - length):
+                        self.tempstore[device][x].insert(0, 0)
+        logging.info(f"Temp store: {list(self.tempstore)}")
 
     def config_section_exists(self, section):
         return section in self.get_config_section_list()
