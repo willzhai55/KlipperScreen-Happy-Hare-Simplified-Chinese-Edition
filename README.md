@@ -34,34 +34,25 @@ KlipperScreen is an amazing piece of software but unfortunally lacks the level o
 
 Install and setup a base KlipperScreen from the original source. Get it working. Don't skip this step because I cannot help with basic KlipperScreen and system setup.  Once you have that installed and working, log into you Rasberry Pi and execute the following commands. You can cut'n'paste...
 
-    > cd ~/KlipperScreen
-    > git remote set-url origin https://github.com/moggieuk/KlipperScreen-Happy-Hare-Edition.git
-    > git config pull.rebase false
-    > git pull
+    > cd ~
+    > mv KlipperScreen KlipperScreen.orig
+    > git clone https://github.com/moggieuk/KlipperScreen-Happy-Hare-Edition.git KlipperScreen
    
     > cd ~/KlipperScreen/happy_hare
     > ./install_ks.sh -g <num_gates>
    
 (where <num_gates> is the number of selectors you built with, e.g. 9)
    
-KlipperScreen will be restarted and hopefully you are now running the enhanced version!
+KlipperScreen will be restarted and hopefully you should now be running the enhanced version!
 
 **Notes:**
 
-**1:** Depending on what you have done with git before on your rpi, the `git pull` operation may require two more steps (you will see in the warning):
+**1:** If you are installing on a rpi without Klipper and printer attached the install will not be able to find the Klipper "config" directory where the `KlipperScreen.conf` and `ercf_klipperscreen.conf` should be placed.  To fix this, specify a `-c <config_dir>` option to the install line and specify a valid directory where KlipperScreen is expecting to see its config files.
 
-    > git config --global user.email "you@example.com"
-    > git config --global user.name "First Last"
-    > git pull
+**2:**
+Expert Tip: The last step of running './install_ks -g <num_gates>' can be run many times.. if you customize the ERCF part of the KlipperScreen menu and want to make use of the "replicator" function that will automatically replicate menu options for the configured number of gates, you can edit menus.conf and reference the templating there.
 
-(CTRL-X out of any editor that pops up -- you can ignore this and the identification doesn't have to be real)
-
-**2:** If you are installing on a rpi without Klipper and printer attached the install will not be able to find the Klipper "config" directory where the `KlipperScreen.conf` and `ercf_klipperscreen.conf` should be placed.  To fix this, specify a `-c <config_dir>` option to the install line and specify a valid directory where KlipperScreen is expecting to see its config files.
-
-**Expert tip:**
-The last step of running './install_ks -g <num_gates>' can be run many times.. if you customize the ERCF part of the KlipperScreen menu and want to make use of the "replicator" function that will automatically replicate menu options for the configured number of gates, you can edit menus.conf and reference the templating there.
-
-Note that the base KlipperScreen is fully up-to-date (and I will continue to pull updates) with changes in the original but also includes extra menu functionality that can be used in the creation of your custom menus.  See the generated ercf_klipperscreen.conf for clues!
+Note that the base KlipperScreen is up-to-date (and I will continue to pull updates) with changes in the original but also includes extra menu functionality that can be used in the creation of your custom menus.  See the generated ercf_klipperscreen.conf for clues!
 
 ## Request
 Remember that this is v1.0, no doubt there are cornmer cases that I haven't considered and I'd like your feedback.  I can offer limited help on the Discord channels so would prefer if you submit an issue report via github so I can manage them.  This project and Happy Hare itself have taken a lot of time. I have a lot more planned so I need your help in organizing my work.
