@@ -242,7 +242,7 @@ class ErcfMain(ScreenPanel):
                 e_data = data['ercf']
                 if 'tool' in e_data or 'gate' in e_data or 'ttg_map' in e_data or 'gate_status' in e_data or 'gate_color' in e_data:
                     self.update_status()
-                if 'loaded_status' in e_data or 'filament_direction' in e_data:
+                if 'tool' in e_data or 'loaded_status' in e_data or 'filament_direction' in e_data:
                     self.update_filament_status()
                 if 'tool' in e_data or 'next_tool' in e_data:
                     self.update_tool()
