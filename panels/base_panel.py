@@ -277,6 +277,9 @@ class BasePanel(ScreenPanel):
             self.action_bar.remove(self.control['macros_shortcut'])
             self.buttons_showing['macros_shortcut'] = False
 
+    def toggle_macro_shorcut_sensitive(self, value=True):
+        self.control['macros_shortcut'].set_sensitive(value)
+
     def show_ercf_shortcut(self, show=True):
         if show is True and self.buttons_showing['ercf_shortcut'] is False:
             self.action_bar.add(self.control['ercf_shortcut'])
@@ -286,6 +289,9 @@ class BasePanel(ScreenPanel):
         elif show is False and self.buttons_showing['ercf_shortcut'] is True:
             self.action_bar.remove(self.control['ercf_shortcut'])
             self.buttons_showing['ercf_shortcut'] = False
+
+    def toggle_ercf_shorcut_sensitive(self, value=True):
+        self.control['ercf_shortcut'].set_sensitive(value)
 
     def show_printer_select(self, show=True):
         if show and self.buttons_showing['printer_select'] is False:

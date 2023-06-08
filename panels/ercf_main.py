@@ -228,6 +228,10 @@ class ErcfMain(ScreenPanel):
         self.bold_filament = self._config.get_main_config().getboolean("ercf_bold_filament", False)
         self.ui_sel_tool = self.NOT_SET
         self.init_tool_value()
+        self._screen.base_panel.toggle_ercf_shorcut_sensitive(False)
+
+    def deactivate(self):
+        self._screen.base_panel.toggle_ercf_shorcut_sensitive(True)
 
     def process_update(self, action, data):
         if action == "notify_status_update":
