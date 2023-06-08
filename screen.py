@@ -517,7 +517,7 @@ class KlipperScreen(Gtk.Window):
         if self._cur_panels[-1] in self.subscriptions:
             self.subscriptions.remove(self._cur_panels[-1])
         if pop:
-            del self.panels[self._cur_panels[-1]]
+            del self.panels[self._cur_panels[-1]] # PAUL deactivate first?
             del self._cur_panels[-1]
             self.attach_panel(self._cur_panels[-1])
 
@@ -930,6 +930,8 @@ class KlipperScreen(Gtk.Window):
         self.base_panel.show_ercf_shortcut((self._config.get_main_config().getboolean('side_ercf_shortcut', True)) and self.printer.has_ercf)
         self.base_panel.show_heaters(True)
         self.base_panel.show_estop(True)
+        self.base_panel.toggle_macro_shorcut_sensitive(True) # PAUL added
+        self.base_panel.toggle_ercf_shorcut_sensitive(True) # PAUL added
 
     def printer_ready(self):
         self.show_panel('main_panel', "main_menu", None, 2, items=self._config.get_menu_items("__main"))
