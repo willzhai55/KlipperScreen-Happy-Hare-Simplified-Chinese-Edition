@@ -21,6 +21,7 @@ class ErcfMain(ScreenPanel):
     GATE_UNKNOWN = -1
     GATE_EMPTY = 0
     GATE_AVAILABLE = 1
+    GATE_AVAILABLE_FROM_BUFFER = 2
 
     LOADED_STATUS_UNKNOWN = -1
     LOADED_STATUS_UNLOADED = 0
@@ -574,9 +575,10 @@ class ErcfMain(ScreenPanel):
         msg_selct = "Selct: "
         for g in range(num_gates):
             color = self.get_rgb_color(gate_color[g])
-            filament_icon = ("▉") if not markup or color == "" else (f"<span color='{color}'>▉</span>")
+            filament_not_buffered_icon = ("▄") if not markup or color == "" else (f"<span color='{color}'>▄</span>")
+            filament_icon = ("█") if not markup or color == "" else (f"<span color='{color}'>█</span>")
             msg_gates += ("│#%d " % g)[:4]
-            msg_avail += "│ %s " % (filament_icon if gate_status[g] == self.GATE_AVAILABLE else " " if gate_status[g] == self.GATE_EMPTY else "?")
+            msg_avail += "│ %s " % (filament_not_buffered_icon if gate_status[g] == self.GATE_AVAILABLE else filament_icon if gate_status[g] == self.GATE_AVAILABLE_FROM_BUFFER else " " if gate_status[g] == self.GATE_EMPTY else "?")
             tool_str = ""
             prefix = ""
             for t in range(num_gates):
@@ -587,7 +589,7 @@ class ErcfMain(ScreenPanel):
             if tool_str == "": tool_str = "   "
             msg_tools += ("│%s " % tool_str)[:4]
             if gate_selected == g:
-                icon = filament_icon if gate_status[g] == self.GATE_AVAILABLE else " " if gate_status[g] == self.GATE_EMPTY else "?"
+                icon = filament_icon if gate_status[g] == self.GATE_AVAILABLE else filament_icon if gate_status[g] == self.GATE_AVAILABLE_FROM_BUFFER else " " if gate_status[g] == self.GATE_EMPTY else "?"
                 msg_selct += ("╡ %s " % icon) if g != 0 else ("│ %s " % icon)
             else:
                 msg_selct += "╞═══" if gate_selected != self.GATE_UNKNOWN and gate_selected == (g - 1) else "╧═══" if g != 0 else "╘═══"

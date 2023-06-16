@@ -21,6 +21,7 @@ class ErcfPicker(ScreenPanel):
     GATE_UNKNOWN = -1
     GATE_EMPTY = 0
     GATE_AVAILABLE = 1
+    GATE_AVAILABLE_FROM_BUFFER = 2
 
     W3C_COLORS = ['aliceblue', 'antiquewhite', 'aqua', 'aquamarine', 'azure', 'beige', 'bisque', 'black', 'blanchedalmond', 'blue', 'blueviolet',
                   'brown', 'burlywood', 'cadetblue', 'chartreuse', 'chocolate', 'coral', 'cornflowerblue', 'cornsilk', 'crimson', 'cyan', 'darkblue',

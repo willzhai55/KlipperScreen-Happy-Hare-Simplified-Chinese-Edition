@@ -21,6 +21,7 @@ class ErcfRecovery(ScreenPanel):
     GATE_UNKNOWN = -1
     GATE_EMPTY = 0
     GATE_AVAILABLE = 1
+    GATE_AVAILABLE_FROM_BUFFER = 2
 
     DUMMY = -99
 

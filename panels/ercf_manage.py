@@ -18,10 +18,6 @@ class ErcfManage(ScreenPanel):
     TOOL_UNKNOWN = -1
     TOOL_BYPASS = -2
 
-    GATE_UNKNOWN = -1
-    GATE_EMPTY = 0
-    GATE_AVAILABLE = 1
-
     NOT_SET = -99
 
     def __init__(self, screen, title):
