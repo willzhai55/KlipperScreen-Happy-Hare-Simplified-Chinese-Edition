@@ -1,5 +1,5 @@
-# Happy Hare ERCF Software
-# Main ERCF management panel
+# Happy Hare MMU Software
+# Main MMU management panel
 #
 # Copyright (C) 2023  moggieuk#6538 (discord)
 #                     moggieuk@hotmail.com
@@ -12,9 +12,9 @@ from gi.repository import Gtk, Gdk, GLib, Pango
 from ks_includes.screen_panel import ScreenPanel
 
 def create_panel(*args):
-    return ErcfMain(*args)
+    return MmuMain(*args)
 
-class ErcfMain(ScreenPanel):
+class MmuMain(ScreenPanel):
     TOOL_UNKNOWN = -1
     TOOL_BYPASS = -2
 
@@ -23,16 +23,16 @@ class ErcfMain(ScreenPanel):
     GATE_AVAILABLE = 1
     GATE_AVAILABLE_FROM_BUFFER = 2
 
-    LOADED_STATUS_UNKNOWN = -1
-    LOADED_STATUS_UNLOADED = 0
-    LOADED_STATUS_PARTIAL_BEFORE_ENCODER = 1
-    LOADED_STATUS_PARTIAL_PAST_ENCODER = 2
-    LOADED_STATUS_PARTIAL_IN_BOWDEN = 3
-    LOADED_STATUS_PARTIAL_END_OF_BOWDEN = 4
-    LOADED_STATUS_PARTIAL_HOMED_EXTRUDER = 5
-    LOADED_STATUS_PARTIAL_HOMED_SENSOR = 6
-    LOADED_STATUS_PARTIAL_IN_EXTRUDER = 7
-    LOADED_STATUS_FULL = 8
+    FILAMENT_POS_UNKNOWN = -1
+    FILAMENT_POS_UNLOADED = 0
+    FILAMENT_POS_START_BOWDEN = 1
+    FILAMENT_POS_IN_BOWDEN = 2
+    FILAMENT_POS_END_BOWDEN = 3
+    FILAMENT_POS_HOMED_EXTRUDER = 4
+    FILAMENT_POS_PAST_EXTRUDER = 5
+    FILAMENT_POS_HOMED_TS = 6
+    FILAMENT_POS_IN_EXTRUDER = 7    # AKA FILAMENT_POS_PAST_TS
+    FILAMENT_POS_LOADED = 8         # AKA FILAMENT_POS_HOMED_NOZZLE
 
     DIRECTION_LOAD = 1
     DIRECTION_UNLOAD = -1
@@ -48,10 +48,10 @@ class ErcfMain(ScreenPanel):
 
         self.has_bypass = False
         self.min_tool = 0
-        if 'ercf' in self._printer.get_config_section_list():
-            ercf_config = self._printer.get_config_section("ercf")
-            if 'bypass_selector' in ercf_config:
-                if float(ercf_config['bypass_selector']) > 0.:
+        if 'mmu' in self._printer.get_config_section_list():
+            mmu_config = self._printer.get_config_section("mmu")
+            if 'bypass_selector' in mmu_config:
+                if float(mmu_config['bypass_selector']) > 0.:
                     self.has_bypass = True
                     self.min_tool = self.TOOL_BYPASS
 
@@ -75,26 +75,26 @@ class ErcfMain(ScreenPanel):
         }
 
         self.labels = {
-            'check_gates': self._gtk.Button('ercf_checkgates', "Gates", 'color1'),
-            'manage': self._gtk.Button('ercf_manage', "Manage...",'color2'),
+            'check_gates': self._gtk.Button('mmu_checkgates', "Gates", 'color1'),
+            'manage': self._gtk.Button('mmu_manage', "Manage...",'color2'),
             't_decrease': self._gtk.Button('decrease', None, scale=self.bts * 1.2),
             'tool': self._gtk.Button('extruder', 'Load T0', 'color2'),
             't_increase': self._gtk.Button('increase', None, scale=self.bts * 1.2),
-            'picker': self._gtk.Button('ercf_tool_picker', 'Tools...', 'color3'),
-            'eject': self._gtk.Button('ercf_eject', 'Eject', 'color4'),
-            'pause': self._gtk.Button('pause', 'ERCF Pause', 'color1'),
+            'picker': self._gtk.Button('mmu_tool_picker', 'Tools...', 'color3'),
+            'eject': self._gtk.Button('mmu_eject', 'Eject', 'color4'),
+            'pause': self._gtk.Button('pause', 'MMU Pause', 'color1'),
             'message': self._gtk.Button('warning', 'Last Error', 'color1'),
-            'unlock': self._gtk.Button('ercf_unlock', 'Unlock', 'color2'),
+            'unlock': self._gtk.Button('mmu_unlock', 'Unlock', 'color2'),
             'resume': self._gtk.Button('resume', 'Resume', 'color3'),
-            'more': self._gtk.Button('ercf_more', 'More...', 'color4'),
+            'more': self._gtk.Button('mmu_more', 'More...', 'color4'),
             'tool_icon': self._gtk.Image('extruder', self._gtk.img_width * 0.8, self._gtk.img_height * 0.8),
             'tool_label': self._gtk.Label('Unknown'),
             'filament': self._gtk.Label('Filament: Unknown ▷ Flow: 100%'),
             'sensor': self._gtk.Label('Ts:'),
             'sensor_state': self._gtk.Label('   '),
-            'select_bypass_img': self._gtk.Image('ercf_select_bypass'), # Alternative for tool
-            'load_bypass_img': self._gtk.Image('ercf_load_bypass'),     # Alternative for picker
-            'unload_bypass_img': self._gtk.Image('ercf_unload_bypass'), # Alternative for eject
+            'select_bypass_img': self._gtk.Image('mmu_select_bypass'), # Alternative for tool
+            'load_bypass_img': self._gtk.Image('mmu_load_bypass'),     # Alternative for picker
+            'unload_bypass_img': self._gtk.Image('mmu_unload_bypass'), # Alternative for eject
         }
         self.labels['eject_img'] = self.labels['eject'].get_image()
         self.labels['tool_img'] = self.labels['tool'].get_image()
@@ -102,7 +102,7 @@ class ErcfMain(ScreenPanel):
 
         self.labels['check_gates'].connect("clicked", self.select_check_gates)
         self.labels['manage'].connect("clicked", self.menu_item_clicked, "manage", {
-            "panel": "ercf_manage", "name": "ERCF Management"})
+            "panel": "mmu_manage", "name": "MMU Management"})
         self.labels['t_decrease'].connect("clicked", self.select_tool, -1)
         self.labels['tool'].connect("clicked", self.select_tool, 0)
         self.labels['t_increase'].connect("clicked", self.select_tool, 1)
@@ -112,22 +112,22 @@ class ErcfMain(ScreenPanel):
         self.labels['message'].connect("clicked", self.select_message)
         self.labels['unlock'].connect("clicked", self.select_unlock)
         self.labels['resume'].connect("clicked", self.select_resume)
-        self.labels['more'].connect("clicked", self._screen._go_to_submenu, "ercf")
+        self.labels['more'].connect("clicked", self._screen._go_to_submenu, "mmu")
 
         self.labels['t_increase'].set_hexpand(False)
-        self.labels['t_increase'].get_style_context().add_class("ercf_sel_increase")
+        self.labels['t_increase'].get_style_context().add_class("mmu_sel_increase")
         self.labels['t_decrease'].set_hexpand(False)
-        self.labels['t_decrease'].get_style_context().add_class("ercf_sel_decrease")
+        self.labels['t_decrease'].get_style_context().add_class("mmu_sel_decrease")
 
-        self.labels['manage'].get_style_context().add_class("ercf_manage_button")
+        self.labels['manage'].get_style_context().add_class("mmu_manage_button")
         self.labels['manage'].set_valign(Gtk.Align.CENTER)
-        self.labels['tool_icon'].get_style_context().add_class("ercf_tool_image")
-        self.labels['tool_label'].get_style_context().add_class("ercf_tool_text")
+        self.labels['tool_icon'].get_style_context().add_class("mmu_tool_image")
+        self.labels['tool_label'].get_style_context().add_class("mmu_tool_text")
         self.labels['tool_label'].set_xalign(0)
         self.labels['filament'].set_xalign(0)
         self.labels['sensor'].set_xalign(1)
         self.labels['sensor_state'].set_xalign(0)
-        self.labels['sensor_state'].get_style_context().add_class("ercf_sensor_text")
+        self.labels['sensor_state'].get_style_context().add_class("mmu_sensor_text")
 
         scale = Gtk.Scale.new_with_range(orientation=Gtk.Orientation.VERTICAL, min=-30., max=0., step=0.1)
         self.labels['scale'] = scale
@@ -138,7 +138,7 @@ class ErcfMain(ScreenPanel):
         scale.set_value_pos(Gtk.PositionType.TOP)
         scale.set_digits(1)
         scale.set_can_focus(False)
-        scale.get_style_context().add_class("ercf_runout")
+        scale.get_style_context().add_class("mmu_runout")
         scale.connect("format_value", self._mm_format)
 
         runout_frame = Gtk.Frame()
@@ -150,8 +150,8 @@ class ErcfMain(ScreenPanel):
         manage_grid = Gtk.Grid()
         manage_grid.set_column_homogeneous(True)
 
-        ercf = self._printer.get_stat("ercf")
-        num_gates = len(ercf['gate_status'])
+        mmu = self._printer.get_stat("mmu")
+        num_gates = len(mmu['gate_status'])
         if num_gates > 9:
             manage_grid.attach(Gtk.Label(),           0, 0, 1, 3)
             manage_grid.attach(self.labels['manage'], 1, 0, 2, 3)
@@ -169,12 +169,12 @@ class ErcfMain(ScreenPanel):
         for i in range(5):
             name = (f'status{i+1}')
             self.labels[name] = Gtk.Label()
-            self.labels[name].get_style_context().add_class("ercf_status")
+            self.labels[name].get_style_context().add_class("mmu_status")
             self.labels[name].set_xalign(0)
             if i < 4:
                 status_box.pack_start(self.labels[name], False, True, 0)
             else:
-                self.labels[name].get_style_context().add_class("ercf_status_filament")
+                self.labels[name].get_style_context().add_class("mmu_status_filament")
 
         top_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
         top_box.pack_start(self.labels['tool_icon'], False, True, 0)
@@ -224,30 +224,30 @@ class ErcfMain(ScreenPanel):
         self.content.add(scroll)
 
     def activate(self):
-        self.markup_status = self._config.get_main_config().getboolean("ercf_color_gates", True)
-        self.markup_filament = self._config.get_main_config().getboolean("ercf_color_filament", False)
-        self.bold_filament = self._config.get_main_config().getboolean("ercf_bold_filament", False)
+        self.markup_status = self._config.get_main_config().getboolean("mmu_color_gates", True)
+        self.markup_filament = self._config.get_main_config().getboolean("mmu_color_filament", False)
+        self.bold_filament = self._config.get_main_config().getboolean("mmu_bold_filament", False)
         self.ui_sel_tool = self.NOT_SET
         self.init_tool_value()
-        self._screen.base_panel.toggle_ercf_shorcut_sensitive(False)
+        self._screen.base_panel.toggle_mmu_shorcut_sensitive(False)
 
     def deactivate(self):
-        self._screen.base_panel.toggle_ercf_shorcut_sensitive(True)
+        self._screen.base_panel.toggle_mmu_shorcut_sensitive(True)
 
     def process_update(self, action, data):
         if action == "notify_status_update":
-            if 'ercf_encoder ercf_encoder' in data: # There is only one ercf_encoder
-                ee_data = data['ercf_encoder ercf_encoder']
+            if 'mmu_encoder mmu_encoder' in data: # There is only one mmu_encoder
+                ee_data = data['mmu_encoder mmu_encoder']
                 self.update_encoder(ee_data)
 
             if 'filament_switch_sensor toolhead_sensor' in data:
                 self.update_filament_status()
 
-            if 'ercf' in data:
-                e_data = data['ercf']
+            if 'mmu' in data:
+                e_data = data['mmu']
                 if 'tool' in e_data or 'gate' in e_data or 'ttg_map' in e_data or 'gate_status' in e_data or 'gate_color' in e_data:
                     self.update_status()
-                if 'tool' in e_data or 'loaded_status' in e_data or 'filament_direction' in e_data:
+                if 'tool' in e_data or 'filament_pos' in e_data or 'filament_direction' in e_data:
                     self.update_filament_status()
                 if 'tool' in e_data or 'next_tool' in e_data:
                     self.update_tool()
@@ -256,15 +256,15 @@ class ErcfMain(ScreenPanel):
                 if 'action' in e_data:
                     self.update_encoder_pos()
 
-            if 'ercf' in data or 'pause_resume' in data:
+            if 'mmu' in data or 'pause_resume' in data:
                 self.update_active_buttons()
             elif 'print_stats' in data and 'state' in data['print_stats']:
                 self.update_active_buttons()
 
     def init_tool_value(self):
-        ercf = self._printer.get_stat("ercf")
-        if self.ui_sel_tool == self.NOT_SET and ercf['tool'] != self.TOOL_UNKNOWN:
-            self.ui_sel_tool = ercf['tool']
+        mmu = self._printer.get_stat("mmu")
+        if self.ui_sel_tool == self.NOT_SET and mmu['tool'] != self.TOOL_UNKNOWN:
+            self.ui_sel_tool = mmu['tool']
         else:
             self.ui_sel_tool = 0
 
@@ -274,15 +274,15 @@ class ErcfMain(ScreenPanel):
     def select_check_gates(self, widget):
         self._screen._confirm_send_action(
             None,
-            "Check filament availabily in all ERCF gates?\n\nAre you sure you want to continue?",
+            "Check filament availabily in all MMU gates?\n\nAre you sure you want to continue?",
             "printer.gcode.script",
-            {'script': "ERCF_CHECK_GATES QUIET=1"}
+            {'script': "MMU_CHECK_GATES QUIET=1"}
         )
 
     def select_tool(self, widget, param=0):
-        ercf = self._printer.get_stat("ercf")
-        num_gates = len(ercf['gate_status'])
-        tool = ercf['tool']
+        mmu = self._printer.get_stat("mmu")
+        num_gates = len(mmu['gate_status'])
+        tool = mmu['tool']
         if param < 0 and self.ui_sel_tool > self.min_tool:
             self.ui_sel_tool -= 1
             if self.ui_sel_tool == self.TOOL_UNKNOWN:
@@ -293,51 +293,51 @@ class ErcfMain(ScreenPanel):
                 self.ui_sel_tool = 0
         elif param == 0:
             if self.ui_sel_tool == self.TOOL_BYPASS:
-                self._screen._ws.klippy.gcode_script(f"ERCF_SELECT_BYPASS")
-            elif self.ui_sel_tool != tool or ercf['filament'] != "Loaded":
-                self._screen._ws.klippy.gcode_script(f"ERCF_CHANGE_TOOL TOOL={self.ui_sel_tool} QUIET=1")
+                self._screen._ws.klippy.gcode_script(f"MMU_SELECT_BYPASS")
+            elif self.ui_sel_tool != tool or mmu['filament'] != "Loaded":
+                self._screen._ws.klippy.gcode_script(f"MMU_CHANGE_TOOL TOOL={self.ui_sel_tool} QUIET=1")
             return
         self.update_tool_buttons()
 
     def select_eject(self, widget):
-        self._screen._ws.klippy.gcode_script(f"ERCF_EJECT")
+        self._screen._ws.klippy.gcode_script(f"MMU_EJECT")
 
     def select_picker(self, widget):
         # This is a multipurpose button to select subpanel or load bypass
-        ercf = self._printer.get_stat("ercf")
-        tool = ercf['tool']
+        mmu = self._printer.get_stat("mmu")
+        tool = mmu['tool']
         if self.ui_sel_tool == self.TOOL_BYPASS:
-            self._screen._ws.klippy.gcode_script(f"ERCF_LOAD EXTRUDER_ONLY=1")
+            self._screen._ws.klippy.gcode_script(f"MMU_LOAD EXTRUDER_ONLY=1")
         else:
-            self._screen.show_panel('picker', 'ercf_picker', "ERCF Tool Picker", 1, False)
+            self._screen.show_panel('picker', 'mmu_picker', "MMU Tool Picker", 1, False)
 
     def select_pause(self, widget):
-        self._screen._ws.klippy.gcode_script(f"ERCF_PAUSE FORCE_IN_PRINT=1")
+        self._screen._ws.klippy.gcode_script(f"MMU_PAUSE FORCE_IN_PRINT=1")
 
     def select_message(self, widget):
-        last_toolchange = self._printer.get_stat('ercf', 'last_toolchange')
+        last_toolchange = self._printer.get_stat('mmu', 'last_toolchange')
         self._screen.show_last_popup_message(f"Last Toolchange: {last_toolchange}")
 
     def select_unlock(self, widget):
-        self._screen._ws.klippy.gcode_script(f"ERCF_UNLOCK")
+        self._screen._ws.klippy.gcode_script(f"MMU_UNLOCK")
 
     def select_resume(self, widget):
         self._screen._ws.klippy.gcode_script(f"RESUME")
 
     def update_enabled(self):
-        enabled = self._printer.get_stat('ercf', 'enabled')
+        enabled = self._printer.get_stat('mmu', 'enabled')
         for i in range(5):
             name = (f'status{i+1}')
             if enabled:
-                self.labels[name].get_style_context().remove_class("ercf_disabled_text")
+                self.labels[name].get_style_context().remove_class("mmu_disabled_text")
             else:
-                self.labels[name].get_style_context().add_class("ercf_disabled_text")
+                self.labels[name].get_style_context().add_class("mmu_disabled_text")
 
     def update_tool(self):
-        ercf = self._printer.get_stat("ercf")
-        tool = ercf['tool']
-        next_tool = ercf['next_tool']
-        last_tool = ercf['last_tool']
+        mmu = self._printer.get_stat("mmu")
+        tool = mmu['tool']
+        next_tool = mmu['next_tool']
+        last_tool = mmu['last_tool']
         if next_tool != self.TOOL_UNKNOWN:
             # Change in progress
             text = ("T%d " % last_tool) if (last_tool >= 0 and last_tool != next_tool) else "Bypass " if last_tool == -2 else "Unknown " if last_tool == -1 else ""
@@ -358,13 +358,13 @@ class ErcfMain(ScreenPanel):
 
     def update_tool_buttons(self, tool_sensitive=True):
         printer_state = self._printer.get_stat("print_stats")['state']
-        ercf = self._printer.get_stat("ercf")
-        num_gates = len(ercf['gate_status'])
-        tool = ercf['tool']
-        filament = ercf['filament']
-        enabled = ercf['enabled']
-        action = ercf['action']
-        locked = ercf['is_locked']
+        mmu = self._printer.get_stat("mmu")
+        num_gates = len(mmu['gate_status'])
+        tool = mmu['tool']
+        filament = mmu['filament']
+        enabled = mmu['enabled']
+        action = mmu['action']
+        locked = mmu['is_locked']
 
         # Set sensitivity of +/- buttons
         if (tool == self.TOOL_BYPASS and filament == "Loaded") or not tool_sensitive:
@@ -385,7 +385,7 @@ class ErcfMain(ScreenPanel):
         if action == "Idle":
             if self.ui_sel_tool >= 0:
                 self.labels['tool'].set_label(f"T{self.ui_sel_tool}")
-                if ercf['tool'] == self.ui_sel_tool and filament == "Loaded":
+                if mmu['tool'] == self.ui_sel_tool and filament == "Loaded":
                     self.labels['tool'].set_sensitive(False)
                 else:
                     self.labels['tool'].set_sensitive(True)
@@ -430,14 +430,14 @@ class ErcfMain(ScreenPanel):
 
     def update_encoder_pos(self, encoder_pos=None):
         if encoder_pos == None:
-            encoder_pos = self._printer.get_stat('ercf_encoder ercf_encoder')['encoder_pos']
-        ercf = self._printer.get_stat("ercf")
-        filament = ercf['filament']
-        action = ercf['action']
+            encoder_pos = self._printer.get_stat('mmu_encoder mmu_encoder')['encoder_pos']
+        mmu = self._printer.get_stat("mmu")
+        filament = mmu['filament']
+        action = mmu['action']
         if action == "Idle":
             pos_str = (f"Filament: {encoder_pos}mm") if filament != "Unloaded" else "Filament: Unloaded"
             if self._printer.get_stat("print_stats")['state'] == "printing":
-                flow_rate = self._printer.get_stat('ercf_encoder ercf_encoder')['flow_rate']
+                flow_rate = self._printer.get_stat('mmu_encoder mmu_encoder')['flow_rate']
                 pos_str += f"  ➥ {flow_rate}%"
         elif action == "Loading" or action == "Unloading":
             pos_str = (f"{action}: {encoder_pos}mm")
@@ -453,15 +453,15 @@ class ErcfMain(ScreenPanel):
 
         if self.check_toolhead_sensor() != None:
             if self.check_toolhead_sensor() == 1:
-                self.labels['sensor'].get_style_context().remove_class("ercf_disabled_text")
+                self.labels['sensor'].get_style_context().remove_class("mmu_disabled_text")
                 self.labels['sensor_state'].set_label("●  ")
                 c_name = "green"
             elif self.check_toolhead_sensor() == 0:
-                self.labels['sensor'].get_style_context().remove_class("ercf_disabled_text")
+                self.labels['sensor'].get_style_context().remove_class("mmu_disabled_text")
                 self.labels['sensor_state'].set_label("○  ")
                 c_name = "red"
             else:
-                self.labels['sensor'].get_style_context().add_class("ercf_disabled_text")
+                self.labels['sensor'].get_style_context().add_class("mmu_disabled_text")
                 self.labels['sensor_state'].set_label("◌  ")
                 c_name = "grey"
 
@@ -483,14 +483,14 @@ class ErcfMain(ScreenPanel):
 
     # Dynamically update button sensitivity based on state
     def update_active_buttons(self):
-        ercf = self._printer.get_stat("ercf")
+        mmu = self._printer.get_stat("mmu")
         printer_state = self._printer.get_stat("print_stats")['state']
-        locked = ercf['is_locked']
+        locked = mmu['is_locked']
         is_paused = self._printer.get_stat("pause_resume")['is_paused']
-        enabled = ercf['enabled']
-        tool = ercf['tool']
-        action = ercf['action']
-        filament = ercf['filament']
+        enabled = mmu['enabled']
+        tool = mmu['tool']
+        action = mmu['action']
+        filament = mmu['filament']
         ui_state = []
         if enabled:
             if printer_state == "paused" or is_paused:
@@ -536,7 +536,7 @@ class ErcfMain(ScreenPanel):
             self.labels['t_increase'].set_sensitive(False)
             self.labels['t_decrease'].set_sensitive(False)
 
-        logging.debug(f"ercf_main: ui_state={ui_state}")
+        logging.debug(f"mmu_main: ui_state={ui_state}")
         for label in self.btn_states['all']:
             sensitive = True
             for state in ui_state:
@@ -560,12 +560,12 @@ class ErcfMain(ScreenPanel):
         return rgb_color
 
     def get_status_text(self, markup=False):
-        ercf = self._printer.get_stat("ercf")
-        gate_status = ercf['gate_status']
-        tool_to_gate_map = ercf['ttg_map']
-        gate_selected = ercf['gate']
-        tool_selected = ercf['tool']
-        gate_color = ercf['gate_color']
+        mmu = self._printer.get_stat("mmu")
+        gate_status = mmu['gate_status']
+        tool_to_gate_map = mmu['ttg_map']
+        gate_selected = mmu['gate']
+        tool_selected = mmu['tool']
+        gate_color = mmu['gate_color']
         num_gates = len(gate_status)
 
         multi_tool = False
@@ -601,16 +601,16 @@ class ErcfMain(ScreenPanel):
         return [msg_gates, msg_tools, msg_avail, msg_selct], multi_tool
 
     def get_filament_text(self, markup=False, bold=False):
-        ercf = self._printer.get_stat("ercf")
-        tool = ercf['tool']
-        loaded_status = ercf['loaded_status']
-        filament_direction = ercf['filament_direction']
+        mmu = self._printer.get_stat("mmu")
+        tool = mmu['tool']
+        filament_pos = mmu['filament_pos']
+        filament_direction = mmu['filament_direction']
 
-        if loaded_status == self.LOADED_STATUS_FULL:
+        if filament_pos == self.FILAMENT_POS_LOADED:
             move_str = "LOADED"
-        elif loaded_status == self.LOADED_STATUS_UNLOADED:
+        elif filament_pos == self.FILAMENT_POS_UNLOADED:
             move_str = "UNLOADED"
-        elif loaded_status == self.LOADED_STATUS_UNKNOWN:
+        elif filament_pos == self.FILAMENT_POS_UNKNOWN:
             move_str = "UNKNOWN"
         elif filament_direction == self.DIRECTION_LOAD:
             move_str = " ▷▷▷"
@@ -621,38 +621,38 @@ class ErcfMain(ScreenPanel):
         tool_str = (f"T{tool} ")[:3] if tool >=0 else "T? "
         sensor_str = "│Ts│" if (self.check_toolhead_sensor() != None and self.check_toolhead_sensor() != -1) else ""
         sensor_str_homed = "┫Ts│" if self.check_toolhead_sensor() != None else ""
-        if tool == self.TOOL_BYPASS and loaded_status == self.LOADED_STATUS_FULL:
+        if tool == self.TOOL_BYPASS and filament_pos == self.FILAMENT_POS_LOADED:
             visual = "BYPASS ^━━━$│En│^━━━━━━━━━━━━━━━━━━$│Nz│^━$▶ %s" % (move_str)
         elif tool == self.TOOL_BYPASS:
             visual = "BYPASS ^━$▶┈│En│┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈│Nz│   %s" % (move_str)
-        elif loaded_status == self.LOADED_STATUS_UNKNOWN:
+        elif filament_pos == self.FILAMENT_POS_UNKNOWN:
             visual     = "%s ┈┈┈│En│┈┈┈┈┈┈┈┈┈┈│Ex│┈┈┈%s┈┈│Nz│   %s" % (tool_str, sensor_str, move_str)
-        elif loaded_status == self.LOADED_STATUS_UNLOADED:
+        elif filament_pos == self.FILAMENT_POS_UNLOADED:
             visual     = "%s ^━$▶┈│En│┈┈┈┈┈┈┈┈┈┈│Ex│┈┈┈%s┈┈│Nz│   %s" % (tool_str, sensor_str, move_str)
-        elif loaded_status == self.LOADED_STATUS_PARTIAL_BEFORE_ENCODER:
-            visual     = "%s ^━━$▶│En│┈┈┈┈┈┈┈┈┈┈│Ex│┈┈┈%s┈┈│Nz│   %s" % (tool_str, sensor_str, move_str)
-        elif loaded_status == self.LOADED_STATUS_PARTIAL_PAST_ENCODER:
+        elif filament_pos == self.FILAMENT_POS_START_BOWDEN:
             visual     = "%s ^━━━$│En│^━$▶┈┈┈┈┈┈┈┈│Ex│┈┈┈%s┈┈│Nz│   %s" % (tool_str, sensor_str, move_str)
-        elif loaded_status == self.LOADED_STATUS_PARTIAL_IN_BOWDEN:
+        elif filament_pos == self.FILAMENT_POS_IN_BOWDEN:
             visual     = "%s ^━━━$│En│^━━━━$▶┈┈┈┈┈│Ex│┈┈┈%s┈┈│Nz│   %s" % (tool_str, sensor_str, move_str)
-        elif loaded_status == self.LOADED_STATUS_PARTIAL_END_OF_BOWDEN:
+        elif filament_pos == self.FILAMENT_POS_END_BOWDEN:
             visual     = "%s ^━━━$│En│^━━━━━━━━$▶┈│Ex│┈┈┈%s┈┈│Nz│   %s" % (tool_str, sensor_str, move_str)
-        elif loaded_status == self.LOADED_STATUS_PARTIAL_HOMED_EXTRUDER:
+        elif filament_pos == self.FILAMENT_POS_HOMED_EXTRUDER:
             visual     = "%s ^━━━$│En│^━━━━━━━━━$▶┫Ex│┈┈┈%s┈┈│Nz│   %s" % (tool_str, sensor_str, move_str)
-        elif loaded_status == self.LOADED_STATUS_PARTIAL_HOMED_SENSOR:
+        elif filament_pos == self.FILAMENT_POS_PAST_EXTRUDER:
+            visual     = "%s ^━━━$│En│^━━━━━━━━━━$│Ex│^━$▶┈%s┈┈│Nz│   %s" % (tool_str, sensor_str_homed, move_str)
+        elif filament_pos == self.FILAMENT_POS_HOMED_TS:
             visual     = "%s ^━━━$│En│^━━━━━━━━━━$│Ex│^━━$▶%s┈┈│Nz│   %s" % (tool_str, sensor_str_homed, move_str)
-        elif loaded_status == self.LOADED_STATUS_PARTIAL_IN_EXTRUDER:
+        elif filament_pos == self.FILAMENT_POS_IN_EXTRUDER:
             visual     = "%s ^━━━$│En│^━━━━━━━━━━$│Ex│^━━━$%s▶┈│Nz│   %s" % (tool_str, sensor_str, move_str)
-        elif loaded_status == self.LOADED_STATUS_FULL:
+        elif filament_pos == self.FILAMENT_POS_LOADED:
             visual     = "%s ^━━━$│En│^━━━━━━━━━━$│Ex│^━━━$%s^━━$│Nz│^━$▶ %s" % (tool_str, sensor_str, move_str)
 
-        #if filament_direction == self.DIRECTION_UNLOAD and loaded_status != self.LOADED_STATUS_UNLOADED:
+        #if filament_direction == self.DIRECTION_UNLOAD and filament_pos != self.FILAMENT_POS_UNLOADED:
         #    visual = visual.replace("▶", "◀")
         if bold:
             visual = visual.replace("━", "█").replace("▶", "▌")
         if markup:
-            gate_color = ercf['gate_color']
-            gate = ercf['gate']
+            gate_color = mmu['gate_color']
+            gate = mmu['gate']
             if gate >= 0:
                 color = self.get_rgb_color(gate_color[gate])
                 if color != "":

@@ -1,4 +1,4 @@
-# Happy Hare ERCF Software
+# Happy Hare MMU Software
 # Display and selection of tools based on color and material
 #
 # Copyright (C) 2023  moggieuk#6538 (discord)
@@ -12,9 +12,9 @@ from gi.repository import Gtk, GLib, Pango, Gdk
 from ks_includes.screen_panel import ScreenPanel
 
 def create_panel(*args):
-    return ErcfPicker(*args)
+    return MmuPicker(*args)
 
-class ErcfPicker(ScreenPanel):
+class MmuPicker(ScreenPanel):
     TOOL_UNKNOWN = -1
     TOOL_BYPASS = -2
 
@@ -32,8 +32,8 @@ class ErcfPicker(ScreenPanel):
         grid.set_column_homogeneous(True)
         grid.set_row_spacing(10)
 
-        ercf = self._printer.get_stat("ercf")
-        num_tools = len(ercf['gate_status'])
+        mmu = self._printer.get_stat("mmu")
+        num_tools = len(mmu['gate_status'])
         for i in range(num_tools):
             status_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
             status = self.labels[f'status_{i}'] = self._gtk.Image()
@@ -45,16 +45,16 @@ class ErcfPicker(ScreenPanel):
             tool.connect("clicked", self.select_tool, i)
 
             color = self.labels[f'color_{i}'] = Gtk.Label(f'⬤')
-            color.get_style_context().add_class("ercf_color_swatch")
+            color.get_style_context().add_class("mmu_color_swatch")
             color.set_xalign(0.7)
 
             material = self.labels[f'material_{i}'] = Gtk.Label("n/a")
-            material.get_style_context().add_class("ercf_material_text")
+            material.get_style_context().add_class("mmu_material_text")
             material.set_xalign(0.1)
 
             gate_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
             gate = self.labels[f'gate_{i}'] = Gtk.Label("n/a")
-            gate.get_style_context().add_class("ercf_gate_text")
+            gate.get_style_context().add_class("mmu_gate_text")
             gate.set_halign(Gtk.Align.START)
             gate.set_valign(Gtk.Align.END)
             alt_gates = self.labels[f'alt_gates_{i}'] = Gtk.Label("n/a")
@@ -69,9 +69,9 @@ class ErcfPicker(ScreenPanel):
             grid.attach(material,   8, i, 3, 1)
             grid.attach(gate_box,  11, i, 5, 1)
 
-        self.labels['unknown_icon'] = self._gtk.Image('ercf_unknown').get_pixbuf()
-        self.labels['available_icon'] = self._gtk.Image('ercf_tick').get_pixbuf()
-        self.labels['empty_icon'] = self._gtk.Image('ercf_cross').get_pixbuf()
+        self.labels['unknown_icon'] = self._gtk.Image('mmu_unknown').get_pixbuf()
+        self.labels['available_icon'] = self._gtk.Image('mmu_tick').get_pixbuf()
+        self.labels['empty_icon'] = self._gtk.Image('mmu_cross').get_pixbuf()
 
         scroll = self._gtk.ScrolledWindow()
         scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
@@ -79,12 +79,12 @@ class ErcfPicker(ScreenPanel):
         self.content.add(scroll)
 
     def activate(self):
-        ercf = self._printer.get_stat("ercf")
-        endless_spool = ercf['endless_spool']
+        mmu = self._printer.get_stat("mmu")
+        endless_spool = mmu['endless_spool']
         tool_map = self.build_tool_map()
-        gate_status = ercf['gate_status']
-        gate_material = ercf['gate_material']
-        gate_color = ercf['gate_color']
+        gate_status = mmu['gate_status']
+        gate_material = mmu['gate_material']
+        gate_color = mmu['gate_color']
         num_tools = len(gate_status)
 
         for i in range(num_tools):
@@ -124,9 +124,9 @@ class ErcfPicker(ScreenPanel):
     # tool_map = [ { 'gate': <gate>, 'alt_gates': <alternative_gates> }, ... ]
     def build_tool_map(self):
         tool_map = []
-        ercf = self._printer.get_stat("ercf")
-        endless_spool_groups = ercf['endless_spool_groups']
-        ttg_map = ercf['ttg_map']
+        mmu = self._printer.get_stat("mmu")
+        endless_spool_groups = mmu['endless_spool_groups']
+        ttg_map = mmu['ttg_map']
         num_tools = len(ttg_map)
         for tool in range(num_tools):
             es_group = endless_spool_groups[tool]
@@ -142,19 +142,19 @@ class ErcfPicker(ScreenPanel):
         if action == "notify_status_update":
             if 'configfile' in data:
                 return
-            elif 'ercf' in data:
-                e_data = data['ercf']
+            elif 'mmu' in data:
+                e_data = data['mmu']
                 if 'tool' in e_data or 'gate' in e_data or 'gate_status' in e_data or 'gate_material' in e_data or 'gate_color' in e_data:
                     self.activate()
 
     def select_tool(self, widget, selected_tool):
-        ercf = self._printer.get_stat("ercf")
-        tool = ercf['tool']
-        filament = ercf['filament']
+        mmu = self._printer.get_stat("mmu")
+        tool = mmu['tool']
+        filament = mmu['filament']
         if tool == self.TOOL_BYPASS and filament == "Loaded":
             # Should not of got here but do nothing for safety
             pass
         else:
-            self._screen._ws.klippy.gcode_script(f"ERCF_CHANGE_TOOL TOOL={selected_tool}")
+            self._screen._ws.klippy.gcode_script(f"MMU_CHANGE_TOOL TOOL={selected_tool}")
             self._screen._menu_go_back()
 

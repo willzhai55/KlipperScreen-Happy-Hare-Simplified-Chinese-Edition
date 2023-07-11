@@ -1,4 +1,4 @@
-# Happy Hare ERCF Software
+# Happy Hare MMU Software
 # Display and editing of TTG map and endless spool groups
 #
 # Copyright (C) 2023  moggieuk#6538 (discord)
@@ -12,9 +12,9 @@ from gi.repository import Gtk, GLib, Pango, Gdk
 from ks_includes.screen_panel import ScreenPanel
 
 def create_panel(*args):
-    return ErcfToolmap(*args)
+    return MmuToolmap(*args)
 
-class ErcfToolmap(ScreenPanel):
+class MmuToolmap(ScreenPanel):
 
     #        0    1    2    3    4    5    6    7    8    9   10   11   12   13   14   15
     box =  [' ', '╵', '╶', '└', '╷', '│', '┌', '├', '╴', '┘', '─', '┴', '┐', '┤', '┬', '┼']
@@ -43,8 +43,8 @@ class ErcfToolmap(ScreenPanel):
         self.ui_sel_tool = self.ui_sel_es_group = self.ui_es_enabled = 0
         self.ui_endless_spool_groups = self.ui_ttg_map = None
 
-        ercf = self._printer.get_stat("ercf")
-        num_tools = len(ercf['gate_status'])
+        mmu = self._printer.get_stat("mmu")
+        num_tools = len(mmu['gate_status'])
 
         self.labels = {
             't_decrease': self._gtk.Button('decrease', None, 'color1', scale=self.bts * 1.2),
@@ -53,7 +53,7 @@ class ErcfToolmap(ScreenPanel):
             'g_decrease': self._gtk.Button('decrease', None, 'color1', scale=self.bts * 1.2),
             'gate': self._gtk.Label("#0"),
             'g_increase': self._gtk.Button('increase', None, 'color2', scale=self.bts * 1.2),
-            'save': self._gtk.Button('ercf_save', 'Save', 'color3'),
+            'save': self._gtk.Button('mmu_save', 'Save', 'color3'),
             'es_decrease': self._gtk.Button('decrease', None, scale=self.bts * 0.6),
             'es_group': self._gtk.Label("ES Group: A"),
             'es_increase': self._gtk.Button('increase', None, scale=self.bts * 0.6),
@@ -71,18 +71,18 @@ class ErcfToolmap(ScreenPanel):
         self.labels['reset'].connect("clicked", self.select_reset_save, "reset")
         self.labels['endless_spool'].connect("notify::active", self.select_es_toggle)
 
-        self.labels['tool'].get_style_context().add_class("ercf_tool_text")
-        self.labels['gate'].get_style_context().add_class("ercf_gate_text")
-        self.labels['es_decrease'].get_style_context().add_class("ercf_es_gate")
-        self.labels['es_increase'].get_style_context().add_class("ercf_es_gate")
+        self.labels['tool'].get_style_context().add_class("mmu_tool_text")
+        self.labels['gate'].get_style_context().add_class("mmu_gate_text")
+        self.labels['es_decrease'].get_style_context().add_class("mmu_es_gate")
+        self.labels['es_increase'].get_style_context().add_class("mmu_es_gate")
         self.labels['save'].set_vexpand(False)
         self.labels['save'].set_hexpand(False)
         self.labels['reset'].set_halign(Gtk.Align.CENTER)
         self.labels['reset'].set_valign(Gtk.Align.START)
         self.labels['reset'].set_vexpand(False)
         self.labels['es_group'].set_xalign(0)
-        self.labels['es_group'].get_style_context().add_class("ercf_endless_spool_toggle")
-        self.labels['endless_spool'].get_style_context().add_class("ercf_endless_spool_toggle")
+        self.labels['es_group'].get_style_context().add_class("mmu_endless_spool_toggle")
+        self.labels['endless_spool'].get_style_context().add_class("mmu_endless_spool_toggle")
 
         tool_grid = Gtk.Grid()
         tool_grid.set_row_homogeneous(True)
@@ -106,7 +106,7 @@ class ErcfToolmap(ScreenPanel):
         for i in range(num_tools):
             name = (f'toolmap{i}')
             self.labels[name] = Gtk.Label()
-            self.labels[name].get_style_context().add_class("ercf_status")
+            self.labels[name].get_style_context().add_class("mmu_status")
             self.labels[name].set_xalign(0)
             ttg_box.pack_start(self.labels[name], False, True, 0)
 
@@ -116,7 +116,7 @@ class ErcfToolmap(ScreenPanel):
         for i in range(num_tools):
             g = self.labels[f'es_gate{i}'] = self._gtk.Button(label=str(i))
             g.connect("clicked", self.select_es_gate, int(i))
-            g.get_style_context().add_class("ercf_es_gate")
+            g.get_style_context().add_class("mmu_es_gate")
             es_flowbox.add(g)
 
         es_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
@@ -155,11 +155,11 @@ class ErcfToolmap(ScreenPanel):
         self.content.add(scroll)
 
     def activate(self, param=0):
-        ercf = self._printer.get_stat("ercf")
-        self.ui_ttg_map = ercf['ttg_map']
-        self.ui_endless_spool_groups = self.map_unique_groups(ercf['endless_spool_groups'])
+        mmu = self._printer.get_stat("mmu")
+        self.ui_ttg_map = mmu['ttg_map']
+        self.ui_endless_spool_groups = self.map_unique_groups(mmu['endless_spool_groups'])
         self.ui_sel_es_group = self.ui_endless_spool_groups[self.ui_ttg_map[self.ui_sel_tool]]
-        self.ui_es_enabled = ercf['endless_spool']
+        self.ui_es_enabled = mmu['endless_spool']
         self.labels['endless_spool'].set_active(self.ui_es_enabled == 1)
         self.update_map()
         self.update_es_group()
@@ -266,14 +266,14 @@ class ErcfToolmap(ScreenPanel):
         if action == "notify_status_update":
             if 'configfile' in data:
                 return
-            elif 'ercf' in data:
-                e_data = data['ercf']
+            elif 'mmu' in data:
+                e_data = data['mmu']
                 if 'ttg_map' in e_data or 'endless_spool_groups' in e_data or 'endless_spool' in e_data:
                     self.activate()
 
     def select_toolgate(self, widget, toolgate, param=0):
-        ercf = self._printer.get_stat("ercf")
-        num_gates = len(ercf['ttg_map'])
+        mmu = self._printer.get_stat("mmu")
+        num_gates = len(mmu['ttg_map'])
 
         if toolgate == "tool":
             if param < 0 and self.ui_sel_tool > 0:
@@ -291,8 +291,8 @@ class ErcfToolmap(ScreenPanel):
         self.update_es_group()
 
     def select_es(self, widget, param=0):
-        ercf = self._printer.get_stat("ercf")
-        max_grp_number = len(ercf['ttg_map'])
+        mmu = self._printer.get_stat("mmu")
+        max_grp_number = len(mmu['ttg_map'])
 
         if param < 0 and self.ui_sel_es_group > 0:
             self.ui_sel_es_group -= 1
@@ -328,9 +328,9 @@ class ErcfToolmap(ScreenPanel):
         label.set_line_wrap_mode(Pango.WrapMode.WORD_CHAR)
 
         if action == "reset":
-            label.set_text("This will reset the TTG map and EndlessSpool groups\n\nto the default defined in your ERCF configuration\n\nAre you sure you want to continue?")
+            label.set_text("This will reset the TTG map and EndlessSpool groups\n\nto the default defined in your MMU configuration\n\nAre you sure you want to continue?")
         else:
-            label.set_text("This will set the ERCF TTG map and ALL EndlessSpool groups\n\nto the configuration defined on this panel\n\nAre you sure you want to continue?")
+            label.set_text("This will set the MMU TTG map and ALL EndlessSpool groups\n\nto the configuration defined on this panel\n\nAre you sure you want to continue?")
 
         grid = self._gtk.HomogeneousGrid()
         grid.attach(label, 0, 0, 1, 1)
@@ -345,11 +345,11 @@ class ErcfToolmap(ScreenPanel):
         self._gtk.remove_dialog(dialog)
         if response_id == Gtk.ResponseType.APPLY:
             if action == "reset":
-                self._screen._ws.klippy.gcode_script(f"ERCF_REMAP_TTG RESET=1 QUIET=1")
-                self._screen._ws.klippy.gcode_script(f"ERCF_ENDLESS_SPOOL RESET=1 QUIET=1")
+                self._screen._ws.klippy.gcode_script(f"MMU_REMAP_TTG RESET=1 QUIET=1")
+                self._screen._ws.klippy.gcode_script(f"MMU_ENDLESS_SPOOL RESET=1 QUIET=1")
             else:
                 ttg_map=",".join(map(str,self.ui_ttg_map))
                 groups=",".join(map(str,self.ui_endless_spool_groups))
-                self._screen._ws.klippy.gcode_script(f"ERCF_REMAP_TTG MAP={ttg_map} QUIET=1")
-                self._screen._ws.klippy.gcode_script(f"ERCF_ENDLESS_SPOOL GROUPS={groups} QUIET=1 ENABLE={self.ui_es_enabled}")
+                self._screen._ws.klippy.gcode_script(f"MMU_REMAP_TTG MAP={ttg_map} QUIET=1")
+                self._screen._ws.klippy.gcode_script(f"MMU_ENDLESS_SPOOL GROUPS={groups} QUIET=1 ENABLE={self.ui_es_enabled}")
 

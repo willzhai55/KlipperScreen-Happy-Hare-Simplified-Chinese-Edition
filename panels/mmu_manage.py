@@ -1,4 +1,4 @@
-# Happy Hare ERCF Software
+# Happy Hare MMU Software
 # Basic manual operation panel (generally in recovery situation)
 #
 # Copyright (C) 2023  moggieuk#6538 (discord)
@@ -12,9 +12,9 @@ from gi.repository import Gtk, GLib, Pango
 from ks_includes.screen_panel import ScreenPanel
 
 def create_panel(*args):
-    return ErcfManage(*args)
+    return MmuManage(*args)
 
-class ErcfManage(ScreenPanel):
+class MmuManage(ScreenPanel):
     TOOL_UNKNOWN = -1
     TOOL_BYPASS = -2
 
@@ -29,10 +29,10 @@ class ErcfManage(ScreenPanel):
 
         self.has_bypass = False
         self.min_gate = 0
-        if 'ercf' in self._printer.get_config_section_list():
-            ercf_config = self._printer.get_config_section("ercf")
-            if 'bypass_selector' in ercf_config:
-                if float(ercf_config['bypass_selector']) > 0.:
+        if 'mmu' in self._printer.get_config_section_list():
+            mmu_config = self._printer.get_config_section("mmu")
+            if 'bypass_selector' in mmu_config:
+                if float(mmu_config['bypass_selector']) > 0.:
                     self.has_bypass = True
                     self.min_gate = self.TOOL_BYPASS
 
@@ -54,18 +54,18 @@ class ErcfManage(ScreenPanel):
 
         self.labels = {
             'g_decrease': self._gtk.Button('decrease', None, scale=self.bts * 1.2),
-            'gate': self._gtk.Button('ercf_select_gate', 'Gate', 'color4'),
+            'gate': self._gtk.Button('mmu_select_gate', 'Gate', 'color4'),
             'g_increase': self._gtk.Button('increase', None, scale=self.bts * 1.2),
             'home': self._gtk.Button('home', 'Home', 'color3'),
             'motors_off': self._gtk.Button('motor-off', 'Motors Off', 'color4'),
-            'checkgate': self._gtk.Button('ercf_checkgates', 'Check Gate', 'color1'),
-            'recover': self._gtk.Button('ercf_maintenance', 'Recover State...', 'color2'),
+            'checkgate': self._gtk.Button('mmu_checkgates', 'Check Gate', 'color1'),
+            'recover': self._gtk.Button('mmu_maintenance', 'Recover State...', 'color2'),
             'servo_up': self._gtk.Button('arrow-up', 'Servo Up', 'color3'),
             'servo_down': self._gtk.Button('arrow-down', 'Servo Down', 'color4'),
-            'load': self._gtk.Button('ercf_load', 'Load', 'color1'),
-            'eject': self._gtk.Button('ercf_eject', 'Eject', 'color2'),
-            'load_ext': self._gtk.Button('ercf_load_extruder', 'Load Extruder', 'color3'),
-            'unload_ext': self._gtk.Button('ercf_unload_extruder', 'Unload Extruder', 'color4'),
+            'load': self._gtk.Button('mmu_load', 'Load', 'color1'),
+            'eject': self._gtk.Button('mmu_eject', 'Eject', 'color2'),
+            'load_ext': self._gtk.Button('mmu_load_extruder', 'Load Extruder', 'color3'),
+            'unload_ext': self._gtk.Button('mmu_unload_extruder', 'Unload Extruder', 'color4'),
         }
 
         self.labels['g_decrease'].connect("clicked", self.select_gate, -1)
@@ -73,7 +73,7 @@ class ErcfManage(ScreenPanel):
         self.labels['g_increase'].connect("clicked", self.select_gate, 1)
         self.labels['checkgate'].connect("clicked", self.select_checkgate)
         self.labels['recover'].connect("clicked", self.menu_item_clicked, "recover", {
-            "panel": "ercf_recover", "name": "ERCF State Recovery"})
+            "panel": "mmu_recover", "name": "MMU State Recovery"})
         self.labels['load'].connect("clicked", self.select_load)
         self.labels['eject'].connect("clicked", self.select_eject)
         self.labels['home'].connect("clicked", self.select_home)
@@ -84,9 +84,9 @@ class ErcfManage(ScreenPanel):
         self.labels['unload_ext'].connect("clicked", self.select_unload_extruder)
 
         self.labels['g_increase'].set_hexpand(False)
-        self.labels['g_increase'].get_style_context().add_class("ercf_sel_increase")
+        self.labels['g_increase'].get_style_context().add_class("mmu_sel_increase")
         self.labels['g_decrease'].set_hexpand(False)
-        self.labels['g_decrease'].get_style_context().add_class("ercf_sel_decrease")
+        self.labels['g_decrease'].get_style_context().add_class("mmu_sel_decrease")
 
         gate_grid = Gtk.Grid()
         gate_grid.set_column_homogeneous(False)
@@ -123,8 +123,8 @@ class ErcfManage(ScreenPanel):
 
     def process_update(self, action, data):
         if action == "notify_status_update":
-            if 'ercf' in data:
-                e_data = data['ercf']
+            if 'mmu' in data:
+                e_data = data['mmu']
                 if 'gate' in e_data:
                     self.ui_sel_gate = e_data['gate']
                     if e_data['gate'] >= 0:
@@ -143,15 +143,15 @@ class ErcfManage(ScreenPanel):
 
     def init_gate_values(self):
         # Get starting values
-        ercf = self._printer.get_stat("ercf")
-        if self.ui_sel_gate == self.NOT_SET and ercf['gate'] != self.TOOL_UNKNOWN:
-            self.ui_sel_gate = ercf['gate']
+        mmu = self._printer.get_stat("mmu")
+        if self.ui_sel_gate == self.NOT_SET and mmu['gate'] != self.TOOL_UNKNOWN:
+            self.ui_sel_gate = mmu['gate']
         else:
             self.ui_sel_gate = 0
 
     def select_gate(self, widget, param=0):
-        ercf = self._printer.get_stat("ercf")
-        num_gates = len(ercf['gate_status'])
+        mmu = self._printer.get_stat("mmu")
+        num_gates = len(mmu['gate_status'])
 
         if param < 0 and self.ui_sel_gate > self.min_gate:
             self.ui_sel_gate -= 1
@@ -165,74 +165,74 @@ class ErcfManage(ScreenPanel):
             self.ui_action_button_name = 'gate'
             self.ui_action_button_label = self.labels[self.ui_action_button_name].get_label()
             if self.ui_sel_gate == self.TOOL_BYPASS:
-                self._screen._ws.klippy.gcode_script(f"ERCF_SELECT_BYPASS")
-            elif ercf['filament'] != "Loaded":
-                self._screen._ws.klippy.gcode_script(f"ERCF_SELECT GATE={self.ui_sel_gate}")
+                self._screen._ws.klippy.gcode_script(f"MMU_SELECT_BYPASS")
+            elif mmu['filament'] != "Loaded":
+                self._screen._ws.klippy.gcode_script(f"MMU_SELECT GATE={self.ui_sel_gate}")
             return
         self.update_gate_buttons()
 
     def select_gatebutton(self, widget):
         self.ui_action_button_name = 'gate'
         self.ui_action_button_label = self.labels[self.ui_action_button_name].get_label()
-        self._screen._ws.klippy.gcode_script(f"ERCF_SELECT GATE={self.ui_sel_gate}")
+        self._screen._ws.klippy.gcode_script(f"MMU_SELECT GATE={self.ui_sel_gate}")
 
     def select_checkgate(self, widget):
         self.ui_action_button_name = 'checkgate'
         self.ui_action_button_label = self.labels[self.ui_action_button_name].get_label()
-        ercf = self._printer.get_stat("ercf")
-        current_gate = ercf['gate']
-        self._screen._ws.klippy.gcode_script(f"ERCF_CHECK_GATES GATE={current_gate} QUIET=1")
+        mmu = self._printer.get_stat("mmu")
+        current_gate = mmu['gate']
+        self._screen._ws.klippy.gcode_script(f"MMU_CHECK_GATES GATE={current_gate} QUIET=1")
 
     def select_load(self, widget):
         self.ui_action_button_name = 'load'
         self.ui_action_button_label = self.labels[self.ui_action_button_name].get_label()
-        self._screen._ws.klippy.gcode_script(f"ERCF_LOAD TEST=0") # TEST=0 is to aid backward compatibility of ERCF_LOAD command
+        self._screen._ws.klippy.gcode_script(f"MMU_LOAD TEST=0") # TEST=0 is to aid backward compatibility of MMU_LOAD command
 
     def select_eject(self, widget):
         self.ui_action_button_name = 'eject'
         self.ui_action_button_label = self.labels[self.ui_action_button_name].get_label()
-        self._screen._ws.klippy.gcode_script(f"ERCF_EJECT")
+        self._screen._ws.klippy.gcode_script(f"MMU_EJECT")
 
     def select_home(self, widget):
         self.ui_action_button_name = 'home'
         self.ui_action_button_label = self.labels[self.ui_action_button_name].get_label()
-        self._screen._ws.klippy.gcode_script(f"ERCF_HOME")
+        self._screen._ws.klippy.gcode_script(f"MMU_HOME")
 
     def select_motors_off(self, widget):
         self._screen._confirm_send_action(
             None,
-            "This will reset ERCF positional state and require re-homing\n\nSure you want to continue?",
+            "This will reset MMU positional state and require re-homing\n\nSure you want to continue?",
             "printer.gcode.script",
-            {'script': "ERCF_MOTORS_OFF"}
+            {'script': "MMU_MOTORS_OFF"}
         )
 
     def select_servo_up(self, widget):
-        self._screen._ws.klippy.gcode_script(f"ERCF_SERVO_UP")
+        self._screen._ws.klippy.gcode_script(f"MMU_SERVO POS=up")
 
     def select_servo_down(self, widget):
-        self._screen._ws.klippy.gcode_script(f"ERCF_SERVO_DOWN")
+        self._screen._ws.klippy.gcode_script(f"MMU_SERVO POS=down")
 
     def select_load_extruder(self, widget):
         self.ui_action_button_name = 'load_ext'
         self.ui_action_button_label = self.labels[self.ui_action_button_name].get_label()
-        self._screen._ws.klippy.gcode_script(f"ERCF_LOAD EXTRUDER_ONLY=1")
+        self._screen._ws.klippy.gcode_script(f"MMU_LOAD EXTRUDER_ONLY=1")
 
     def select_unload_extruder(self, widget):
         self.ui_action_button_name = 'unload_ext'
         self.ui_action_button_label = self.labels[self.ui_action_button_name].get_label()
-        self._screen._ws.klippy.gcode_script(f"ERCF_EJECT EXTRUDER_ONLY=1")
+        self._screen._ws.klippy.gcode_script(f"MMU_EJECT EXTRUDER_ONLY=1")
 
     # Dynamically update button sensitivity based on state
     def update_active_buttons(self):
-        ercf = self._printer.get_stat("ercf")
+        mmu = self._printer.get_stat("mmu")
         printer_state = self._printer.get_stat("print_stats")['state']
-        enabled = ercf['enabled']
-        servo = ercf['servo']
-        is_homed = ercf['is_homed']
-        gate = ercf['gate']
-        tool = ercf['tool']
-        action = ercf['action']
-        filament = ercf['filament']
+        enabled = mmu['enabled']
+        servo = mmu['servo']
+        is_homed = mmu['is_homed']
+        gate = mmu['gate']
+        tool = mmu['tool']
+        action = mmu['action']
+        filament = mmu['filament']
         ui_state = []
         if enabled:
             ui_state.append("servo_up" if servo == "Up" else "servo_down" if servo == "Down" else "all")
@@ -259,7 +259,7 @@ class ErcfManage(ScreenPanel):
         else:
             ui_state.append("disabled")
 
-        logging.debug(f"ercf_manage: ui_state={ui_state}")
+        logging.debug(f"mmu_manage: ui_state={ui_state}")
         for label in self.btn_states['all']:
             sensitive = True
             for state in ui_state:
@@ -275,11 +275,11 @@ class ErcfManage(ScreenPanel):
         self.update_gate_buttons(gate_sensitive)
 
     def update_gate_buttons(self, gate_sensitive=True):
-        ercf = self._printer.get_stat("ercf")
-        gate = ercf['gate']
-        filament = ercf['filament']
-        num_gates = len(ercf['gate_status'])
-        action = ercf['action']
+        mmu = self._printer.get_stat("mmu")
+        gate = mmu['gate']
+        filament = mmu['filament']
+        num_gates = len(mmu['gate_status'])
+        action = mmu['action']
         if (gate == self.TOOL_BYPASS and filament != "Unloaded") or not gate_sensitive:
             self.labels['g_decrease'].set_sensitive(False)
             self.labels['g_increase'].set_sensitive(False)
@@ -297,13 +297,13 @@ class ErcfManage(ScreenPanel):
         if action == "Idle":
             if self.ui_sel_gate >= 0:
                 self.labels['gate'].set_label(f"Gate #{self.ui_sel_gate}")
-                if ercf['gate'] == self.ui_sel_gate:
+                if mmu['gate'] == self.ui_sel_gate:
                     self.labels['gate'].set_sensitive(False)
                 else:
                     self.labels['gate'].set_sensitive(True)
             elif self.ui_sel_gate == self.TOOL_BYPASS:
                 self.labels['gate'].set_label(f"Bypass")
-                if ercf['gate'] == self.ui_sel_gate:
+                if mmu['gate'] == self.ui_sel_gate:
                     self.labels['gate'].set_sensitive(False)
                 else:
                     self.labels['gate'].set_sensitive(True)

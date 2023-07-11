@@ -18,14 +18,14 @@ will natively work with [Klipper](https://github.com/kevinOConnor/klipper) and [
 <br>
 KlipperScreen "Happy Hare" Fork...
 
-# KlipperScreen - ERCF Happy Hare edition
+# KlipperScreen - MMU Happy Hare edition
 
-[![ERCF Control](docs/img/ercf/ercf_main.png)](docs/ERCF.md)
+[![MMU Control](docs/img/mmu/mmu_main.png)](docs/MMU.md)
 
-Read more on how [ERCF Panels work...](docs/ERCF.md)
+Read more on how [MMU Panels work...](docs/MMU.md)
 
 ## Introduction
-KlipperScreen ERCF Happy Hare edition is quite a mouthful!  It is a forked version of KlipperScreen designed to run/manage ERCF using the Happy Hare driver software.
+KlipperScreen Happy Hare edition is quite a mouthful!  It is a forked version of KlipperScreen designed to run/manage MMU using the Happy Hare driver software. Initially created for ERCF it now support all MMU's running under Happy Hare with Klipper
 
 KlipperScreen is an amazing piece of software but unfortunally lacks the level of panel integration and features I needed for this project.  I hope in the future to have changes integrated so that this becomes a layered install rather than a fork.  Until then you must follow these install directions closely:
 
@@ -47,17 +47,17 @@ KlipperScreen will be restarted and hopefully you should now be running the enha
 
 **Notes:**
 
-**1:** If you are installing on a rpi without Klipper and printer attached the install will not be able to find the Klipper "config" directory where the `KlipperScreen.conf` and `ercf_klipperscreen.conf` should be placed.  To fix this, specify a `-c <config_dir>` option to the install line and specify a valid directory where KlipperScreen is expecting to see its config files.
+**1:** If you are installing on a rpi without Klipper and printer attached the install will not be able to find the Klipper "config" directory where the `KlipperScreen.conf` and `mmu_klipperscreen.conf` should be placed.  To fix this, specify a `-c <config_dir>` option to the install line and specify a valid directory where KlipperScreen is expecting to see its config files.
 
 **2:**
-Expert Tip: The last step of running './install_ks -g <num_gates>' can be run many times.. if you customize the ERCF part of the KlipperScreen menu and want to make use of the "replicator" function that will automatically replicate menu options for the configured number of gates, you can edit menus.conf and reference the templating there.
+Expert Tip: The last step of running './install_ks -g <num_gates>' can be run many times.. if you customize the MMU part of the KlipperScreen menu and want to make use of the "replicator" function that will automatically replicate menu options for the configured number of gates, you can edit menus.conf and reference the templating there.
 
-Note that the base KlipperScreen is up-to-date (and I will continue to pull updates) with changes in the original but also includes extra menu functionality that can be used in the creation of your custom menus.  See the generated ercf_klipperscreen.conf for clues!
+Note that the base KlipperScreen is up-to-date (and I will continue to pull updates) with changes in the original but also includes extra menu functionality that can be used in the creation of your custom menus.  See the generated mmu_klipperscreen.conf for clues!
 
 ## Request
 Remember that this is v1.0, no doubt there are cornmer cases that I haven't considered and I'd like your feedback.  I can offer limited help on the Discord channels so would prefer if you submit an issue report via github so I can manage them.  This project and Happy Hare itself have taken a lot of time. I have a lot more planned so I need your help in organizing my work.
 
-Also, some folks have asked about making a donation to cover the cost of the all the coffee I'm drinking.  I'm not doing this for any financial reward but it you feel inclined a donation to PayPal https://www.paypal.me/moggieuk will certainly be spent making your life with ERCF more enjoyable.
+Also, some folks have asked about making a donation to cover the cost of the all the coffee I'm drinking.  I'm not doing this for any financial reward but it you feel inclined a donation to PayPal https://www.paypal.me/moggieuk will certainly be spent making your life with MMU more enjoyable.
 
 Thank you!
 
@@ -67,7 +67,7 @@ I have only tested on a single screen.  A 640x480 resolution BTT TFT5.0.   I am 
 ### Moonraker warning
 The install updates moonraker so that KlipperScreen-happy_hare can be upgraded with update-manager. It comments out the original and inserts Happy Hare specific logic.  The one consequence of this is that you may see the following warning from Moonraker:
 
-![ercf_panel_printing](docs/img/ercf/moonraker_warning.png)
+![mmu_panel_printing](docs/img/mmu/moonraker_warning.png)
 
 This is simply because I didn't want to call my software by the original name "KlipperScreen".  The fix this, click on the bell icon with line through it and select "Never" so the warning never appears again.  Note that the functionality of restarting "KlipperScreen" is still available via Mainsail.
 
@@ -85,7 +85,7 @@ JFYI the installer will comment out the existing original entry in moonraker if 
 ### Font problems:
 The CSS style only specifies a "Free Mono" font to be used (this is the same as original KlipperScreen") for all textual displays.  I use the Unicode Box character set in that font to render the selector status, filament positions and TTG map. A couple of users have reported issues with this part of the display, either not appearing or not spaced correctly.  E.g.
 
-![ercf_panel_printing](docs/img/ercf/font_problem.jpg)
+![mmu_panel_printing](docs/img/mmu/font_problem.jpg)
 
 If this occurs the first thing to try is to run the following, then restart KlipperScreen:
 
@@ -104,7 +104,7 @@ Then finally update the font reference in the KlipperScreen css file:
 
     cd ~/KlipperScreen/styles
 
-Edit `base.css` file.  Find the css entry for `.ercf_status`, then change the font-family to:
+Edit `base.css` file.  Find the css entry for `.mmu_status`, then change the font-family to:
 
     font-family:      JetBrains Mono;
 
@@ -125,5 +125,5 @@ Then restart KlipperScreen.
 
 *All screen shots are taken with the "Colorize" theme (my preference because the buttons are more defined).  The default is z-bolt and looks slightly different*
 
-## Now go read the [rest of the doc here](docs/ERCF.md)...
+## Now go read the [rest of the doc here](docs/MMU.md)...
 

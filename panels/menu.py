@@ -170,7 +170,7 @@ class MenuPanel(ScreenPanel):
             return self.ks_printer_cfg and self.ks_printer_cfg.get("camera_url", None) is not None
         self.j2_data = self._printer.get_printer_status_data()
         self.j2_data["klipperscreen"] = {
-                "side_ercf_shortcut": self._config.get_main_config().getboolean("side_ercf_shortcut")
+                "side_mmu_shortcut": self._config.get_main_config().getboolean("side_mmu_shortcut")
                 }
         try:
             j2_temp = Template(enable, autoescape=True)

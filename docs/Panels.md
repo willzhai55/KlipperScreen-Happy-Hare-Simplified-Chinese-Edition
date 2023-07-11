@@ -120,13 +120,13 @@ panel: zcalibrate
 ```
 [![Z Calibrate](img/panels/zcalibrate.png)](Panels/Zcalibrate.md)
 
-### [ERCF](ERCF.md)
+### [MMU](MMU.md)
 ```py
-panel: ercf
+panel: mmu
 ```
-![ERCF Main](img/panels/ercf_main.png)
+![MMU Main](img/panels/mmu_main.png)
 
-![ERCF Manage](img/panels/ercf_manage.png)
+![MMU Manage](img/panels/mmu_manage.png)
 
-![ERCF Recover](img/panels/ercf_recover.png)
+![MMU Recover](img/panels/mmu_recover.png)
 

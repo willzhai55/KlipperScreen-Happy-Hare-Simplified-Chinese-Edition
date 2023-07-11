@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# ERCF KlipperScreen Happy Hare edition supplemental installer
+# MMU KlipperScreen Happy Hare edition supplemental installer
 #
 # Copyright (C) 2023  moggieuk#6538 (discord)
 #                     moggieuk@hotmail.com
@@ -76,10 +76,10 @@ verify_home_dirs() {
 }
 
 install_klipper_screen() {
-    echo -e "${INFO}Adding KlipperScreen support for ERCF"
+    echo -e "${INFO}Adding KlipperScreen support for MMU"
     do_install=0
     ks_config="${KLIPPER_CONFIG_HOME}/KlipperScreen.conf"
-    hh_config="${KLIPPER_CONFIG_HOME}/ercf_klipperscreen.conf"
+    hh_config="${KLIPPER_CONFIG_HOME}/mmu_klipperscreen.conf"
 
     # Backup old Klippersreen Happy Hare menus
     if [ -f "${hh_config}" ]; then
@@ -91,18 +91,18 @@ install_klipper_screen() {
     # Ensure KlipperScreen.conf includes Happy Hare menus
     cat << EOF > /tmp/KlipperScreen.conf.tmp
 # 
-# ERCF "Happy Hare edition" menus
+# MMU "Happy Hare edition" menus
 #
-[include ercf_klipperscreen.conf]
+[include mmu_klipperscreen.conf]
 
 EOF
 
     if [ -f "${ks_config}" ]; then
-        update_section=$(grep -c '\[include ercf_klipperscreen.conf\]' ${ks_config} || true)
+        update_section=$(grep -c '\[include mmu_klipperscreen.conf\]' ${ks_config} || true)
         if [ "${update_section}" -eq 0 ]; then
             cat ${ks_config} >> /tmp/KlipperScreen.conf.tmp && cp /tmp/KlipperScreen.conf.tmp ${ks_config}
         else
-            echo -e "${INFO}KlipperScreen ERCF include already exists in conf. Skipping install"
+            echo -e "${INFO}KlipperScreen MMU include already exists in conf. Skipping install"
         fi
     else
         cp /tmp/KlipperScreen.conf.tmp ${ks_config}
@@ -119,7 +119,7 @@ EOF
             cat ${SRCDIR}/${token}.conf | sed -e "s/{i}/${i}/g"
         done)
         expanded="# Generated menus for each tool/gate...\n${expanded}"
-        awk -v r="$expanded" "{gsub(/^ERCF_${token}/,r)}1" "${hh_config}" > /tmp/ercf_klipperscreen.conf.tmp && mv /tmp/ercf_klipperscreen.conf.tmp "${hh_config}"
+        awk -v r="$expanded" "{gsub(/^MMU_${token}/,r)}1" "${hh_config}" > /tmp/mmu_klipperscreen.conf.tmp && mv /tmp/mmu_klipperscreen.conf.tmp "${hh_config}"
     done
 
     # Always ensure images are linked for every style
@@ -199,6 +199,6 @@ echo "Done.  Enjoy KlipperScreen Happy Hare Edition!"
 echo -e "${INFO}"
 echo '(\_/)'
 echo '( *,*)'
-echo '(")_(") ERCF Ready'
+echo '(")_(") MMU Ready'
 echo
 

@@ -1,4 +1,4 @@
-# Happy Hare ERCF Software
+# Happy Hare MMU Software
 # State recovery panel
 #
 # Copyright (C) 2023  moggieuk#6538 (discord)
@@ -12,9 +12,9 @@ from gi.repository import Gtk, GLib, Pango
 from ks_includes.screen_panel import ScreenPanel
 
 def create_panel(*args):
-    return ErcfRecovery(*args)
+    return MmuRecovery(*args)
 
-class ErcfRecovery(ScreenPanel):
+class MmuRecovery(ScreenPanel):
     TOOL_UNKNOWN = -1
     TOOL_BYPASS = -2
 
@@ -34,10 +34,10 @@ class ErcfRecovery(ScreenPanel):
 
         self.has_bypass = False
         self.min_tool = 0
-        if 'ercf' in self._printer.get_config_section_list():
-            ercf_config = self._printer.get_config_section("ercf")
-            if 'bypass_selector' in ercf_config:
-                if float(ercf_config['bypass_selector']) > 0.:
+        if 'mmu' in self._printer.get_config_section_list():
+            mmu_config = self._printer.get_config_section("mmu")
+            if 'bypass_selector' in mmu_config:
+                if float(mmu_config['bypass_selector']) > 0.:
                     self.has_bypass = True
                     self.min_tool = self.TOOL_BYPASS
 
@@ -56,9 +56,9 @@ class ErcfRecovery(ScreenPanel):
             'gate': self._gtk.Label("Gate #0"),
             'g_increase': self._gtk.Button('increase', None, scale=self.bts * 1.2),
             'filament': Gtk.CheckButton("Filament: Unknown"),
-            'reset': self._gtk.Button('ercf_reset', 'Reset ERCF', 'color1'),
-            'auto': self._gtk.Button('ercf_recover_auto', 'Auto Recover', 'color2'),
-            'manual': self._gtk.Button('ercf_recover_manual', 'Set State', 'color1'),
+            'reset': self._gtk.Button('mmu_reset', 'Reset MMU', 'color1'),
+            'auto': self._gtk.Button('mmu_recover_auto', 'Auto Recover', 'color2'),
+            'manual': self._gtk.Button('mmu_recover_manual', 'Set State', 'color1'),
         }
 
         self.labels['t_decrease'].connect("clicked", self.select_toolgate, 'tool', -1)
@@ -80,16 +80,16 @@ class ErcfRecovery(ScreenPanel):
         self.labels['g_decrease'].set_margin_end(10)
         self.labels['filament'].set_halign(Gtk.Align.CENTER)
 
-        self.labels['tool'].get_style_context().add_class("ercf_tool_text")
-        self.labels['gate'].get_style_context().add_class("ercf_gate_text")
-        self.labels['filament'].get_style_context().add_class("ercf_recover")
+        self.labels['tool'].get_style_context().add_class("mmu_tool_text")
+        self.labels['gate'].get_style_context().add_class("mmu_gate_text")
+        self.labels['filament'].get_style_context().add_class("mmu_recover")
 
         for i in ['current_state', 'tool_label', 'gate_label', 'filament_label', 'future_state']:
             self.labels[i] = Gtk.Label()
             self.labels[i].set_xalign(0.5 if i.endswith("state") else 0)
             self.labels[i].set_yalign(0.7 if i.endswith("state") else 0.5)
-            self.labels[i].get_style_context().add_class("ercf_recover")
-        self.labels['current_state'].set_label("Current ERCF state:")
+            self.labels[i].get_style_context().add_class("mmu_recover")
+        self.labels['current_state'].set_label("Current MMU state:")
         self.labels['future_state'].set_label("Reset state to:")
 
         status_grid = Gtk.Grid()
@@ -98,9 +98,9 @@ class ErcfRecovery(ScreenPanel):
         status_grid.attach(self.labels['current_state'],     0, 0, 3, 1)
         status_grid.attach(self._gtk.Image('extruder'),      0, 1, 1, 1)
         status_grid.attach(self.labels['tool_label'],        1, 1, 2, 1)
-        status_grid.attach(self._gtk.Image('ercf_gate'),     0, 2, 1, 1)
+        status_grid.attach(self._gtk.Image('mmu_gate'),     0, 2, 1, 1)
         status_grid.attach(self.labels['gate_label'],        1, 2, 2, 1)
-        status_grid.attach(self._gtk.Image('ercf_filament'), 0, 3, 1, 1)
+        status_grid.attach(self._gtk.Image('mmu_filament'), 0, 3, 1, 1)
         status_grid.attach(self.labels['filament_label'],    1, 3, 2, 1)
 
         status_grid.attach(self.labels['future_state'],      3, 0, 3, 1)
@@ -133,8 +133,8 @@ class ErcfRecovery(ScreenPanel):
 
     def process_update(self, action, data):
         if action == "notify_status_update":
-            if 'ercf' in data:
-                e_data = data['ercf']
+            if 'mmu' in data:
+                e_data = data['mmu']
                 if 'tool' in e_data or 'gate' in e_data or 'filament' in e_data:
                     self.update_state_labels()
                     self.update_toolgate_buttons()
@@ -143,11 +143,11 @@ class ErcfRecovery(ScreenPanel):
 
     # Dynamically update button sensitivity based on state
     def update_active_buttons(self):
-        ercf = self._printer.get_stat("ercf")
+        mmu = self._printer.get_stat("mmu")
         printer_state = self._printer.get_stat("print_stats")['state']
-        servo = ercf['servo']
-        enabled = ercf['enabled']
-        tool = ercf['tool']
+        servo = mmu['servo']
+        enabled = mmu['enabled']
+        tool = mmu['tool']
         ui_state = []
         if enabled:
             if tool == self.TOOL_BYPASS:
@@ -171,20 +171,20 @@ class ErcfRecovery(ScreenPanel):
 
     # Get starting values
     def init_toolgate_values(self):
-        ercf = self._printer.get_stat("ercf")
+        mmu = self._printer.get_stat("mmu")
         if self.ui_sel_tool == self.DUMMY:
-            self.ui_sel_tool = ercf['tool']
+            self.ui_sel_tool = mmu['tool']
         if self.ui_sel_gate == self.DUMMY:
-            self.ui_sel_gate = ercf['gate']
+            self.ui_sel_gate = mmu['gate']
         if self.ui_sel_loaded == self.DUMMY:
-            self.ui_sel_loaded = 0 if ercf['filament'] == "Unloaded" else 1
+            self.ui_sel_loaded = 0 if mmu['filament'] == "Unloaded" else 1
 
     def get_possible_gates(self, tool):
-        ercf = self._printer.get_stat("ercf")
-        num_gates = len(ercf['gate_status'])
-        endless_spool_groups = ercf['endless_spool_groups']
-        ttg_map = ercf['ttg_map']
-        gate_status = ercf['gate_status']
+        mmu = self._printer.get_stat("mmu")
+        num_gates = len(mmu['gate_status'])
+        endless_spool_groups = mmu['endless_spool_groups']
+        ttg_map = mmu['ttg_map']
+        gate_status = mmu['gate_status']
 
         gate = ttg_map[tool]
         group = endless_spool_groups[tool]
@@ -202,8 +202,8 @@ class ErcfRecovery(ScreenPanel):
         return best_gate, possible_gates
 
     def select_toolgate(self, widget, toolgate, param=0):
-        ercf = self._printer.get_stat("ercf")
-        num_gates = len(ercf['gate_status'])
+        mmu = self._printer.get_stat("mmu")
+        num_gates = len(mmu['gate_status'])
 
         if toolgate == "tool":
             if param < 0 and self.ui_sel_tool > self.min_tool:
@@ -241,8 +241,8 @@ class ErcfRecovery(ScreenPanel):
         self.update_toolgate_buttons()
 
     def update_toolgate_buttons(self, tool_sensitive=True):
-        ercf = self._printer.get_stat("ercf")
-        num_gates = len(ercf['gate_status'])
+        mmu = self._printer.get_stat("mmu")
+        num_gates = len(mmu['gate_status'])
 
         # Set sensitivity of +/- buttons
         if not tool_sensitive:
@@ -305,10 +305,10 @@ class ErcfRecovery(ScreenPanel):
             self.labels['filament'].set_active(False)
 
     def update_state_labels(self):
-        ercf = self._printer.get_stat("ercf")
-        tool = ercf['tool']
-        gate = ercf['gate']
-        filament = ercf['filament']
+        mmu = self._printer.get_stat("mmu")
+        tool = mmu['tool']
+        gate = mmu['gate']
+        filament = mmu['filament']
 
         tool_str = (f"T{tool}") if tool >= 0 else "Bypass" if tool == self.TOOL_BYPASS else "Unknown"
         gate_str = (f"#{gate}") if gate >= 0 else "Bypass" if gate == self.TOOL_BYPASS else "Unknown"
@@ -317,8 +317,8 @@ class ErcfRecovery(ScreenPanel):
         self.labels['filament_label'].set_label(f"Filament: {filament}")
 
     def select_manual(self, widget):
-        ercf = self._printer.get_stat("ercf")
-        endless_spool = ercf['endless_spool']
+        mmu = self._printer.get_stat("mmu")
+        endless_spool = mmu['endless_spool']
         warning = ""
         loaded = "Loaded" if self.ui_sel_loaded == 1 else "Unloaded"
         if self.ui_sel_gate != self.TOOL_BYPASS:
@@ -337,24 +337,24 @@ class ErcfRecovery(ScreenPanel):
             sel_loaded = 0 # Assume unloaded
         self._screen._confirm_send_action(
             None,
-            "This will set the ERCF state to:\n\n" + summary + warning + "\n\nSure you want to continue?",
+            "This will set the MMU state to:\n\n" + summary + warning + "\n\nSure you want to continue?",
             "printer.gcode.script",
-            {'script': f"ERCF_RECOVER TOOL={self.ui_sel_tool} GATE={self.ui_sel_gate} LOADED={self.ui_sel_loaded}"}
+            {'script': f"MMU_RECOVER TOOL={self.ui_sel_tool} GATE={self.ui_sel_gate} LOADED={self.ui_sel_loaded}"}
         )
 
     def select_auto(self, widget):
         self._screen._confirm_send_action(
             None,
-            "This will automatically attempt to reset the ERCF filament state\n\nSure you want to continue?",
+            "This will automatically attempt to reset the MMU filament state\n\nSure you want to continue?",
             "printer.gcode.script",
-            {'script': "ERCF_RECOVER"}
+            {'script': "MMU_RECOVER"}
         )
 
     def select_reset(self, widget):
         self._screen._confirm_send_action(
             None,
-            "This will reset persisted ERCF state to defaults including TTG map,\n\nEndlessSpool groups, Gate map (material and type) and current selector position\n\nSure you want to continue?",
+            "This will reset persisted MMU state to defaults including TTG map,\n\nEndlessSpool groups, Gate map (material and type) and current selector position\n\nSure you want to continue?",
             "printer.gcode.script",
-            {'script': "ERCF_RESET"}
+            {'script': "MMU_RESET"}
         )
 

@@ -20,7 +20,7 @@ class Printer:
         self.tempdevcount = 0
         self.fancount = 0
         self.output_pin_count = 0
-        self.has_ercf = False
+        self.has_mmu = False
         self.store_timeout = None
         self.tempstore = {}
         self.busy_cb = busy_cb
@@ -36,7 +36,7 @@ class Printer:
         self.tempdevcount = 0
         self.fancount = 0
         self.output_pin_count = 0
-        self.has_ercf = False
+        self.has_mmu = False
         self.tempstore = {}
         self.busy = False
         if not self.store_timeout:
@@ -75,8 +75,8 @@ class Printer:
                     self.fancount += 1
             if x.startswith('output_pin ') and not x.split()[1].startswith("_"):
                 self.output_pin_count += 1
-            if x == 'ercf':
-                self.has_ercf = True
+            if x == 'mmu':
+                self.has_mmu = True
             if x.startswith('bed_mesh '):
                 r = self.config[x]
                 r['x_count'] = int(r['x_count'])
@@ -93,12 +93,12 @@ class Printer:
         logging.info(f"# Temperature devices: {self.tempdevcount}")
         logging.info(f"# Fans: {self.fancount}")
         logging.info(f"# Output pins: {self.output_pin_count}")
-        logging.info(f"# Has ERCF: {self.has_ercf}")
+        logging.info(f"# Has MMU: {self.has_mmu}")
 
     def process_update(self, data):
         if self.data is None:
             return
-        for x in (self.get_tools() + self.get_heaters() + self.get_filament_sensors() + self.get_ercf_encoders()):
+        for x in (self.get_tools() + self.get_heaters() + self.get_filament_sensors() + self.get_mmu_encoders()):
             if x in data:
                 for i in data[x]:
                     self.set_dev_stat(x, i, data[x][i])
@@ -216,8 +216,8 @@ class Printer:
         sensors.extend(iter(self.get_config_section_list("filament_motion_sensor ")))
         return sensors
 
-    def get_ercf_encoders(self):
-        return list(self.get_config_section_list("ercf_encoder"))
+    def get_mmu_encoders(self):
+        return list(self.get_config_section_list("mmu_encoder"))
 
     def get_probe(self):
         probe_types = ["probe", "bltouch", "smart_effector", "dockable_probe"]
@@ -242,8 +242,8 @@ class Printer:
             }
         }
 
-        if self.has_ercf:
-            data["printer"]["ercf"] = self.get_stat("ercf")
+        if self.has_mmu:
+            data["printer"]["mmu"] = self.get_stat("mmu")
 
         sections = ["bed_mesh", "bltouch", "probe", "quad_gantry_level", "z_tilt"]
         for section in sections:

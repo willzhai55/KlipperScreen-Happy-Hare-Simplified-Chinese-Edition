@@ -46,7 +46,7 @@ PRINTER_BASE_STATUS_OBJECTS = [
     'motion_report',
     'firmware_retraction',
     'exclude_object',
-    'ercf'
+    'mmu'
 ]
 
 klipperscreendir = pathlib.Path(__file__).parent.resolve()
@@ -237,9 +237,9 @@ class KlipperScreen(Gtk.Window):
                 "firmware_retraction": ["retract_length", "retract_speed", "unretract_extra_length", "unretract_speed"],
                 "motion_report": ["live_position", "live_velocity", "live_extruder_velocity"],
                 "exclude_object": ["current_object", "objects", "excluded_objects"],
-                "ercf": ["enabled", "is_locked", "is_homed", "tool", "next_tool", "last_tool", "last_toolchange", "gate",
+                "mmu": ["enabled", "is_locked", "is_homed", "tool", "next_tool", "last_tool", "last_toolchange", "gate",
                     "clog_detection", "endless_spool", "filament", "servo", "gate_status", "gate_material", "gate_color",
-                    "endless_spool_groups", "ttg_map", "loaded_status", "filament_direction", "action"],
+                    "endless_spool_groups", "ttg_map", "filament_pos", "filament_direction", "action"],
             }
         }
         for extruder in self.printer.get_tools():
@@ -250,7 +250,7 @@ class KlipperScreen(Gtk.Window):
             requested_updates['objects'][f] = ["speed"]
         for f in self.printer.get_filament_sensors():
             requested_updates['objects'][f] = ["enabled", "filament_detected"]
-        for e in self.printer.get_ercf_encoders():
+        for e in self.printer.get_mmu_encoders():
             requested_updates['objects'][e] = ["encoder_pos", "detection_length", "min_headroom", "headroom", "desired_headroom", "detection_mode", "enabled", "flow_rate"]
         for p in self.printer.get_output_pins():
             requested_updates['objects'][p] = ["value"]
@@ -760,7 +760,7 @@ class KlipperScreen(Gtk.Window):
                 elif data.startswith("!! "):
                     self.show_popup_message(data[3:], 3)
                 elif "unknown" in data.lower() and \
-                        not ("TESTZ" in data or "MEASURE_AXES_NOISE" in data or "ACCELEROMETER_QUERY" in data or "ERCF" in data or "from Unknown to" in data or "Tool Unknown" in data):
+                        not ("TESTZ" in data or "MEASURE_AXES_NOISE" in data or "ACCELEROMETER_QUERY" in data or "MMU" in data or "from Unknown to" in data or "Tool Unknown" in data):
                     if data.startswith("// "):
                         self.show_popup_message(data[3:])
                     else:
@@ -773,7 +773,7 @@ class KlipperScreen(Gtk.Window):
                         "printer.gcode.script",
                         script
                     )
-                elif "ERCF Statistics:" in data:
+                elif "MMU Statistics:" in data:
                     msg = data.replace("// ", "")
                     self.show_popup_message(msg, level=1)
         self.process_update(action, data)
@@ -895,7 +895,7 @@ class KlipperScreen(Gtk.Window):
                      + self.printer.get_fans()
                      + self.printer.get_filament_sensors()
                      + self.printer.get_output_pins()
-                     + self.printer.get_ercf_encoders()
+                     + self.printer.get_mmu_encoders()
                       )
 
         data = self.apiclient.send_request("printer/objects/query?" + "&".join(PRINTER_BASE_STATUS_OBJECTS +
@@ -927,11 +927,11 @@ class KlipperScreen(Gtk.Window):
 
     def base_panel_show_all(self):
         self.base_panel.show_macro_shortcut(self._config.get_main_config().getboolean('side_macro_shortcut', True))
-        self.base_panel.show_ercf_shortcut((self._config.get_main_config().getboolean('side_ercf_shortcut', True)) and self.printer.has_ercf)
+        self.base_panel.show_mmu_shortcut((self._config.get_main_config().getboolean('side_mmu_shortcut', True)) and self.printer.has_mmu)
         self.base_panel.show_heaters(True)
         self.base_panel.show_estop(True)
         self.base_panel.toggle_macro_shorcut_sensitive(True) # PAUL added
-        self.base_panel.toggle_ercf_shorcut_sensitive(True) # PAUL added
+        self.base_panel.toggle_mmu_shorcut_sensitive(True) # PAUL added
 
     def printer_ready(self):
         self.show_panel('main_panel', "main_menu", None, 2, items=self._config.get_menu_items("__main"))

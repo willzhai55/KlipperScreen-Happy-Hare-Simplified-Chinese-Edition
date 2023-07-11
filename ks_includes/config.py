@@ -168,7 +168,7 @@ class KlipperScreenConfig:
                 bools = (
                     'invert_x', 'invert_y', 'invert_z', '24htime', 'only_heaters', 'show_cursor', 'confirm_estop',
                     'autoclose_popups', 'use_dpms', 'use_default_menu', 'side_macro_shortcut',
-                    'side_ercf_shortcut', 'ercf_color_gates', 'ercf_color_filament', 'ercf_bold_filament',
+                    'side_mmu_shortcut', 'mmu_color_gates', 'mmu_color_filament', 'mmu_bold_filament',
                     'use-matchbox-keyboard', 'show_heater_power'
                 )
                 strs = (
@@ -262,17 +262,17 @@ class KlipperScreenConfig:
             {"side_macro_shortcut": {
                 "section": "main", "name": _("Macro shortcut on sidebar"), "type": "binary",
                 "value": "True", "callback": screen.toggle_macro_shortcut}},
-            {"side_ercf_shortcut": {
-                "section": "main", "name": _("ERCF shortcut on sidebar"), "type": "binary",
+            {"side_mmu_shortcut": {
+                "section": "main", "name": _("MMU shortcut on sidebar"), "type": "binary",
                 "value": "True", "callback": screen.restart_ks}},
-            {"ercf_color_gates": {
-                "section": "main", "name": _("ERCF show color in gates"), "type": "binary",
+            {"mmu_color_gates": {
+                "section": "main", "name": _("MMU show color in gates"), "type": "binary",
                 "value": "True"}},
-            {"ercf_color_filament": {
-                "section": "main", "name": _("ERCF show colored filament"), "type": "binary",
+            {"mmu_color_filament": {
+                "section": "main", "name": _("MMU show colored filament"), "type": "binary",
                 "value": "False"}},
-            {"ercf_bold_filament": {
-                "section": "main", "name": _("ERCF show bold filament"), "type": "binary",
+            {"mmu_bold_filament": {
+                "section": "main", "name": _("MMU show bold filament"), "type": "binary",
                 "value": "False"}},
             {"font_size": {
                 "section": "main", "name": _("Font Size"), "type": "dropdown",

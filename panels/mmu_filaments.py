@@ -1,4 +1,4 @@
-# Happy Hare ERCF Software
+# Happy Hare MMU Software
 # Display filaments loaded on each gate and allow editing of gate_map
 #
 # Copyright (C) 2023  moggieuk#6538 (discord)
@@ -12,9 +12,9 @@ from gi.repository import Gtk, GLib, Pango, Gdk
 from ks_includes.screen_panel import ScreenPanel
 
 def create_panel(*args):
-    return ErcfPicker(*args)
+    return MmuPicker(*args)
 
-class ErcfPicker(ScreenPanel):
+class MmuPicker(ScreenPanel):
     TOOL_UNKNOWN = -1
     TOOL_BYPASS = -2
 
@@ -48,8 +48,8 @@ class ErcfPicker(ScreenPanel):
         grid.set_column_homogeneous(True)
         grid.set_row_spacing(10)
 
-        ercf = self._printer.get_stat("ercf")
-        num_gates = len(ercf['gate_status'])
+        mmu = self._printer.get_stat("mmu")
+        num_gates = len(mmu['gate_status'])
         for i in range(num_gates):
             status_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
             status = self.labels[f'status_{i}'] = self._gtk.Image()
@@ -58,24 +58,24 @@ class ErcfPicker(ScreenPanel):
             status_box.pack_start(available, True, True, 0)
 
             gate_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
-            gate_icon = self.labels[f'gate_icon_{i}'] = self._gtk.Image('ercf_gate')
+            gate_icon = self.labels[f'gate_icon_{i}'] = self._gtk.Image('mmu_gate')
             gate_label = self.labels[f'gate_label_{i}'] = Gtk.Label(f'Gate #{i}')
             gate_box.pack_start(gate_icon, True, True, 0)
             gate_box.pack_start(gate_label, True, True, 0)
 
             color = self.labels[f'color_{i}'] = Gtk.Label(f'⬤')
-            color.get_style_context().add_class("ercf_color_swatch")
+            color.get_style_context().add_class("mmu_color_swatch")
             color.set_xalign(0.7)
 
             material = self.labels[f'material_{i}'] = Gtk.Label("n/a")
-            material.get_style_context().add_class("ercf_material_text")
+            material.get_style_context().add_class("mmu_material_text")
             material.set_xalign(0.1)
 
             tools = self.labels[f'tools_{i}'] = Gtk.Label("n/a")
-            tools.get_style_context().add_class("ercf_gate_text")
+            tools.get_style_context().add_class("mmu_gate_text")
             tools.set_xalign(0)
 
-            edit = self.labels[f'edit_{i}'] = self._gtk.Button('ercf_gear', f'Edit', 'color4')
+            edit = self.labels[f'edit_{i}'] = self._gtk.Button('mmu_gear', f'Edit', 'color4')
             edit.connect("clicked", self.select_edit, i)
 
             grid.attach(status_box, 0, i, 3, 1)
@@ -85,20 +85,20 @@ class ErcfPicker(ScreenPanel):
             grid.attach(tools,     11, i, 3, 1)
             grid.attach(edit,      14, i, 2, 1)
 
-        self.labels['unknown_icon'] = self._gtk.Image('ercf_unknown').get_pixbuf()
-        self.labels['available_icon'] = self._gtk.Image('ercf_tick').get_pixbuf()
-        self.labels['empty_icon'] = self._gtk.Image('ercf_cross').get_pixbuf()
+        self.labels['unknown_icon'] = self._gtk.Image('mmu_unknown').get_pixbuf()
+        self.labels['available_icon'] = self._gtk.Image('mmu_tick').get_pixbuf()
+        self.labels['empty_icon'] = self._gtk.Image('mmu_cross').get_pixbuf()
 
         self.labels.update( {
             'status': self._gtk.Image(),
             'available': Gtk.Label("Unknown"),
-            'gate_icon': self._gtk.Image('ercf_gate'),
+            'gate_icon': self._gtk.Image('mmu_gate'),
             'gate_label': Gtk.Label('Gate #0'),
             'color': Gtk.Label('⬤'),
             'material': Gtk.Label('PLA'),
             'tools': Gtk.Label("n/a"),
-            'save': self._gtk.Button('ercf_save', f'Save', 'color3'),
-            'c_picker': self._gtk.Button('ercf_color_chooser', None, 'color1', scale=self.bts * 1.2),
+            'save': self._gtk.Button('mmu_save', f'Save', 'color3'),
+            'c_picker': self._gtk.Button('mmu_color_chooser', None, 'color1', scale=self.bts * 1.2),
             'c_selector': Gtk.ComboBoxText(),
             'm_entry': Gtk.Entry(),
             'filament': Gtk.CheckButton(),
@@ -113,13 +113,13 @@ class ErcfPicker(ScreenPanel):
         edit_gate_box.pack_start(self.labels['gate_icon'], True, True, 0)
         edit_gate_box.pack_start(self.labels['gate_label'], True, True, 0)
 
-        self.labels['color'].get_style_context().add_class("ercf_color_swatch")
+        self.labels['color'].get_style_context().add_class("mmu_color_swatch")
         self.labels['color'].set_xalign(0.7)
 
-        self.labels['material'].get_style_context().add_class("ercf_material_text")
+        self.labels['material'].get_style_context().add_class("mmu_material_text")
         self.labels['material'].set_xalign(0.1)
 
-        self.labels['tools'].get_style_context().add_class("ercf_gate_text")
+        self.labels['tools'].get_style_context().add_class("mmu_gate_text")
         self.labels['tools'].set_xalign(0)
 
         self.labels['save'].connect("clicked", self.select_save)
@@ -133,7 +133,7 @@ class ErcfPicker(ScreenPanel):
         self.labels['c_picker'].connect("clicked", self.select_color)
 
         self.labels['m_entry'].set_vexpand(False)
-        self.labels['m_entry'].get_style_context().add_class("ercf_entry_text")
+        self.labels['m_entry'].get_style_context().add_class("mmu_entry_text")
         self.labels['m_entry'].connect("button-press-event", self._screen.show_keyboard)
         self.labels['m_entry'].connect("focus-in-event", self._screen.show_keyboard)
         self.labels['m_entry'].connect("changed", self.select_material)
@@ -141,7 +141,7 @@ class ErcfPicker(ScreenPanel):
         self.labels['m_entry'].set_max_length(6)
 
         self.labels['filament'].set_vexpand(False)
-        self.labels['filament'].get_style_context().add_class("ercf_recover")
+        self.labels['filament'].get_style_context().add_class("mmu_recover")
         self.labels['filament'].connect("notify::active", self.select_filament)
         self.labels['filament'].set_halign(Gtk.Align.CENTER)
 
@@ -198,10 +198,10 @@ class ErcfPicker(ScreenPanel):
 
     def activate(self):
         self.gate_tool_map = self.build_gate_tool_map()
-        ercf = self._printer.get_stat("ercf")
-        gate_status = ercf['gate_status']
-        gate_material = ercf['gate_material']
-        gate_color = ercf['gate_color']
+        mmu = self._printer.get_stat("mmu")
+        gate_status = mmu['gate_status']
+        gate_material = mmu['gate_material']
+        gate_color = mmu['gate_color']
         num_gates = len(gate_status)
 
         for i in range(num_gates):
@@ -249,8 +249,8 @@ class ErcfPicker(ScreenPanel):
     # gate_tool_map = [ { 'tools': <list of tools mapped to this gate> } ]
     def build_gate_tool_map(self):
         gate_tool_map = []
-        ercf = self._printer.get_stat("ercf")
-        ttg_map = ercf['ttg_map']
+        mmu = self._printer.get_stat("mmu")
+        ttg_map = mmu['ttg_map']
         num_gates = len(ttg_map)
         for gate in range(num_gates):
             tools = []
@@ -271,16 +271,16 @@ class ErcfPicker(ScreenPanel):
         if action == "notify_status_update":
             if 'configfile' in data:
                 return
-            elif 'ercf' in data:
-                e_data = data['ercf']
+            elif 'mmu' in data:
+                e_data = data['mmu']
                 if 'ttg_map' in e_data or 'gate' in e_data or 'gate_status' in e_data or 'gate_material' in e_data or 'gate_color' in e_data:
                     self.activate()
 
     def select_edit(self, widget, sel_gate):
         self.ui_sel_gate = sel_gate
-        self.ui_gate_status = self._printer.get_stat('ercf', 'gate_status')[self.ui_sel_gate]
-        self.ui_gate_material = self._printer.get_stat('ercf', 'gate_material')[self.ui_sel_gate]
-        self.ui_gate_color = self._printer.get_stat('ercf', 'gate_color')[self.ui_sel_gate]
+        self.ui_gate_status = self._printer.get_stat('mmu', 'gate_status')[self.ui_sel_gate]
+        self.ui_gate_material = self._printer.get_stat('mmu', 'gate_material')[self.ui_sel_gate]
+        self.ui_gate_color = self._printer.get_stat('mmu', 'gate_color')[self.ui_sel_gate]
         self.labels['layers'].set_current_page(1) # Edit layer
         self.update_edited_gate()
 
@@ -344,7 +344,7 @@ class ErcfPicker(ScreenPanel):
 
     def select_save(self, widget):
         self._screen.remove_keyboard()
-        self._screen._ws.klippy.gcode_script(f"ERCF_SET_GATE_MAP GATE={self.ui_sel_gate} COLOR={self.ui_gate_color} MATERIAL={self.ui_gate_material} AVAILABLE={self.ui_gate_status} QUIET=1")
+        self._screen._ws.klippy.gcode_script(f"MMU_SET_GATE_MAP GATE={self.ui_sel_gate} COLOR={self.ui_gate_color} MATERIAL={self.ui_gate_material} AVAILABLE={self.ui_gate_status} QUIET=1")
         self.labels['layers'].set_current_page(0) # Gate list layer
 
     def select_cancel_edit(self, widget):

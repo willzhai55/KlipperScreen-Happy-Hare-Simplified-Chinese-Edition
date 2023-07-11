@@ -549,64 +549,64 @@ popover button {
     background-color: darkred;
 }
 
-.ercf_runout slider, .ercf_runout highlight, .ercf_runout fill {
+.mmu_runout slider, .mmu_runout highlight, .mmu_runout fill {
     min-height: 0;
 }
 
-.ercf_runout trough {
+.mmu_runout trough {
     margin-top: 0;
 }
 
-.ercf_tool_image {
+.mmu_tool_image {
     margin-top: 12px;
     margin-bottom: 12px;
 }
 
-.ercf_tool_text {
+.mmu_tool_text {
     margin-top: 6px;
     margin-bottom: 6px;
     font-size: 1.8em;
 }
 
-.ercf_entry_text {
+.mmu_entry_text {
     margin-top: 6px;
     margin-bottom: 6px;
     font-size: 1.8em;
 }
 
-.ercf_color_swatch {
+.mmu_color_swatch {
     font-size: 3em;
 }
 
-.ercf_sensor_text {
+.mmu_sensor_text {
     font-size: 1.6em;
 }
 
-.ercf_sel_increase {
+.mmu_sel_increase {
     margin-left: 10px;
     margin-right: 25px;
     padding-left: 15px;
     padding-right: 15px;
 }
 
-.ercf_sel_decrease {
+.mmu_sel_decrease {
     margin-left: 25px;
     margin-right: 10px;
     padding-left: 15px;
     padding-right: 15px;
 }
 
-.ercf_gate_text {
+.mmu_gate_text {
     margin-top: 8px;
     margin-bottom: 8px;
     font-size: 1.2em;
 }
 
-.ercf_material_text {
+.mmu_material_text {
     font-size: 1.6em;
 }
 
-.ercf_status {
+.mmu_status {
     background: transparent;
     margin-left: 8px;
     font-family: Free Mono;
@@ -615,26 +615,26 @@ popover button {
     padding: 0;
 }
 
-.ercf_status_filament {
+.mmu_status_filament {
     margin-left: 8px;
     margin-top: 8px;
     margin-bottom: 8px;
 }
 
-.ercf_recover check {
+.mmu_recover check {
     padding: 0.2em;
 }
 
-.ercf_recover, .ercf_recover label {
+.mmu_recover, .mmu_recover label {
     background: transparent;
     font-size: 1.1em;
 }
 
-.ercf_disabled_text {
+.mmu_disabled_text {
     color: grey;
 }
 
-.ercf_es_gate {
+.mmu_es_gate {
     border: .15em transparent;
     margin-left: 0;
     margin-right: 0;
@@ -645,7 +645,7 @@ popover button {
     min-height: 2em;
 }
 
-.ercf_endless_spool_toggle {
+.mmu_endless_spool_toggle {
     padding-bottom: .6em;
 }
 
