@@ -34,12 +34,10 @@ class MmuRecovery(ScreenPanel):
 
         self.has_bypass = False
         self.min_tool = 0
-        if 'mmu' in self._printer.get_config_section_list():
-            mmu_config = self._printer.get_config_section("mmu")
-            if 'bypass_selector' in mmu_config:
-                if float(mmu_config['bypass_selector']) > 0.:
-                    self.has_bypass = True
-                    self.min_tool = self.TOOL_BYPASS
+        mmu = self._printer.get_stat("mmu")
+        self.has_bypass = self._printer.get_stat("mmu")['has_bypass']
+        if self.has_bypass:
+            self.min_tool = self.TOOL_BYPASS
 
         # btn_states: The "gaps" are what functionality the state takes away. Multiple states are combined
         self.btn_states = {
