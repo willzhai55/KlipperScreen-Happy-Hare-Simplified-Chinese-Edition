@@ -29,7 +29,6 @@ class MmuManage(ScreenPanel):
 
         self.has_bypass = False
         self.min_gate = 0
-        mmu = self._printer.get_stat("mmu")
         self.has_bypass = self._printer.get_stat("mmu")['has_bypass']
         if self.has_bypass:
             self.min_gate = self.TOOL_BYPASS
@@ -298,18 +297,18 @@ class MmuManage(ScreenPanel):
                 if mmu['gate'] == self.ui_sel_gate:
                     self.labels['gate'].set_sensitive(False)
                 else:
-                    self.labels['gate'].set_sensitive(True)
+                    self.labels['gate'].set_sensitive(gate_sensitive)
             elif self.ui_sel_gate == self.TOOL_BYPASS:
                 self.labels['gate'].set_label(f"Bypass")
                 if mmu['gate'] == self.ui_sel_gate:
                     self.labels['gate'].set_sensitive(False)
                 else:
-                    self.labels['gate'].set_sensitive(True)
+                    self.labels['gate'].set_sensitive(gate_sensitive)
             else:
                 self.labels['gate'].set_label(f"Unknown")
         else:
-            self.labels['tool'].set_label(action)
-            self.labels['tool'].set_sensitive(False)
+            self.labels['gate'].set_label(action)
+            self.labels['gate'].set_sensitive(False)
 
         if self.ui_sel_gate == self.TOOL_BYPASS:
             self.labels['checkgate'].set_sensitive(False)

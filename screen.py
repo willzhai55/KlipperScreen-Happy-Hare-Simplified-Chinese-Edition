@@ -239,7 +239,7 @@ class KlipperScreen(Gtk.Window):
                 "exclude_object": ["current_object", "objects", "excluded_objects"],
                 "mmu": ["enabled", "is_locked", "is_homed", "tool", "next_tool", "last_tool", "last_toolchange", "gate",
                     "clog_detection", "endless_spool", "filament", "servo", "gate_status", "gate_material", "gate_color",
-                    "endless_spool_groups", "ttg_map", "filament_pos", "filament_direction", "action"],
+                    "endless_spool_groups", "ttg_map", "filament_pos", "filament_direction", "action", "has_bypass"],
             }
         }
         for extruder in self.printer.get_tools():

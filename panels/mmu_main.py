@@ -48,7 +48,6 @@ class MmuMain(ScreenPanel):
 
         self.has_bypass = False
         self.min_tool = 0
-        mmu = self._printer.get_stat("mmu")
         self.has_bypass = self._printer.get_stat("mmu")['has_bypass']
         if self.has_bypass:
             self.min_tool = self.TOOL_BYPASS
@@ -386,13 +385,13 @@ class MmuMain(ScreenPanel):
                 if mmu['tool'] == self.ui_sel_tool and filament == "Loaded":
                     self.labels['tool'].set_sensitive(False)
                 else:
-                    self.labels['tool'].set_sensitive(True)
+                    self.labels['tool'].set_sensitive(tool_sensitive)
             elif self.ui_sel_tool == self.TOOL_BYPASS:
                 self.labels['tool'].set_label(f"Bypass")
-                self.labels['tool'].set_sensitive(True)
+                self.labels['tool'].set_sensitive(tool_sensitive)
             else:
                 self.labels['tool'].set_label(f"n/a")
-                self.labels['tool'].set_sensitive(True)
+                self.labels['tool'].set_sensitive(tool_sensitive)
         else:
             self.labels['tool'].set_label(action)
             self.labels['tool'].set_sensitive(False)

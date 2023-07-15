@@ -34,7 +34,6 @@ class MmuRecovery(ScreenPanel):
 
         self.has_bypass = False
         self.min_tool = 0
-        mmu = self._printer.get_stat("mmu")
         self.has_bypass = self._printer.get_stat("mmu")['has_bypass']
         if self.has_bypass:
             self.min_tool = self.TOOL_BYPASS
@@ -250,12 +249,12 @@ class MmuRecovery(ScreenPanel):
             if self.ui_sel_tool == self.min_tool:
                 self.labels['t_decrease'].set_sensitive(False)
             else:
-                self.labels['t_decrease'].set_sensitive(True)
+                self.labels['t_decrease'].set_sensitive(tool_sensitive)
 
             if self.ui_sel_tool == num_gates -1:
                 self.labels['t_increase'].set_sensitive(False)
             else:
-                self.labels['t_increase'].set_sensitive(True)
+                self.labels['t_increase'].set_sensitive(tool_sensitive)
 
         if self.ui_sel_tool == self.TOOL_BYPASS or not tool_sensitive:
             self.labels['g_decrease'].set_sensitive(False)
@@ -264,19 +263,19 @@ class MmuRecovery(ScreenPanel):
             if self.ui_sel_gate == (self.min_tool if self.ui_sel_tool == self.TOOL_BYPASS else 0):
                 self.labels['g_decrease'].set_sensitive(False)
             else:
-                self.labels['g_decrease'].set_sensitive(True)
+                self.labels['g_decrease'].set_sensitive(tool_sensitive)
 
             if self.ui_sel_gate == num_gates -1:
                 self.labels['g_increase'].set_sensitive(False)
             else:
-                self.labels['g_increase'].set_sensitive(True)
+                self.labels['g_increase'].set_sensitive(tool_sensitive)
 
         if (self.ui_sel_tool == self.DUMMY or self.ui_sel_gate == self.DUMMY
                 or self.ui_sel_loaded == self.DUMMY or self.ui_sel_tool == self.TOOL_UNKNOWN
                 or self.ui_sel_gate == self.TOOL_UNKNOWN or not tool_sensitive):
             self.labels['manual'].set_sensitive(False)
         else:
-            self.labels['manual'].set_sensitive(True)
+            self.labels['manual'].set_sensitive(tool_sensitive)
 
         if self.ui_sel_tool >= 0:
             self.labels['tool'].set_label(f"T{self.ui_sel_tool}")
