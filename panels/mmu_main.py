@@ -29,7 +29,7 @@ class MmuMain(ScreenPanel):
     FILAMENT_POS_IN_BOWDEN = 2
     FILAMENT_POS_END_BOWDEN = 3
     FILAMENT_POS_HOMED_EXTRUDER = 4
-    FILAMENT_POS_PAST_EXTRUDER = 5
+    FILAMENT_POS_EXTRUDER_ENTRY = 5
     FILAMENT_POS_HOMED_TS = 6
     FILAMENT_POS_IN_EXTRUDER = 7    # AKA FILAMENT_POS_PAST_TS
     FILAMENT_POS_LOADED = 8         # AKA FILAMENT_POS_HOMED_NOZZLE
@@ -634,7 +634,7 @@ class MmuMain(ScreenPanel):
             visual     = "%s ^━━━$│En│^━━━━━━━━$▶┈│Ex│┈┈┈%s┈┈│Nz│   %s" % (tool_str, sensor_str, move_str)
         elif filament_pos == self.FILAMENT_POS_HOMED_EXTRUDER:
             visual     = "%s ^━━━$│En│^━━━━━━━━━$▶┫Ex│┈┈┈%s┈┈│Nz│   %s" % (tool_str, sensor_str, move_str)
-        elif filament_pos == self.FILAMENT_POS_PAST_EXTRUDER:
+        elif filament_pos == self.FILAMENT_POS_EXTRUDER_ENTRY:
             visual     = "%s ^━━━$│En│^━━━━━━━━━━$│Ex│^━$▶┈%s┈┈│Nz│   %s" % (tool_str, sensor_str_homed, move_str)
         elif filament_pos == self.FILAMENT_POS_HOMED_TS:
             visual     = "%s ^━━━$│En│^━━━━━━━━━━$│Ex│^━━$▶%s┈┈│Nz│   %s" % (tool_str, sensor_str_homed, move_str)
