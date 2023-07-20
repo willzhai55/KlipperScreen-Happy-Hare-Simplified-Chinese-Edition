@@ -54,21 +54,19 @@ class MmuMain(ScreenPanel):
 
         # btn_states: The "gaps" are what functionality the state takes away. Multiple states are combined
         self.btn_states = {
-            'all':             ['check_gates', 'tool', 'eject', 'picker', 'pause', 'message', 'unlock', 'resume', 'manage', 'more'],
-            'printing':        [                                          'pause',                                          'more'],
-            'paused':          ['check_gates', 'tool', 'eject', 'picker',          'message', 'unlock', 'resume', 'manage', 'more'],
-            'idle':            ['check_gates', 'tool', 'eject', 'picker', 'pause', 'message', 'unlock',           'manage', 'more'],
-            'locked':          [                                                   'message', 'unlock',                     'more'],
-            'not_locked':      ['check_gates', 'tool', 'eject', 'picker', 'pause', 'message',           'resume', 'manage', 'more'],
-            'bypass_loaded':   [                       'eject',           'pause', 'message', 'unlock', 'resume', 'manage', 'more'],
-            'bypass_unloaded': ['check_gates', 'tool',          'picker', 'pause', 'message', 'unlock', 'resume', 'manage', 'more'],
-            'bypass_unknown':  ['check_gates', 'tool', 'eject', 'picker', 'pause', 'message', 'unlock', 'resume', 'manage', 'more'],
-            'tool_loaded':     ['check_gates', 'tool', 'eject', 'picker', 'pause', 'message', 'unlock', 'resume', 'manage', 'more'],
-            'tool_unloaded':   ['check_gates', 'tool',          'picker', 'pause', 'message', 'unlock', 'resume', 'manage', 'more'],
-            'tool_unknown':    ['check_gates', 'tool', 'eject', 'picker', 'pause', 'message', 'unlock', 'resume', 'manage', 'more'],
-            'no_message':      ['check_gates', 'tool', 'eject', 'picker', 'pause',            'unlock', 'resume', 'manage', 'more'],
-            'busy':            [                                                                                  'manage', 'more'],
-            'disabled':        [                                                                                                  ],
+            'all':             ['check_gates', 'tool', 'eject', 'picker', 'pause', 'message', 'filaments', 'resume', 'manage', 'more'],
+            'printing':        [                                          'pause',                                             'more'],
+            'paused':          ['check_gates', 'tool', 'eject', 'picker',          'message', 'filaments', 'resume', 'manage', 'more'],
+            'idle':            ['check_gates', 'tool', 'eject', 'picker', 'pause', 'message', 'filaments',           'manage', 'more'],
+            'bypass_loaded':   [                       'eject',           'pause', 'message', 'filaments', 'resume', 'manage', 'more'],
+            'bypass_unloaded': ['check_gates', 'tool',          'picker', 'pause', 'message', 'filaments', 'resume', 'manage', 'more'],
+            'bypass_unknown':  ['check_gates', 'tool', 'eject', 'picker', 'pause', 'message', 'filaments', 'resume', 'manage', 'more'],
+            'tool_loaded':     ['check_gates', 'tool', 'eject', 'picker', 'pause', 'message', 'filaments', 'resume', 'manage', 'more'],
+            'tool_unloaded':   ['check_gates', 'tool',          'picker', 'pause', 'message', 'filaments', 'resume', 'manage', 'more'],
+            'tool_unknown':    ['check_gates', 'tool', 'eject', 'picker', 'pause', 'message', 'filaments', 'resume', 'manage', 'more'],
+            'no_message':      ['check_gates', 'tool', 'eject', 'picker', 'pause',            'filaments', 'resume', 'manage', 'more'],
+            'busy':            [                                                                                     'manage', 'more'],
+            'disabled':        [                                                                                                                ],
         }
 
         self.labels = {
@@ -77,12 +75,12 @@ class MmuMain(ScreenPanel):
             't_decrease': self._gtk.Button('decrease', None, scale=self.bts * 1.2),
             'tool': self._gtk.Button('extruder', 'Load T0', 'color2'),
             't_increase': self._gtk.Button('increase', None, scale=self.bts * 1.2),
-            'picker': self._gtk.Button('mmu_tool_picker', 'Tools...', 'color3'),
+            'picker': self._gtk.Button('mmu_tool_picker', 'Pick...', 'color3'),
             'eject': self._gtk.Button('mmu_eject', 'Eject', 'color4'),
             'pause': self._gtk.Button('pause', 'MMU Pause', 'color1'),
             'message': self._gtk.Button('warning', 'Last Error', 'color1'),
-            'unlock': self._gtk.Button('mmu_unlock', 'Unlock', 'color2'),
             'resume': self._gtk.Button('resume', 'Resume', 'color3'),
+            'filaments': self._gtk.Button('mmu_filaments', 'Filaments...', 'color2'),
             'more': self._gtk.Button('mmu_more', 'More...', 'color4'),
             'tool_icon': self._gtk.Image('extruder', self._gtk.img_width * 0.8, self._gtk.img_height * 0.8),
             'tool_label': self._gtk.Label('Unknown'),
@@ -107,8 +105,9 @@ class MmuMain(ScreenPanel):
         self.labels['eject'].connect("clicked", self.select_eject)
         self.labels['pause'].connect("clicked", self.select_pause)
         self.labels['message'].connect("clicked", self.select_message)
-        self.labels['unlock'].connect("clicked", self.select_unlock)
         self.labels['resume'].connect("clicked", self.select_resume)
+        self.labels['filaments'].connect("clicked", self.menu_item_clicked, "filaments", {
+            "panel": "mmu_filaments", "name": "Filament Editor"})
         self.labels['more'].connect("clicked", self._screen._go_to_submenu, "mmu")
 
         self.labels['t_increase'].set_hexpand(False)
@@ -208,8 +207,8 @@ class MmuMain(ScreenPanel):
         main_grid.attach(self.labels['eject'],        8, 0, 2, 1)
         main_grid.attach(self.labels['check_gates'], 10, 0, 2, 1)
         main_grid.attach(pause_layer,                 0, 1, 3, 1)
-        main_grid.attach(self.labels['unlock'],       3, 1, 3, 1)
-        main_grid.attach(self.labels['resume'],       6, 1, 3, 1)
+        main_grid.attach(self.labels['resume'],       3, 1, 3, 1)
+        main_grid.attach(self.labels['filaments'],    6, 1, 3, 1)
         main_grid.attach(self.labels['more'],         9, 1, 3, 1)
 
         box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
@@ -315,9 +314,6 @@ class MmuMain(ScreenPanel):
         last_toolchange = self._printer.get_stat('mmu', 'last_toolchange')
         self._screen.show_last_popup_message(f"Last Toolchange: {last_toolchange}")
 
-    def select_unlock(self, widget):
-        self._screen._ws.klippy.gcode_script(f"MMU_UNLOCK")
-
     def select_resume(self, widget):
         self._screen._ws.klippy.gcode_script(f"RESUME")
 
@@ -349,7 +345,7 @@ class MmuMain(ScreenPanel):
             self.labels['eject'].set_label(f"Unload")
         else:
             self.labels['picker'].set_image(self.labels['tool_picker_img'])
-            self.labels['picker'].set_label(f"Tools...")
+            self.labels['picker'].set_label(f"Pick...")
             self.labels['eject'].set_image(self.labels['eject_img'])
             self.labels['eject'].set_label(f"Eject")
 
@@ -361,7 +357,6 @@ class MmuMain(ScreenPanel):
         filament = mmu['filament']
         enabled = mmu['enabled']
         action = mmu['action']
-        locked = mmu['is_locked']
 
         # Set sensitivity of +/- buttons
         if (tool == self.TOOL_BYPASS and filament == "Loaded") or not tool_sensitive:
@@ -482,7 +477,6 @@ class MmuMain(ScreenPanel):
     def update_active_buttons(self):
         mmu = self._printer.get_stat("mmu")
         printer_state = self._printer.get_stat("print_stats")['state']
-        locked = mmu['is_locked']
         is_paused = self._printer.get_stat("pause_resume")['is_paused']
         enabled = mmu['enabled']
         tool = mmu['tool']
@@ -497,7 +491,6 @@ class MmuMain(ScreenPanel):
                 self._screen.clear_last_popup_message()
             else:
                 ui_state.append("idle")
-            ui_state.append("locked" if locked else "not_locked")
             if tool == self.TOOL_BYPASS:
                 if filament == "Loaded":
                     ui_state.append("bypass_loaded")

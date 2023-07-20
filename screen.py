@@ -773,9 +773,8 @@ class KlipperScreen(Gtk.Window):
                         "printer.gcode.script",
                         script
                     )
-                elif "MMU Statistics:" in data:
-                    msg = data.replace("// ", "")
-                    self.show_popup_message(msg, level=1)
+                elif data.startswith("// MMU"):
+                    self.show_popup_message(data[3:], level=1)
         self.process_update(action, data)
 
     def process_update(self, *args):
