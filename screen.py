@@ -774,7 +774,8 @@ class KlipperScreen(Gtk.Window):
                         script
                     )
                 elif data.startswith("// MMU"):
-                    self.show_popup_message(data[3:], level=1)
+                    if not data.startswith("// MMU [") and not data.startswith("// MMU BYPASS"):
+                        self.show_popup_message(data[3:], level=1)
         self.process_update(action, data)
 
     def process_update(self, *args):
