@@ -21,7 +21,6 @@ class MenuPanel(ScreenPanel):
     def __init__(self, screen, title, items=None):
         super().__init__(screen, title)
         self.menu_callbacks = {}
-        logging.debug("PAUL __init__ menu_callbacks={}") # PAUL
         self.items = items
         self.create_menu_items()
         self.grid = self._gtk.HomogeneousGrid()
@@ -77,10 +76,6 @@ class MenuPanel(ScreenPanel):
         show_list = []
         for item in items:
             key = list(item)[0]
-            if not self.evaluate_enable(item[key]['enable']):
-                logging.debug(f"X > {key}")
-                continue
-
             if item[key]['show_disabled'] and self.evaluate_enable(item[key]['show_disabled']):
                 show_list.append(key)
                 if self.evaluate_enable(item[key]['enable']):

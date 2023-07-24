@@ -526,7 +526,7 @@ class MmuMain(ScreenPanel):
             self.labels['t_increase'].set_sensitive(False)
             self.labels['t_decrease'].set_sensitive(False)
 
-        logging.debug(f"mmu_main: ui_state={ui_state}")
+        #logging.debug(f"mmu_main: ui_state={ui_state}")
         for label in self.btn_states['all']:
             sensitive = True
             for state in ui_state:
