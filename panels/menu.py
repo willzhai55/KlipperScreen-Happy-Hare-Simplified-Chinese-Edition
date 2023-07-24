@@ -21,6 +21,7 @@ class MenuPanel(ScreenPanel):
     def __init__(self, screen, title, items=None):
         super().__init__(screen, title)
         self.items = items
+        self.menu_callbacks = {}
         self.create_menu_items()
         self.grid = self._gtk.HomogeneousGrid()
         self.scroll = self._gtk.ScrolledWindow()
