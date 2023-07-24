@@ -20,6 +20,8 @@ class MenuPanel(ScreenPanel):
 
     def __init__(self, screen, title, items=None):
         super().__init__(screen, title)
+        self.menu_callbacks = {}
+        logging.debug("PAUL __init__ menu_callbacks={}") # PAUL
         self.items = items
         self.create_menu_items()
         self.grid = self._gtk.HomogeneousGrid()
