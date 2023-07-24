@@ -660,6 +660,7 @@ popover button {
 
 .ercf_endless_spool_toggle {
     padding-bottom: .6em;
+}
 
 /* Hardcoded values until creation of dynamic CSS updates */
 .graph_label_hidden {padding-left: .9em;} /* .4em on top of normal button padding */
