@@ -76,10 +76,6 @@ class MenuPanel(ScreenPanel):
         show_list = []
         for item in items:
             key = list(item)[0]
-            if not self.evaluate_enable(item[key]['enable']):
-                logging.debug(f"X > {key}")
-                continue
-
             if item[key]['show_disabled'] and self.evaluate_enable(item[key]['show_disabled']):
                 show_list.append(key)
                 if self.evaluate_enable(item[key]['enable']):
