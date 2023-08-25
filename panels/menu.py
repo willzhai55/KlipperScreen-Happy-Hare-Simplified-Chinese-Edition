@@ -1,21 +1,14 @@
 import logging
-
-import gi
-
 import json
+import gi
 
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 from jinja2 import Template
-
 from ks_includes.screen_panel import ScreenPanel
 
 
-def create_panel(*args, **kwargs):
-    return MenuPanel(*args, **kwargs)
-
-
-class MenuPanel(ScreenPanel):
+class Panel(ScreenPanel):
     j2_data = None
 
     def __init__(self, screen, title, items=None):
@@ -128,7 +121,7 @@ class MenuPanel(ScreenPanel):
 
             if item['panel'] is not None:
                 panel = self._screen.env.from_string(item['panel']).render(printer)
-                b.connect("clicked", self.menu_item_clicked, panel, item)
+                b.connect("clicked", self.menu_item_clicked, item)
             elif item['method'] is not None:
                 params = {}
 
@@ -157,8 +150,6 @@ class MenuPanel(ScreenPanel):
         if enable == "{{ moonraker_connected }}":
             logging.info(f"moonraker connected {self._screen._ws.connected}")
             return self._screen._ws.connected
-        elif enable == "{{ camera_configured }}":
-            return self.ks_printer_cfg and self.ks_printer_cfg.get("camera_url", None) is not None
         self.j2_data = self._printer.get_printer_status_data()
         self.j2_data["klipperscreen"] = {
                 "side_mmu_shortcut": self._config.get_main_config().getboolean("side_mmu_shortcut")

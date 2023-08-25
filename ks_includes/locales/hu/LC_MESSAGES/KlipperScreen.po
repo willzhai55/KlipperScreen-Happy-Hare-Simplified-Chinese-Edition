@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: KlipperScreen\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-12 16:32-0300\n"
+"POT-Creation-Date: 2023-08-05 16:43-0300\n"
 "PO-Revision-Date: \n"
 "Last-Translator: AntoszHUN\n"
 "Language-Team: \n"
@@ -158,6 +158,9 @@ msgstr "Folytat"
 msgid "Cooldown"
 msgstr "Lehűtés"
 
+msgid "DPMS has failed to load and has been disabled"
+msgstr "DPMS betöltése nem sikerült, ezért le van tiltva"
+
 msgid "Date"
 msgstr "Dátum"
 
@@ -251,9 +254,6 @@ msgstr "Betűméret"
 
 msgid "Full Update"
 msgstr "Teljes Frissítés"
-
-msgid "Fullscreen"
-msgstr "Teljes képernyő"
 
 msgid "Go Back"
 msgstr "Visszalépés"
@@ -445,8 +445,8 @@ msgid ""
 "Not supported for auto-detection, it needs to be configured in klipperscreen."
 "conf"
 msgstr ""
-"Az automatikus felismerés nem támogatott, a KlipperScreen-ben kell beállítani."
-"conf"
+"Az automatikus felismerés nem támogatott, a KlipperScreen-ben kell "
+"beállítani.conf"
 
 msgid "Nothing selected"
 msgstr "Nincs kiválasztva"
@@ -647,6 +647,9 @@ msgstr "Sebesség:"
 msgid "Square Corner Velocity"
 msgstr "Sebesség a sarkokban"
 
+msgid "Standby"
+msgstr "Készenlét"
+
 msgid "Start"
 msgstr "Indítás"
 
@@ -754,6 +757,9 @@ msgstr "mm/s²"
 
 msgid "mm³/s"
 msgstr "mm³/s"
+
+#~ msgid "Fullscreen"
+#~ msgstr "Teljes képernyő"
 
 #~ msgid "Actions"
 #~ msgstr "Műveletek"

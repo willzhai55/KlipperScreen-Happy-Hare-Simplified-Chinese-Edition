@@ -5,10 +5,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: 2023-07-22 14:53-0300\n"
+"Project-Id-Version: 2023-07-31 15:31\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-02 16:32-0300\n"
-"PO-Revision-Date: 2023-07-22 12:41+0300\n"
+"POT-Creation-Date: 2023-08-16 10:20-0300\n"
+"PO-Revision-Date: 2023-07-31 15:32+0300\n"
 "Last-Translator: Andrii Komarovskyi\n"
 "Language-Team: Andrii Komarovskyi\n"
 "Language: uk\n"
@@ -164,6 +164,9 @@ msgstr "Продовжити"
 msgid "Cooldown"
 msgstr "Охолодження"
 
+msgid "DPMS has failed to load and has been disabled"
+msgstr "DPMS не вдалося завантажити, і його було вимкнено"
+
 msgid "Date"
 msgstr "Дата"
 
@@ -261,9 +264,6 @@ msgid "Full Update"
 msgstr ""
 "Повне\n"
 "Оновлення"
-
-msgid "Fullscreen"
-msgstr "Повноекранний режим"
 
 msgid "Go Back"
 msgstr "Назад"
@@ -666,6 +666,9 @@ msgstr "Швидкість:"
 msgid "Square Corner Velocity"
 msgstr "Квадратно кутова швидкість"
 
+msgid "Standby"
+msgstr "Очікування"
+
 msgid "Start"
 msgstr "СТАРТ"
 
@@ -778,6 +781,9 @@ msgstr "мм/с²"
 
 msgid "mm³/s"
 msgstr "мм/с³"
+
+#~ msgid "Fullscreen"
+#~ msgstr "Повноекранний режим"
 
 #~ msgid "Actions"
 #~ msgstr "Дії"

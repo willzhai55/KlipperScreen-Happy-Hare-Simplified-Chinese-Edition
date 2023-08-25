@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-02 16:32-0300\n"
+"POT-Creation-Date: 2023-08-16 10:20-0300\n"
 "PO-Revision-Date: 2023-07-23 17:27+0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -163,6 +163,9 @@ msgstr "Devam et"
 msgid "Cooldown"
 msgstr "Soğutma"
 
+msgid "DPMS has failed to load and has been disabled"
+msgstr ""
+
 msgid "Date"
 msgstr "Tarih"
 
@@ -256,9 +259,6 @@ msgstr "Yazı boyutu"
 
 msgid "Full Update"
 msgstr "Tam Güncelleme"
-
-msgid "Fullscreen"
-msgstr "Tam Ekran"
 
 msgid "Go Back"
 msgstr "Geri git"
@@ -652,6 +652,9 @@ msgstr "Hız:"
 msgid "Square Corner Velocity"
 msgstr "Kare Köşe Hızı"
 
+msgid "Standby"
+msgstr ""
+
 msgid "Start"
 msgstr "Başlat"
 
@@ -759,6 +762,9 @@ msgstr "mm/s²"
 
 msgid "mm³/s"
 msgstr "mm³/s"
+
+#~ msgid "Fullscreen"
+#~ msgstr "Tam Ekran"
 
 #~ msgid "Actions"
 #~ msgstr "Eylemler"

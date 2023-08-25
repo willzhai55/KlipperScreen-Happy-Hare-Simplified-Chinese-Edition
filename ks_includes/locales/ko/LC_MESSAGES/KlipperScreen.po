@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: KlipperScreen\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-02 16:32-0300\n"
+"POT-Creation-Date: 2023-08-16 10:20-0300\n"
 "PO-Revision-Date: \n"
 "Last-Translator: NSteven\n"
 "Language-Team: NSteven\n"
@@ -158,6 +158,9 @@ msgstr "계속"
 msgid "Cooldown"
 msgstr "가열 중단"
 
+msgid "DPMS has failed to load and has been disabled"
+msgstr ""
+
 msgid "Date"
 msgstr "날짜"
 
@@ -251,9 +254,6 @@ msgstr "글꼴 크기"
 
 msgid "Full Update"
 msgstr "전체 업데이트"
-
-msgid "Fullscreen"
-msgstr ""
 
 msgid "Go Back"
 msgstr "뒤로"
@@ -643,6 +643,9 @@ msgstr "속도:"
 
 msgid "Square Corner Velocity"
 msgstr "모서리 통과 속도"
+
+msgid "Standby"
+msgstr ""
 
 msgid "Start"
 msgstr "시작"

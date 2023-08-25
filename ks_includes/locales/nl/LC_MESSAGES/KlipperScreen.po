@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-02 16:32-0300\n"
+"POT-Creation-Date: 2023-08-16 10:20-0300\n"
 "PO-Revision-Date: 2023-05-07 18:50+0200\n"
 "Last-Translator: Thijs Triemstra <info@collab.nl>\n"
 "Language-Team: \n"
@@ -163,6 +163,9 @@ msgstr "Doorgaan"
 msgid "Cooldown"
 msgstr "Afkoelen"
 
+msgid "DPMS has failed to load and has been disabled"
+msgstr ""
+
 msgid "Date"
 msgstr "Datum"
 
@@ -256,9 +259,6 @@ msgstr "Lettertype Grootte"
 
 msgid "Full Update"
 msgstr "Volledige Update"
-
-msgid "Fullscreen"
-msgstr "Volledig Scherm"
 
 msgid "Go Back"
 msgstr "Ga Terug"
@@ -652,6 +652,9 @@ msgstr "Snelheid:"
 msgid "Square Corner Velocity"
 msgstr "Square Corner Velocity"
 
+msgid "Standby"
+msgstr ""
+
 msgid "Start"
 msgstr "Start"
 
@@ -759,6 +762,9 @@ msgstr "mm/s²"
 
 msgid "mm³/s"
 msgstr "mm³/s"
+
+#~ msgid "Fullscreen"
+#~ msgstr "Volledig Scherm"
 
 #~ msgid "Actions"
 #~ msgstr "Acties"

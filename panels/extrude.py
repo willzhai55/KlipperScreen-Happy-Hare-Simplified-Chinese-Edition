@@ -1,20 +1,14 @@
 import logging
 import re
-
 import gi
 
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, Pango
-
 from ks_includes.KlippyGcodes import KlippyGcodes
 from ks_includes.screen_panel import ScreenPanel
 
 
-def create_panel(*args):
-    return ExtrudePanel(*args)
-
-
-class ExtrudePanel(ScreenPanel):
+class Panel(ScreenPanel):
 
     def __init__(self, screen, title):
         super().__init__(screen, title)
@@ -45,16 +39,20 @@ class ExtrudePanel(ScreenPanel):
             'unload': self._gtk.Button("arrow-up", _("Unload"), "color2"),
             'retract': self._gtk.Button("retract", _("Retract"), "color1"),
             'temperature': self._gtk.Button("heat-up", _("Temperature"), "color4"),
+            'spoolman': self._gtk.Button("spoolman", "Spoolman", "color3"),
         }
         self.buttons['extrude'].connect("clicked", self.extrude, "+")
         self.buttons['load'].connect("clicked", self.load_unload, "+")
         self.buttons['unload'].connect("clicked", self.load_unload, "-")
         self.buttons['retract'].connect("clicked", self.extrude, "-")
-        self.buttons['temperature'].connect("clicked", self.menu_item_clicked, "temperature", {
+        self.buttons['temperature'].connect("clicked", self.menu_item_clicked, {
             "name": "Temperature",
             "panel": "temperature"
         })
-
+        self.buttons['spoolman'].connect("clicked", self.menu_item_clicked, {
+            "name": "Spoolman",
+            "panel": "spoolman"
+        })
         extgrid = self._gtk.HomogeneousGrid()
         limit = 5
         i = 0
@@ -72,6 +70,8 @@ class ExtrudePanel(ScreenPanel):
                 i += 1
         if i < (limit - 1):
             extgrid.attach(self.buttons['temperature'], i + 1, 0, 1, 1)
+        if i < (limit - 2) and self._printer.spoolman:
+            extgrid.attach(self.buttons['spoolman'], i + 2, 0, 1, 1)
 
         distgrid = Gtk.Grid()
         for j, i in enumerate(self.distances):
@@ -167,15 +167,22 @@ class ExtrudePanel(ScreenPanel):
 
         self.content.add(grid)
 
-    def process_busy(self, busy):
+    def enable_buttons(self, enable):
         for button in self.buttons:
-            if button == "temperature":
+            if button in ("temperature", "spoolman"):
                 continue
-            self.buttons[button].set_sensitive((not busy))
+            self.buttons[button].set_sensitive(enable)
+
+    def activate(self):
+        if self._printer.state == "printing":
+            self.enable_buttons(False)
 
     def process_update(self, action, data):
-        if action == "notify_busy":
-            self.process_busy(data)
+        if action == "notify_gcode_response":
+            if "action:cancel" in data or "action:paused" in data:
+                self.enable_buttons(True)
+            elif "action:resumed" in data:
+                self.enable_buttons(False)
             return
         if action != "notify_status_update":
             return
@@ -222,8 +229,8 @@ class ExtrudePanel(ScreenPanel):
         for tool in self._printer.get_tools():
             self.labels[tool].get_style_context().remove_class("button_active")
         self.labels[extruder].get_style_context().add_class("button_active")
-
-        self._screen._ws.klippy.gcode_script(f"T{self._printer.get_tool_number(extruder)}")
+        self._screen._send_action(widget, "printer.gcode.script",
+                                  {"script": f"T{self._printer.get_tool_number(extruder)}"})
 
     def change_speed(self, widget, speed):
         logging.info(f"### Speed {speed}")
@@ -233,19 +240,22 @@ class ExtrudePanel(ScreenPanel):
 
     def extrude(self, widget, direction):
         self._screen._ws.klippy.gcode_script(KlippyGcodes.EXTRUDE_REL)
-        self._screen._ws.klippy.gcode_script(KlippyGcodes.extrude(f"{direction}{self.distance}", f"{self.speed * 60}"))
+        self._screen._send_action(widget, "printer.gcode.script",
+                                  {"script": f"G1 E{direction}{self.distance} F{self.speed * 60}"})
 
     def load_unload(self, widget, direction):
         if direction == "-":
             if not self.unload_filament:
                 self._screen.show_popup_message("Macro UNLOAD_FILAMENT not found")
             else:
-                self._screen._ws.klippy.gcode_script(f"UNLOAD_FILAMENT SPEED={self.speed * 60}")
+                self._screen._send_action(widget, "printer.gcode.script",
+                                          {"script": f"UNLOAD_FILAMENT SPEED={self.speed * 60}"})
         if direction == "+":
             if not self.load_filament:
                 self._screen.show_popup_message("Macro LOAD_FILAMENT not found")
             else:
-                self._screen._ws.klippy.gcode_script(f"LOAD_FILAMENT SPEED={self.speed * 60}")
+                self._screen._send_action(widget, "printer.gcode.script",
+                                          {"script": f"LOAD_FILAMENT SPEED={self.speed * 60}"})
 
     def enable_disable_fs(self, switch, gparams, name, x):
         if switch.get_active():

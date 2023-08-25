@@ -1,5 +1,4 @@
 import logging
-import contextlib
 import gi
 
 gi.require_version("Gtk", "3.0")
@@ -26,6 +25,9 @@ class Printer:
         self.busy_cb = busy_cb
         self.busy = False
         self.tempstore_size = 1200
+        self.cameras = []
+        self.available_commands = {}
+        self.spoolman = False
 
     def reinit(self, printer_info, data):
         self.config = data['configfile']['config']
@@ -38,10 +40,12 @@ class Printer:
         self.output_pin_count = 0
         self.has_mmu = False
         self.tempstore = {}
+        self.spoolman = False
         self.busy = False
         if not self.store_timeout:
             self.store_timeout = GLib.timeout_add_seconds(1, self._update_temp_store)
         self.tempstore_size = 1200
+        self.available_commands = {}
 
         for x in self.config.keys():
             if x[:8] == "extruder":
@@ -126,14 +130,14 @@ class Printer:
         # webhooks states: startup, ready, shutdown, error
         # print_stats: standby, printing, paused, error, complete
         # idle_timeout: Idle, Printing, Ready
-        if self.data['webhooks']['state'] == "ready":
-            with contextlib.suppress(KeyError):
-                if self.data['print_stats']['state'] == 'paused':
-                    return "paused"
-                if self.data['print_stats']['state'] == 'printing':
-                    return "printing"
-                if self.data['idle_timeout']['state'].lower() == "printing":
-                    return "busy"
+        if self.data['webhooks']['state'] == "ready" and (
+                'print_stats' in self.data and 'state' in self.data['print_stats']):
+            if self.data['print_stats']['state'] == 'paused':
+                return "paused"
+            if self.data['print_stats']['state'] == 'printing':
+                return "printing"
+            if self.data['idle_timeout']['state'].lower() == "printing":
+                return "busy"
         return self.data['webhooks']['state']
 
     def process_status_update(self):
@@ -171,6 +175,10 @@ class Printer:
                 "status": "on" if x['status'] == "on" else "off"
             }
         logging.debug(f"Power devices: {self.power_devices}")
+
+    def configure_cameras(self, data):
+        self.cameras = data
+        logging.debug(f"Cameras: {self.cameras}")
 
     def get_config_section_list(self, search=""):
         if self.config is not None:
@@ -244,6 +252,8 @@ class Printer:
                 "idle_timeout": self.get_stat("idle_timeout").copy(),
                 "pause_resume": self.get_stat("pause_resume").copy(), # PAUL TODO: Original code was?? "pause_resume": {"is_paused": self.state == "paused"},
                 "power_devices": {"count": len(self.get_power_devices())}
+                "cameras": {"count": len(self.cameras)},
+                "spoolman": self.spoolman
             }
         }
 
@@ -341,14 +351,12 @@ class Printer:
             return True
 
     def init_temp_store(self, tempstore):
-        if not tempstore or 'result' not in tempstore:
-            return
-        if self.tempstore and list(self.tempstore) != list(tempstore['result']):
+        if self.tempstore and list(self.tempstore) != list(tempstore):
             logging.debug("Tempstore has changed")
-            self.tempstore = tempstore['result']
+            self.tempstore = tempstore
             self.change_state(self.state)
         else:
-            self.tempstore = tempstore['result']
+            self.tempstore = tempstore
         for device in self.tempstore:
             for x in self.tempstore[device]:
                 length = len(self.tempstore[device][x])
@@ -377,3 +385,7 @@ class Printer:
                     temp = 0
                 self.tempstore[device][x].append(temp)
         return True
+
+    def enable_spoolman(self):
+        logging.info("Enabling Spoolman")
+        self.spoolman = True

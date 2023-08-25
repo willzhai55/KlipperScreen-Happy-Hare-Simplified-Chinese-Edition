@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Czech\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-02 16:32-0300\n"
+"POT-Creation-Date: 2023-08-16 10:20-0300\n"
 "PO-Revision-Date: 2023-01-29 09:27-0600\n"
 "Last-Translator: \n"
 "Language-Team: Jan Stanka (stanky@email.cz)\n"
@@ -163,6 +163,9 @@ msgstr "Pokračuj"
 msgid "Cooldown"
 msgstr "Zchladit"
 
+msgid "DPMS has failed to load and has been disabled"
+msgstr ""
+
 msgid "Date"
 msgstr "Datum"
 
@@ -256,9 +259,6 @@ msgstr "Velikost fontu"
 
 msgid "Full Update"
 msgstr "Úplný update"
-
-msgid "Fullscreen"
-msgstr ""
 
 msgid "Go Back"
 msgstr "Zpět"
@@ -649,6 +649,9 @@ msgid "Speed:"
 msgstr "Rychlost:"
 
 msgid "Square Corner Velocity"
+msgstr ""
+
+msgid "Standby"
 msgstr ""
 
 msgid "Start"
