@@ -10,6 +10,8 @@ The filament color can be displayed as shown here so long as you have your gate 
 
 The philosophy behind this screen is that it works with the concept of `Tool` which is really a virtual entity in Happy Hare because of the Tool-To-Gate mapping.  When you are actually printing the panel will look a little different (see below).
 
+There is quite a lot of information compressed onto this page including: (i) tool icon in top left that also indicates if gear stepper is synchronized with the extruder, (ii) toolhead ssensor state (if fitted), (iii) current action being taken, (iv) toolchange in process, etc...
+
 ![mmu_panel_printing](img/mmu/mmu_main_printing.png)
 
 The top left button is replaced with a live monitor of Happy Hare clog/runout detection.  This "thermonitor" usually will sit at the bottom of the scale.  As the difference between extruder and encoder measured movement increases the "temperature" will rise.  If it hits the top a runout condition will be triggered.  The configurable check mark on the side is the 'headroom' used by the automatic tuning option and represents a safe gap to avoid accidental firing.  The detection length (and headroom) are all tunable, but with automatic, they will be updated at least every tool change.
