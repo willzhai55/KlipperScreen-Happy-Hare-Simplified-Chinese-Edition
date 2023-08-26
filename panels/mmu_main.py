@@ -11,10 +11,7 @@ gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, Gdk, GLib, Pango
 from ks_includes.screen_panel import ScreenPanel
 
-def create_panel(*args):
-    return MmuMain(*args)
-
-class MmuMain(ScreenPanel):
+class Panel(ScreenPanel):
     TOOL_UNKNOWN = -1
     TOOL_BYPASS = -2
 
@@ -73,16 +70,16 @@ class MmuMain(ScreenPanel):
             'check_gates': self._gtk.Button('mmu_checkgates', "Gates", 'color1'),
             'manage': self._gtk.Button('mmu_manage', "Manage...",'color2'),
             't_decrease': self._gtk.Button('decrease', None, scale=self.bts * 1.2),
-            'tool': self._gtk.Button('extruder', 'Load T0', 'color2'),
+            'tool': self._gtk.Button('mmu_extruder', 'Load T0', 'color2'),
             't_increase': self._gtk.Button('increase', None, scale=self.bts * 1.2),
-            'picker': self._gtk.Button('mmu_tool_picker', 'Pick...', 'color3'),
+            'picker': self._gtk.Button('mmu_tool_picker', 'Tools...', 'color3'),
             'eject': self._gtk.Button('mmu_eject', 'Eject', 'color4'),
             'pause': self._gtk.Button('pause', 'MMU Pause', 'color1'),
             'message': self._gtk.Button('warning', 'Last Error', 'color1'),
             'resume': self._gtk.Button('resume', 'Resume', 'color3'),
             'filaments': self._gtk.Button('mmu_filaments', 'Filaments...', 'color2'),
             'more': self._gtk.Button('mmu_more', 'More...', 'color4'),
-            'tool_icon': self._gtk.Image('extruder', self._gtk.img_width * 0.8, self._gtk.img_height * 0.8),
+            'tool_icon': self._gtk.Image('mmu_extruder', self._gtk.img_width * 0.8, self._gtk.img_height * 0.8),
             'tool_label': self._gtk.Label('Unknown'),
             'filament': self._gtk.Label('Filament: Unknown ▷ Flow: 100%'),
             'sensor': self._gtk.Label('Ts:'),
@@ -90,14 +87,16 @@ class MmuMain(ScreenPanel):
             'select_bypass_img': self._gtk.Image('mmu_select_bypass'), # Alternative for tool
             'load_bypass_img': self._gtk.Image('mmu_load_bypass'),     # Alternative for picker
             'unload_bypass_img': self._gtk.Image('mmu_unload_bypass'), # Alternative for eject
+            'sync_drive_img': self._gtk.Image('mmu_synced_extruder', self._gtk.img_width * 0.8, self._gtk.img_height * 0.8), # Alternative for tool_icon
         }
         self.labels['eject_img'] = self.labels['eject'].get_image()
         self.labels['tool_img'] = self.labels['tool'].get_image()
         self.labels['tool_picker_img'] = self.labels['picker'].get_image()
+        self.labels['tool_icon_pixbuf'] = self.labels['tool_icon'].get_pixbuf()
+        self.labels['sync_drive_pixbuf'] = self.labels['sync_drive_img'].get_pixbuf()
 
         self.labels['check_gates'].connect("clicked", self.select_check_gates)
-        self.labels['manage'].connect("clicked", self.menu_item_clicked, "manage", {
-            "panel": "mmu_manage", "name": "MMU Management"})
+        self.labels['manage'].connect("clicked", self.menu_item_clicked, {"panel": "mmu_manage", "name": "MMU Management"})
         self.labels['t_decrease'].connect("clicked", self.select_tool, -1)
         self.labels['tool'].connect("clicked", self.select_tool, 0)
         self.labels['t_increase'].connect("clicked", self.select_tool, 1)
@@ -106,8 +105,7 @@ class MmuMain(ScreenPanel):
         self.labels['pause'].connect("clicked", self.select_pause)
         self.labels['message'].connect("clicked", self.select_message)
         self.labels['resume'].connect("clicked", self.select_resume)
-        self.labels['filaments'].connect("clicked", self.menu_item_clicked, "filaments", {
-            "panel": "mmu_filaments", "name": "Filament Editor"})
+        self.labels['filaments'].connect("clicked", self.menu_item_clicked, {"panel": "mmu_filaments", "name": "MMU Filament Editor"})
         self.labels['more'].connect("clicked", self._screen._go_to_submenu, "mmu")
 
         self.labels['t_increase'].set_hexpand(False)
@@ -157,8 +155,9 @@ class MmuMain(ScreenPanel):
         runout_layer = Gtk.Notebook()
         self.labels['runout_layer'] = runout_layer
         runout_layer.set_show_tabs(False)
-        runout_layer.insert_page(runout_frame, None, 0)
-        runout_layer.insert_page(manage_grid, None, 1)
+        runout_layer.insert_page(manage_grid, None, 0)
+        runout_layer.insert_page(runout_frame, None, 1)
+        runout_layer.set_current_page(0)
         
         # TextView has problems in this use case so use 5 separate labels... Simple!
         status_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
@@ -219,16 +218,20 @@ class MmuMain(ScreenPanel):
         scroll.add(box)
         self.content.add(scroll)
 
+        # Was in activate() but now process_update can occur before activate() !?
+        self.ui_sel_tool = self.NOT_SET
+        self.init_tool_value()
+        self.config_update()
+
     def activate(self):
+        self.config_update()
+        self.update_status()
+        self.update_filament_status()
+
+    def config_update(self):
         self.markup_status = self._config.get_main_config().getboolean("mmu_color_gates", True)
         self.markup_filament = self._config.get_main_config().getboolean("mmu_color_filament", False)
         self.bold_filament = self._config.get_main_config().getboolean("mmu_bold_filament", False)
-        self.ui_sel_tool = self.NOT_SET
-        self.init_tool_value()
-        self._screen.base_panel.toggle_mmu_shorcut_sensitive(False)
-
-    def deactivate(self):
-        self._screen.base_panel.toggle_mmu_shorcut_sensitive(True)
 
     def process_update(self, action, data):
         if action == "notify_status_update":
@@ -245,7 +248,7 @@ class MmuMain(ScreenPanel):
                     self.update_status()
                 if 'tool' in e_data or 'filament_pos' in e_data or 'filament_direction' in e_data:
                     self.update_filament_status()
-                if 'tool' in e_data or 'next_tool' in e_data:
+                if 'tool' in e_data or 'next_tool' in e_data or 'sync_drive' in e_data:
                     self.update_tool()
                 if 'enabled' in e_data:
                     self.update_enabled()
@@ -305,7 +308,7 @@ class MmuMain(ScreenPanel):
         if self.ui_sel_tool == self.TOOL_BYPASS:
             self._screen._ws.klippy.gcode_script(f"MMU_LOAD EXTRUDER_ONLY=1")
         else:
-            self._screen.show_panel('picker', 'mmu_picker', "MMU Tool Picker", 1, False)
+            self._screen.show_panel('mmu_picker', 'MMU Tool Picker')
 
     def select_pause(self, widget):
         self._screen._ws.klippy.gcode_script(f"MMU_PAUSE FORCE_IN_PRINT=1")
@@ -331,6 +334,7 @@ class MmuMain(ScreenPanel):
         tool = mmu['tool']
         next_tool = mmu['next_tool']
         last_tool = mmu['last_tool']
+        sync_drive = mmu['sync_drive']
         if next_tool != self.TOOL_UNKNOWN:
             # Change in progress
             text = ("T%d " % last_tool) if (last_tool >= 0 and last_tool != next_tool) else "Bypass " if last_tool == -2 else "Unknown " if last_tool == -1 else ""
@@ -338,6 +342,10 @@ class MmuMain(ScreenPanel):
         else:
             text = ("T%d " % tool) if tool >= 0 else "Bypass " if tool == -2 else "Unknown " if tool == -1 else ""
         self.labels['tool_label'].set_text(text)
+        if sync_drive:
+            self.labels['tool_icon'].set_from_pixbuf(self.labels['sync_drive_pixbuf'])
+        else:
+            self.labels['tool_icon'].set_from_pixbuf(self.labels['tool_icon_pixbuf'])
         if tool == self.TOOL_BYPASS:
             self.labels['picker'].set_image(self.labels['load_bypass_img'])
             self.labels['picker'].set_label(f"Load")
@@ -345,7 +353,7 @@ class MmuMain(ScreenPanel):
             self.labels['eject'].set_label(f"Unload")
         else:
             self.labels['picker'].set_image(self.labels['tool_picker_img'])
-            self.labels['picker'].set_label(f"Pick...")
+            self.labels['picker'].set_label(f"Tools...")
             self.labels['eject'].set_image(self.labels['eject_img'])
             self.labels['eject'].set_label(f"Eject")
 
@@ -508,10 +516,10 @@ class MmuMain(ScreenPanel):
             if not self._screen.have_last_popup_message():
                 ui_state.append("no_message")
 
-            if 'printing' in ui_state:
-                self.labels['runout_layer'].set_current_page(0) # Clog display
+            if not 'printing' in ui_state:
+                self.labels['runout_layer'].set_current_page(0) # Manage recovery button
             else:
-                self.labels['runout_layer'].set_current_page(1) # Recovery
+                self.labels['runout_layer'].set_current_page(1) # Clog display
 
             if not 'paused' in ui_state:
                 self.labels['pause_layer'].set_current_page(0) # Pause button
@@ -522,7 +530,7 @@ class MmuMain(ScreenPanel):
                 ui_state.append("busy")
         else:
             ui_state.append("disabled")
-            self.labels['runout_layer'].set_current_page(0)
+            self.labels['runout_layer'].set_current_page(0) # Manage recovery button
             self.labels['t_increase'].set_sensitive(False)
             self.labels['t_decrease'].set_sensitive(False)
 

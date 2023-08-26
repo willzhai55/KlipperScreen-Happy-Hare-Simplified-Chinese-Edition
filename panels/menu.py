@@ -151,7 +151,7 @@ class Panel(ScreenPanel):
             logging.info(f"moonraker connected {self._screen._ws.connected}")
             return self._screen._ws.connected
         self.j2_data = self._printer.get_printer_status_data()
-        self.j2_data["klipperscreen"] = {
+        self.j2_data["klipperscreen"] = { # Happy Hare: to allow for menu button rather than side bar navigation
                 "side_mmu_shortcut": self._config.get_main_config().getboolean("side_mmu_shortcut")
                 }
         try:

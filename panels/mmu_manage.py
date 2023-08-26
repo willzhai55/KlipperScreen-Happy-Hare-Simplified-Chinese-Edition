@@ -11,10 +11,7 @@ gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, GLib, Pango
 from ks_includes.screen_panel import ScreenPanel
 
-def create_panel(*args):
-    return MmuManage(*args)
-
-class MmuManage(ScreenPanel):
+class Panel(ScreenPanel):
     TOOL_UNKNOWN = -1
     TOOL_BYPASS = -2
 
@@ -69,8 +66,7 @@ class MmuManage(ScreenPanel):
         self.labels['gate'].connect("clicked", self.select_gate, 0)
         self.labels['g_increase'].connect("clicked", self.select_gate, 1)
         self.labels['checkgate'].connect("clicked", self.select_checkgate)
-        self.labels['recover'].connect("clicked", self.menu_item_clicked, "recover", {
-            "panel": "mmu_recover", "name": "MMU State Recovery"})
+        self.labels['recover'].connect("clicked", self.menu_item_clicked, {"panel": "mmu_recover", "name": "MMU State Recovery"})
         self.labels['load'].connect("clicked", self.select_load)
         self.labels['eject'].connect("clicked", self.select_eject)
         self.labels['home'].connect("clicked", self.select_home)
@@ -110,13 +106,14 @@ class MmuManage(ScreenPanel):
         scroll.add(grid)
         self.content.add(scroll)
 
-    def activate(self):
         self.ui_sel_gate = self.NOT_SET
+        self.ui_action_button_name = None
+        self.ui_action_button_label = ""
+
+    def activate(self):
         self.init_gate_values()
         if self.ui_action_button_name != None:
             self.labels[self.ui_action_button_name].set_label(self.ui_action_button_label)
-        self.ui_action_button_name = None
-        self.ui_action_button_label = ""
 
     def process_update(self, action, data):
         if action == "notify_status_update":

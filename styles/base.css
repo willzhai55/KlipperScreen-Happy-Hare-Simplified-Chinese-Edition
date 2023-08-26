@@ -7,8 +7,9 @@
     border: 0;
 }
 
+/* Happy Hare changed opacity from .2 to .8 */
 button:disabled {
-    opacity: .2;
+    opacity: .8;
 }
 
 list row,

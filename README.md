@@ -31,7 +31,8 @@ The current maintainer is Alfredo Monclus (alfrix) from 2021 onwards
 
 thanks to all the people who helped along the way.
 
-<<<<<<< HEAD
+[Contributors](https://github.com/KlipperScreen/KlipperScreen/graphs/contributors)
+
 <br>
 <br>
 
@@ -147,6 +148,3 @@ Then restart KlipperScreen.
 
 ## Now go read the [rest of the doc here](docs/MMU.md)...
 
-=======
-[Contributors](https://github.com/KlipperScreen/KlipperScreen/graphs/contributors)
->>>>>>> upstream/master

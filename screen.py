@@ -47,7 +47,7 @@ PRINTER_BASE_STATUS_OBJECTS = [
     'firmware_retraction',
     'exclude_object',
     'manual_probe',
-    'mmu'
+    'mmu',
 ]
 
 klipperscreendir = pathlib.Path(__file__).parent.resolve()
@@ -90,7 +90,7 @@ class KlipperScreen(Gtk.Window):
     screensaver_timeout = None
     reinit_count = 0
     max_retries = 4
-    last_popup_msg = None
+    last_popup_msg = None # Happy Hare
     initialized = initializing = False
     popup_timeout = None
 
@@ -233,7 +233,8 @@ class KlipperScreen(Gtk.Window):
                 "gcode_move": ["extrude_factor", "gcode_position", "homing_origin", "speed_factor", "speed"],
                 "idle_timeout": ["state"],
                 "pause_resume": ["is_paused"],
-                "print_stats": ["print_duration", "total_duration", "filament_used", "filename", "state", "message", "info"],
+                "print_stats": ["print_duration", "total_duration", "filament_used", "filename", "state", "message",
+                                "info"],
                 "toolhead": ["homed_axes", "estimated_print_time", "print_time", "position", "extruder",
                              "max_accel", "max_accel_to_decel", "max_velocity", "square_corner_velocity"],
                 "virtual_sdcard": ["file_position", "is_active", "progress"],
@@ -244,24 +245,25 @@ class KlipperScreen(Gtk.Window):
                 "manual_probe": ['is_active'],
                 "mmu": ["enabled", "is_locked", "is_homed", "tool", "next_tool", "last_tool", "last_toolchange", "gate",
                     "clog_detection", "endless_spool", "filament", "servo", "gate_status", "gate_material", "gate_color",
-                    "endless_spool_groups", "ttg_map", "filament_pos", "filament_direction", "action", "has_bypass"],
+                    "endless_spool_groups", "ttg_map", "filament_pos", "filament_direction", "action", "has_bypass", "sync_drive"],
             }
         }
         for extruder in self.printer.get_tools():
-            requested_updates['objects'][extruder] = ["target", "temperature", "pressure_advance", "smooth_time", "power"]
+            requested_updates['objects'][extruder] = [
+                "target", "temperature", "pressure_advance", "smooth_time", "power"]
         for h in self.printer.get_heaters():
             requested_updates['objects'][h] = ["target", "temperature", "power"]
         for f in self.printer.get_fans():
             requested_updates['objects'][f] = ["speed"]
         for f in self.printer.get_filament_sensors():
             requested_updates['objects'][f] = ["enabled", "filament_detected"]
-        for e in self.printer.get_mmu_encoders():
+        for e in self.printer.get_mmu_encoders(): # Happy Hare
             requested_updates['objects'][e] = ["encoder_pos", "detection_length", "min_headroom", "headroom", "desired_headroom", "detection_mode", "enabled", "flow_rate"]
         for p in self.printer.get_output_pins():
             requested_updates['objects'][p] = ["value"]
 
         self._ws.klippy.object_subscription(requested_updates)
-        # PAUL TODO make this extensible with variables references in custom Menus..? Can you call object_subscription more than once?
+        # Happy Hare TODO make this extensible with variables references in custom Menus..? Can you call object_subscription more than once?
 
     def preload(self):
         logging.debug("Preloading panels")
@@ -312,7 +314,8 @@ class KlipperScreen(Gtk.Window):
             self.panels[panel].activate()
         self.show_all()
 
-    def show_popup_message(self, message, level=3, save=True):
+    def show_popup_message(self, message, level=3, save=True): # Happy Hare: added save=
+        message = message.replace("// ", "") # Happy Hare added to clean up multi-line messages
         self.close_screensaver()
         if self.popup_message is not None:
             self.close_popup_message()
@@ -514,15 +517,6 @@ class KlipperScreen(Gtk.Window):
         self.base_panel.remove(self.panels[self._cur_panels[-1]].content)
         if hasattr(self.panels[self._cur_panels[-1]], "deactivate"):
             self.panels[self._cur_panels[-1]].deactivate()
-#<<<<<<< HEAD
-#        if self._cur_panels[-1] in self.subscriptions:
-#            self.subscriptions.remove(self._cur_panels[-1])
-#        if pop:
-#            # PAUL del self.panels[self._cur_panels[-1]] # PAUL deactivate first? 
-#            del self._cur_panels[-1]
-#            self.attach_panel(self._cur_panels[-1])
-#=======
-#>>>>>>> upstream/master
 
     def _menu_go_back(self, widget=None, home=False):
         logging.info(f"#### Menu go {'home' if home else 'back'}")
@@ -534,22 +528,15 @@ class KlipperScreen(Gtk.Window):
             del self._cur_panels[-1]
             if not home:
                 break
-#<<<<<<< HEAD
-#
-#    def _menu_go_to(self, widget, panel_name, panel_type, title):
-#        logging.info(f"#### Menu go_to {panel_name}")
-#        self._menu_go_back(widget, True)
-#        self.show_panel(panel_name, panel_type, title, 1, False)
-#
-#    def add_subscription(self, panel_name):
-#        if panel_name not in self.subscriptions:
-#            self.subscriptions.append(panel_name)
-#=======
         if len(self._cur_panels) < 1:
             self.reload_panels()
             return
         self.attach_panel(self._cur_panels[-1])
-#>>>>>>> upstream/master
+
+    def _menu_go_to(self, widget, panel_name, title): # Happy Hare added
+        logging.info(f"#### Menu go_to {panel_name}")
+        self._menu_go_back(widget, home=True)
+        self.show_panel(panel_name, title, remove_all=False)
 
     def reset_screensaver_timeout(self, *args):
         if self.screensaver_timeout is not None:
@@ -726,6 +713,9 @@ class KlipperScreen(Gtk.Window):
     def toggle_shortcut(self, value):
         self.base_panel.show_shortcut(value)
 
+    def toggle_mmu_shortcut(self, value): # Happy Hare
+        self.base_panel.show_mmu_shortcut(value)
+
     def change_language(self, widget, lang):
         self._config.install_language(lang)
         self.lang_ltr = set_text_direction(lang)
@@ -782,7 +772,7 @@ class KlipperScreen(Gtk.Window):
                 elif data.startswith("!! "):
                     self.show_popup_message(data[3:], 3)
                 elif "unknown" in data.lower() and \
-                        not ("TESTZ" in data or "MEASURE_AXES_NOISE" in data or "ACCELEROMETER_QUERY" in data or "MMU" in data or "from Unknown to" in data or "Tool Unknown" in data):
+                        not ("TESTZ" in data or "MEASURE_AXES_NOISE" in data or "ACCELEROMETER_QUERY" in data or "MMU" in data or "from Unknown to" in data or "Tool Unknown" in data): # Happy Hare modified
                     if data.startswith("// "):
                         self.show_popup_message(data[3:])
                     else:
@@ -795,7 +785,7 @@ class KlipperScreen(Gtk.Window):
                         "printer.gcode.script",
                         script
                     )
-                elif data.startswith("// MMU"):
+                elif data.startswith("// MMU"): # Happy Hare
                     if not data.startswith("// MMU [") and not data.startswith("// MMU BYPASS"):
                         self.show_popup_message(data[3:], level=1)
         self.process_update(action, data)
@@ -930,12 +920,12 @@ class KlipperScreen(Gtk.Window):
 
         self.ws_subscribe()
         extra_items = (self.printer.get_tools()
-                     + self.printer.get_heaters()
-                     + self.printer.get_fans()
-                     + self.printer.get_filament_sensors()
-                     + self.printer.get_output_pins()
-                     + self.printer.get_mmu_encoders()
-                      )
+                       + self.printer.get_heaters()
+                       + self.printer.get_fans()
+                       + self.printer.get_filament_sensors()
+                       + self.printer.get_output_pins()
+                       + self.printer.get_mmu_encoders() # Happy Hare
+                       )
 
         data = self.apiclient.send_request("printer/objects/query?" + "&".join(PRINTER_BASE_STATUS_OBJECTS +
                                                                                extra_items))
@@ -976,15 +966,6 @@ class KlipperScreen(Gtk.Window):
                 logging.error("Couldn't get the temperature store size")
         return False
 
-#<<<<<<< HEAD
-#    def base_panel_show_all(self):
-#        self.base_panel.show_macro_shortcut(self._config.get_main_config().getboolean('side_macro_shortcut', True))
-#        self.base_panel.show_mmu_shortcut((self._config.get_main_config().getboolean('side_mmu_shortcut', True)) and self.printer.has_mmu)
-#        self.base_panel.show_heaters(True)
-#        self.base_panel.show_estop(True)
-#        self.base_panel.toggle_macro_shorcut_sensitive(True) # PAUL added
-#        self.base_panel.toggle_mmu_shorcut_sensitive(True) # PAUL added
-#=======
     def init_spoolman(self):
         server_config = self.apiclient.send_request("server/config")
         if server_config:
@@ -995,7 +976,6 @@ class KlipperScreen(Gtk.Window):
                 logging.warning("Not using Spoolman")
 
         return False
-#>>>>>>> upstream/master
 
     def show_keyboard(self, entry=None, event=None):
         if self.keyboard is not None:

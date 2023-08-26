@@ -11,10 +11,7 @@ gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, GLib, Pango, Gdk
 from ks_includes.screen_panel import ScreenPanel
 
-def create_panel(*args):
-    return MmuPicker(*args)
-
-class MmuPicker(ScreenPanel):
+class Panel(ScreenPanel):
     TOOL_UNKNOWN = -1
     TOOL_BYPASS = -2
 
@@ -195,9 +192,9 @@ class MmuPicker(ScreenPanel):
         layers.insert_page(edit_grid, None, 1)
 
         self.content.add(layers)
+        self.gate_tool_map = self.build_gate_tool_map()
 
     def activate(self):
-        self.gate_tool_map = self.build_gate_tool_map()
         mmu = self._printer.get_stat("mmu")
         gate_status = mmu['gate_status']
         gate_material = mmu['gate_material']

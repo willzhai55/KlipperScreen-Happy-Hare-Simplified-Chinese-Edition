@@ -11,10 +11,7 @@ gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, GLib, Pango, Gdk
 from ks_includes.screen_panel import ScreenPanel
 
-def create_panel(*args):
-    return MmuToolmap(*args)
-
-class MmuToolmap(ScreenPanel):
+class Panel(ScreenPanel):
 
     #        0    1    2    3    4    5    6    7    8    9   10   11   12   13   14   15
     box =  [' ', '╵', '╶', '└', '╷', '│', '┌', '├', '╴', '┘', '─', '┴', '┐', '┤', '┬', '┼']
@@ -154,12 +151,13 @@ class MmuToolmap(ScreenPanel):
         scroll.add(grid)
         self.content.add(scroll)
 
-    def activate(self, param=0):
         mmu = self._printer.get_stat("mmu")
         self.ui_ttg_map = mmu['ttg_map']
         self.ui_endless_spool_groups = self.map_unique_groups(mmu['endless_spool_groups'])
         self.ui_sel_es_group = self.ui_endless_spool_groups[self.ui_ttg_map[self.ui_sel_tool]]
         self.ui_es_enabled = mmu['endless_spool']
+
+    def activate(self):
         self.labels['endless_spool'].set_active(self.ui_es_enabled == 1)
         self.update_map()
         self.update_es_group()

@@ -11,10 +11,7 @@ gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, GLib, Pango
 from ks_includes.screen_panel import ScreenPanel
 
-def create_panel(*args):
-    return MmuRecovery(*args)
-
-class MmuRecovery(ScreenPanel):
+class Panel(ScreenPanel):
     TOOL_UNKNOWN = -1
     TOOL_BYPASS = -2
 
@@ -121,8 +118,9 @@ class MmuRecovery(ScreenPanel):
         scroll.add(grid)
         self.content.add(scroll)
 
-    def activate(self):
         self.ui_sel_tool = self.ui_sel_gate = self.ui_sel_loaded = self.DUMMY
+
+    def activate(self):
         self.init_toolgate_values()
         self.update_state_labels()
         self.update_toolgate_buttons()

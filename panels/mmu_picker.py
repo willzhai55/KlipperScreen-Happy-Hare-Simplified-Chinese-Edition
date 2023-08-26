@@ -11,10 +11,7 @@ gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, GLib, Pango, Gdk
 from ks_includes.screen_panel import ScreenPanel
 
-def create_panel(*args):
-    return MmuPicker(*args)
-
-class MmuPicker(ScreenPanel):
+class Panel(ScreenPanel):
     TOOL_UNKNOWN = -1
     TOOL_BYPASS = -2
 

@@ -19,7 +19,7 @@ class Printer:
         self.tempdevcount = 0
         self.fancount = 0
         self.output_pin_count = 0
-        self.has_mmu = False
+        self.has_mmu = False # Happy Hare
         self.store_timeout = None
         self.tempstore = {}
         self.busy_cb = busy_cb
@@ -38,7 +38,7 @@ class Printer:
         self.tempdevcount = 0
         self.fancount = 0
         self.output_pin_count = 0
-        self.has_mmu = False
+        self.has_mmu = False # Happy Hare
         self.tempstore = {}
         self.spoolman = False
         self.busy = False
@@ -79,7 +79,7 @@ class Printer:
                     self.fancount += 1
             if x.startswith('output_pin ') and not x.split()[1].startswith("_"):
                 self.output_pin_count += 1
-            if x == 'mmu':
+            if x == 'mmu': # Happy Hare
                 self.has_mmu = True
             if x.startswith('bed_mesh '):
                 try:
@@ -100,12 +100,12 @@ class Printer:
         logging.info(f"# Temperature devices: {self.tempdevcount}")
         logging.info(f"# Fans: {self.fancount}")
         logging.info(f"# Output pins: {self.output_pin_count}")
-        logging.info(f"# Has MMU: {self.has_mmu}")
+        logging.info(f"# Has MMU: {self.has_mmu}") # Happy Hare
 
     def process_update(self, data):
         if self.data is None:
             return
-        for x in (self.get_tools() + self.get_heaters() + self.get_filament_sensors() + self.get_mmu_encoders()):
+        for x in (self.get_tools() + self.get_heaters() + self.get_filament_sensors() + self.get_mmu_encoders()): # Happy Hare: added mmu_encoders
             if x in data:
                 for i in data[x]:
                     self.set_dev_stat(x, i, data[x][i])
@@ -229,7 +229,7 @@ class Printer:
         sensors.extend(iter(self.get_config_section_list("filament_motion_sensor ")))
         return sensors
 
-    def get_mmu_encoders(self):
+    def get_mmu_encoders(self): # Happy Hare
         return list(self.get_config_section_list("mmu_encoder"))
 
     def get_probe(self):
@@ -250,14 +250,14 @@ class Printer:
                 "output_pins": {"count": self.output_pin_count},
                 "gcode_macros": {"count": len(self.get_gcode_macros())},
                 "idle_timeout": self.get_stat("idle_timeout").copy(),
-                "pause_resume": self.get_stat("pause_resume").copy(), # PAUL TODO: Original code was?? "pause_resume": {"is_paused": self.state == "paused"},
-                "power_devices": {"count": len(self.get_power_devices())}
+                "pause_resume": self.get_stat("pause_resume").copy(), # Happy Hare: Original code was?? "pause_resume": {"is_paused": self.state == "paused"},
+                "power_devices": {"count": len(self.get_power_devices())},
                 "cameras": {"count": len(self.cameras)},
                 "spoolman": self.spoolman
             }
         }
 
-        if self.has_mmu:
+        if self.has_mmu: # Happy Hare
             data["printer"]["mmu"] = self.get_stat("mmu")
 
         sections = ["bed_mesh", "bltouch", "probe", "quad_gantry_level", "z_tilt"]
