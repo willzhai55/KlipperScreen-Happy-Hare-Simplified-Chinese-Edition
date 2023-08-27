@@ -689,7 +689,10 @@ class KlipperScreen(Gtk.Window):
         self.close_screensaver()
         for dialog in self.dialogs:
             self.gtk.remove_dialog(dialog)
+        mmu_active = True if "mmu_main" in self._cur_panels else False # Happy Hare
         self.show_panel("job_status", _("Printing"), remove_all=True)
+        if mmu_active: # Happy Hare
+            self.show_panel("mmu_main", 'MMU')
 
     def state_ready(self, wait=True):
         # Do not return to main menu if completing a job, timeouts/user input will return
