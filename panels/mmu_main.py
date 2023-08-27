@@ -51,18 +51,18 @@ class Panel(ScreenPanel):
 
         # btn_states: The "gaps" are what functionality the state takes away. Multiple states are combined
         self.btn_states = {
-            'all':             ['check_gates', 'tool', 'eject', 'picker', 'pause', 'message', 'filaments', 'resume', 'manage', 'more'],
-            'printing':        [                                          'pause',                                             'more'],
-            'paused':          ['check_gates', 'tool', 'eject', 'picker',          'message', 'filaments', 'resume', 'manage', 'more'],
-            'idle':            ['check_gates', 'tool', 'eject', 'picker', 'pause', 'message', 'filaments',           'manage', 'more'],
-            'bypass_loaded':   [                       'eject',           'pause', 'message', 'filaments', 'resume', 'manage', 'more'],
-            'bypass_unloaded': ['check_gates', 'tool',          'picker', 'pause', 'message', 'filaments', 'resume', 'manage', 'more'],
-            'bypass_unknown':  ['check_gates', 'tool', 'eject', 'picker', 'pause', 'message', 'filaments', 'resume', 'manage', 'more'],
-            'tool_loaded':     ['check_gates', 'tool', 'eject', 'picker', 'pause', 'message', 'filaments', 'resume', 'manage', 'more'],
-            'tool_unloaded':   ['check_gates', 'tool',          'picker', 'pause', 'message', 'filaments', 'resume', 'manage', 'more'],
-            'tool_unknown':    ['check_gates', 'tool', 'eject', 'picker', 'pause', 'message', 'filaments', 'resume', 'manage', 'more'],
-            'no_message':      ['check_gates', 'tool', 'eject', 'picker', 'pause',            'filaments', 'resume', 'manage', 'more'],
-            'busy':            [                                                                                     'manage', 'more'],
+            'all':             ['check_gates', 'tool', 'eject', 'picker', 'pause', 'message', 'extrude', 'resume', 'manage', 'more'],
+            'printing':        [                                          'pause',                                           'more'],
+            'paused':          ['check_gates', 'tool', 'eject', 'picker',          'message', 'extrude', 'resume', 'manage', 'more'],
+            'idle':            ['check_gates', 'tool', 'eject', 'picker', 'pause', 'message', 'extrude',           'manage', 'more'],
+            'bypass_loaded':   [                       'eject',           'pause', 'message', 'extrude', 'resume', 'manage', 'more'],
+            'bypass_unloaded': ['check_gates', 'tool',          'picker', 'pause', 'message', 'extrude', 'resume', 'manage', 'more'],
+            'bypass_unknown':  ['check_gates', 'tool', 'eject', 'picker', 'pause', 'message', 'extrude', 'resume', 'manage', 'more'],
+            'tool_loaded':     ['check_gates', 'tool', 'eject', 'picker', 'pause', 'message', 'extrude', 'resume', 'manage', 'more'],
+            'tool_unloaded':   ['check_gates', 'tool',          'picker', 'pause', 'message', 'extrude', 'resume', 'manage', 'more'],
+            'tool_unknown':    ['check_gates', 'tool', 'eject', 'picker', 'pause', 'message', 'extrude', 'resume', 'manage', 'more'],
+            'no_message':      ['check_gates', 'tool', 'eject', 'picker', 'pause',            'extrude', 'resume', 'manage', 'more'],
+            'busy':            [                                                                                   'manage', 'more'],
             'disabled':        [                                                                                                                ],
         }
 
@@ -77,7 +77,7 @@ class Panel(ScreenPanel):
             'pause': self._gtk.Button('pause', 'MMU Pause', 'color1'),
             'message': self._gtk.Button('warning', 'Last Error', 'color1'),
             'resume': self._gtk.Button('resume', 'Resume', 'color3'),
-            'filaments': self._gtk.Button('mmu_filaments', 'Filaments...', 'color2'),
+            'extrude': self._gtk.Button('extrude', 'Extrude...', 'color2'),
             'more': self._gtk.Button('mmu_more', 'More...', 'color4'),
             'tool_icon': self._gtk.Image('mmu_extruder', self._gtk.img_width * 0.8, self._gtk.img_height * 0.8),
             'tool_label': self._gtk.Label('Unknown'),
@@ -105,7 +105,7 @@ class Panel(ScreenPanel):
         self.labels['pause'].connect("clicked", self.select_pause)
         self.labels['message'].connect("clicked", self.select_message)
         self.labels['resume'].connect("clicked", self.select_resume)
-        self.labels['filaments'].connect("clicked", self.menu_item_clicked, {"panel": "mmu_filaments", "name": "MMU Filament Editor"})
+        self.labels['extrude'].connect("clicked", self.menu_item_clicked, {"panel": "extrude", "name": "Extrude"})
         self.labels['more'].connect("clicked", self._screen._go_to_submenu, "mmu")
 
         self.labels['t_increase'].set_hexpand(False)
@@ -207,7 +207,7 @@ class Panel(ScreenPanel):
         main_grid.attach(self.labels['check_gates'], 10, 0, 2, 1)
         main_grid.attach(pause_layer,                 0, 1, 3, 1)
         main_grid.attach(self.labels['resume'],       3, 1, 3, 1)
-        main_grid.attach(self.labels['filaments'],    6, 1, 3, 1)
+        main_grid.attach(self.labels['extrude'],      6, 1, 3, 1)
         main_grid.attach(self.labels['more'],         9, 1, 3, 1)
 
         box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
