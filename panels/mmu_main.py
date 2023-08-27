@@ -96,7 +96,7 @@ class Panel(ScreenPanel):
         self.labels['sync_drive_pixbuf'] = self.labels['sync_drive_img'].get_pixbuf()
 
         self.labels['check_gates'].connect("clicked", self.select_check_gates)
-        self.labels['manage'].connect("clicked", self.menu_item_clicked, {"panel": "mmu_manage", "name": "MMU Management"})
+        self.labels['manage'].connect("clicked", self.menu_item_clicked, {"panel": "mmu_manage", "name": "MMU Manage"})
         self.labels['t_decrease'].connect("clicked", self.select_tool, -1)
         self.labels['tool'].connect("clicked", self.select_tool, 0)
         self.labels['t_increase'].connect("clicked", self.select_tool, 1)
