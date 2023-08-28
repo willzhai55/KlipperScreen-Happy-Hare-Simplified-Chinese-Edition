@@ -205,7 +205,7 @@ class Panel(ScreenPanel):
         main_grid.attach(self.labels['picker'],       6, 0, 2, 1)
         main_grid.attach(self.labels['eject'],        8, 0, 2, 1)
         main_grid.attach(self.labels['check_gates'], 10, 0, 2, 1)
-        main_grid.attach(pause_layer,                 0, 1, 3, 1)
+        main_grid.attach(self.labels['pause_layer'],  0, 1, 3, 1)
         main_grid.attach(self.labels['resume'],       3, 1, 3, 1)
         main_grid.attach(self.labels['extrude'],      6, 1, 3, 1)
         main_grid.attach(self.labels['more'],         9, 1, 3, 1)
@@ -227,6 +227,10 @@ class Panel(ScreenPanel):
         self.config_update()
         self.update_status()
         self.update_filament_status()
+
+    def post_attach(self):
+        # Gtk Notebook will only change layer after show_all() hence this extra callback to fix state
+        self.update_active_buttons()
 
     def config_update(self):
         self.markup_status = self._config.get_main_config().getboolean("mmu_color_gates", True)

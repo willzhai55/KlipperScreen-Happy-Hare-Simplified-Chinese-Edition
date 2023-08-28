@@ -313,6 +313,8 @@ class KlipperScreen(Gtk.Window):
         if hasattr(self.panels[panel], "activate"):
             self.panels[panel].activate()
         self.show_all()
+        if hasattr(self.panels[panel], "post_attach"): # Happy Hare
+            self.panels[panel].post_attach()
 
     def show_popup_message(self, message, level=3, save=True): # Happy Hare: added save=
         message = message.replace("// ", "") # Happy Hare added to clean up multi-line messages
