@@ -32,16 +32,17 @@ class Panel(ScreenPanel):
 
         # btn_states: The "gaps" are what functionality the state takes away. Multiple states are combined
         self.btn_states = {
-            'all':             ['gate', 'checkgate', 'recover', 'load', 'eject', 'home', 'motors_off', 'servo_up', 'servo_down', 'load_ext', 'unload_ext'],
-            'not_homed':       [                     'recover',         'eject', 'home', 'motors_off', 'servo_up', 'servo_down', 'load_ext', 'unload_ext'],
-            'servo_up':        ['gate', 'checkgate', 'recover', 'load', 'eject', 'home', 'motors_off',             'servo_down', 'load_ext', 'unload_ext'],
-            'servo_down':      ['gate', 'checkgate', 'recover', 'load', 'eject', 'home', 'motors_off', 'servo_up',               'load_ext', 'unload_ext'],
-            'bypass_loaded':   [                     'recover',         'eject',         'motors_off', 'servo_up', 'servo_down',             'unload_ext'],
-            'bypass_unloaded': ['gate', 'checkgate', 'recover', 'load',          'home', 'motors_off', 'servo_up', 'servo_down', 'load_ext', 'unload_ext'],
-            'bypass_unknown':  ['gate', 'checkgate', 'recover', 'load', 'eject', 'home', 'motors_off', 'servo_up', 'servo_down', 'load_ext', 'unload_ext'],
-            'tool_loaded':     [                     'recover',         'eject',         'motors_off', 'servo_up', 'servo_down',             'unload_ext'],
-            'tool_unloaded':   ['gate', 'checkgate', 'recover', 'load',          'home', 'motors_off', 'servo_up', 'servo_down', 'load_ext', 'unload_ext'],
-            'tool_unknown':    ['gate', 'checkgate', 'recover', 'load', 'eject', 'home', 'motors_off', 'servo_up', 'servo_down', 'load_ext', 'unload_ext'],
+            'all':             ['gate', 'checkgate', 'recover', 'load', 'eject', 'home', 'motors_off', 'servo_up', 'servo_move', 'servo_down', 'load_ext', 'unload_ext'],
+            'not_homed':       [                     'recover',         'eject', 'home', 'motors_off', 'servo_up', 'servo_move', 'servo_down', 'load_ext', 'unload_ext'],
+            'servo_up':        ['gate', 'checkgate', 'recover', 'load', 'eject', 'home', 'motors_off',             'servo_move', 'servo_down', 'load_ext', 'unload_ext'],
+            'servo_move':      ['gate', 'checkgate', 'recover', 'load', 'eject', 'home', 'motors_off', 'servo_up',               'servo_down', 'load_ext', 'unload_ext'],
+            'servo_down':      ['gate', 'checkgate', 'recover', 'load', 'eject', 'home', 'motors_off', 'servo_up', 'servo_move',               'load_ext', 'unload_ext'],
+            'bypass_loaded':   [                     'recover',         'eject',         'motors_off', 'servo_up', 'servo_move', 'servo_down',             'unload_ext'],
+            'bypass_unloaded': ['gate', 'checkgate', 'recover', 'load',          'home', 'motors_off', 'servo_up', 'servo_move', 'servo_down', 'load_ext', 'unload_ext'],
+            'bypass_unknown':  ['gate', 'checkgate', 'recover', 'load', 'eject', 'home', 'motors_off', 'servo_up', 'servo_move', 'servo_down', 'load_ext', 'unload_ext'],
+            'tool_loaded':     [                     'recover',         'eject',         'motors_off', 'servo_up', 'servo_move', 'servo_down',             'unload_ext'],
+            'tool_unloaded':   ['gate', 'checkgate', 'recover', 'load',          'home', 'motors_off', 'servo_up', 'servo_move', 'servo_down', 'load_ext', 'unload_ext'],
+            'tool_unknown':    ['gate', 'checkgate', 'recover', 'load', 'eject', 'home', 'motors_off', 'servo_up', 'servo_move', 'servo_down', 'load_ext', 'unload_ext'],
             'busy':            [                                                                                                                         ],
             'disabled':        [                                                                                                                         ],
         }
@@ -50,12 +51,13 @@ class Panel(ScreenPanel):
             'g_decrease': self._gtk.Button('decrease', None, scale=self.bts * 1.2),
             'gate': self._gtk.Button('mmu_select_gate', 'Gate', 'color4'),
             'g_increase': self._gtk.Button('increase', None, scale=self.bts * 1.2),
-            'home': self._gtk.Button('home', 'Home', 'color3'),
-            'motors_off': self._gtk.Button('motor-off', 'Motors Off', 'color4'),
-            'checkgate': self._gtk.Button('mmu_checkgates', 'Check Gate', 'color1'),
-            'recover': self._gtk.Button('mmu_maintenance', 'Recover State...', 'color2'),
-            'servo_up': self._gtk.Button('arrow-up', 'Servo Up', 'color3'),
-            'servo_down': self._gtk.Button('arrow-down', 'Servo Down', 'color4'),
+            'home': self._gtk.Button('home', 'Home', 'color2'),
+            'motors_off': self._gtk.Button('motor-off', 'Motors Off', 'color3'),
+            'checkgate': self._gtk.Button('mmu_checkgates', 'Check Gate', 'color4'),
+            'recover': self._gtk.Button('mmu_maintenance', 'Recover State...', 'color1'),
+            'servo_up': self._gtk.Button('arrow-up', 'Servo Up', 'color1'),
+            'servo_move': self._gtk.Button('arrow-right', 'Servo Move', 'color2'),
+            'servo_down': self._gtk.Button('arrow-down', 'Servo Down', 'color3'),
             'load': self._gtk.Button('mmu_load', 'Load', 'color1'),
             'eject': self._gtk.Button('mmu_eject', 'Eject', 'color2'),
             'load_ext': self._gtk.Button('mmu_load_extruder', 'Load Extruder', 'color3'),
@@ -72,6 +74,7 @@ class Panel(ScreenPanel):
         self.labels['home'].connect("clicked", self.select_home)
         self.labels['motors_off'].connect("clicked", self.select_motors_off)
         self.labels['servo_up'].connect("clicked", self.select_servo_up)
+        self.labels['servo_move'].connect("clicked", self.select_servo_move)
         self.labels['servo_down'].connect("clicked", self.select_servo_down)
         self.labels['load_ext'].connect("clicked", self.select_load_extruder)
         self.labels['unload_ext'].connect("clicked", self.select_unload_extruder)
@@ -87,16 +90,21 @@ class Panel(ScreenPanel):
         gate_grid.attach(self.labels['gate'],       1, 0, 1, 1)
         gate_grid.attach(self.labels['g_increase'], 2, 0, 1, 1)
 
+        servo_grid = Gtk.Grid()
+        servo_grid.set_column_homogeneous(True)
+        servo_grid.attach(self.labels['servo_up'],   0, 0, 1, 1)
+        servo_grid.attach(self.labels['servo_move'], 1, 0, 1, 1)
+        servo_grid.attach(self.labels['servo_down'], 2, 0, 1, 1)
+
         grid = Gtk.Grid()
         grid.set_column_homogeneous(True)
         grid.set_row_homogeneous(True)
         grid.attach(gate_grid,                 0, 0, 2, 1)
-        grid.attach(self.labels['home'],       2, 0, 1, 1)
-        grid.attach(self.labels['motors_off'], 3, 0, 1, 1)
-        grid.attach(self.labels['checkgate'],  0, 1, 1, 1)
-        grid.attach(self.labels['recover'],    1, 1, 1, 1)
-        grid.attach(self.labels['servo_up'],   2, 1, 1, 1)
-        grid.attach(self.labels['servo_down'], 3, 1, 1, 1)
+        grid.attach(servo_grid,                2, 0, 2, 1)
+        grid.attach(self.labels['recover'],    0, 1, 1, 1)
+        grid.attach(self.labels['home'],       1, 1, 1, 1)
+        grid.attach(self.labels['motors_off'], 2, 1, 1, 1)
+        grid.attach(self.labels['checkgate'],  3, 1, 1, 1)
         grid.attach(self.labels['load'],       0, 2, 1, 1)
         grid.attach(self.labels['eject'],      1, 2, 1, 1)
         grid.attach(self.labels['load_ext'],   2, 2, 1, 1)
@@ -203,6 +211,9 @@ class Panel(ScreenPanel):
     def select_servo_up(self, widget):
         self._screen._ws.klippy.gcode_script(f"MMU_SERVO POS=up")
 
+    def select_servo_move(self, widget):
+        self._screen._ws.klippy.gcode_script(f"MMU_SERVO POS=move")
+
     def select_servo_down(self, widget):
         self._screen._ws.klippy.gcode_script(f"MMU_SERVO POS=down")
 
@@ -229,7 +240,7 @@ class Panel(ScreenPanel):
         filament = mmu['filament']
         ui_state = []
         if enabled:
-            ui_state.append("servo_up" if servo == "Up" else "servo_down" if servo == "Down" else "all")
+            ui_state.append("servo_up" if servo == "Up" else "servo_down" if servo == "Down" else "servo_move" if servo == "Move" else "all")
             if not is_homed:
                 ui_state.append("not_homed")
 
