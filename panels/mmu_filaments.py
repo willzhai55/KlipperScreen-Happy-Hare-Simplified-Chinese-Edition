@@ -217,10 +217,10 @@ class Panel(ScreenPanel):
         self.labels['layers'].set_current_page(0) # Gate list layer
 
     def get_status_details(self, gate_status):
-        if gate_status == 1:
+        if gate_status in (self.GATE_AVAILABLE, self.GATE_AVAILABLE_FROM_BUFFER):
             status_icon = 'available_icon'
             status_str = "Available"
-        elif gate_status == 0:
+        elif gate_status == self.GATE_EMPTY:
             status_icon = 'empty_icon'
             status_str = "Empty"
         else: 
@@ -284,7 +284,7 @@ class Panel(ScreenPanel):
         self.labels['m_entry'].set_text(self.ui_gate_material)
         if self.ui_gate_color in self.W3C_COLORS:
             self.labels['c_selector'].set_active(self.W3C_COLORS.index(self.ui_gate_color))
-        self.labels['filament'].set_active(self.ui_gate_status == 1)
+        self.labels['filament'].set_active(self.ui_gate_status in (self.GATE_AVAILABLE, self.GATE_AVAILABLE_FROM_BUFFER))
 
     def update_edited_gate(self):
         g_map = self.gate_tool_map[self.ui_sel_gate]

@@ -97,10 +97,10 @@ class Panel(ScreenPanel):
                 alt_gate_str = '+(' + ', '.join(map(str, t_map['alt_gates'][:6]))
                 alt_gate_str += ', ...)' if len(t_map['alt_gates']) > 6 else ')'
 
-            if gate_status[gate] == 1:
+            if gate_status[gate] in (self.GATE_AVAILABLE, self.GATE_AVAILABLE_FROM_BUFFER):
                 status_icon = 'available_icon'
                 status_str = "Available"
-            elif gate_status[gate] == 0:
+            elif gate_status[gate] == self.GATE_EMPTY:
                 status_icon = 'empty_icon'
                 status_str = "Empty"
             else: 
@@ -110,7 +110,7 @@ class Panel(ScreenPanel):
             self.labels[f'status_{i}'].clear()
             self.labels[f'status_{i}'].set_from_pixbuf(self.labels[f'{status_icon}'])
             self.labels[f'available_{i}'].set_label(status_str)
-            self.labels[f'tool_{i}'].set_sensitive(gate_status[i] != self.GATE_EMPTY)
+            self.labels[f'tool_{i}'].set_sensitive(gate_status[i] in (self.GATE_AVAILABLE, self.GATE_AVAILABLE_FROM_BUFFER))
             self.labels[f'color_{i}'].override_color(Gtk.StateType.NORMAL, color)
             self.labels[f'material_{i}'].set_label(gate_material[gate][:6])
             self.labels[f'gate_{i}'].set_label(gate_str)
