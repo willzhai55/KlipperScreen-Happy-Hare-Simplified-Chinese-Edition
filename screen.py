@@ -725,7 +725,7 @@ class KlipperScreen(Gtk.Window):
         self.base_panel.show_shortcut(value)
 
     def toggle_mmu_shortcut(self, value): # Happy Hare
-        self.base_panel.show_mmu_shortcut(value)
+        self.base_panel.show_mmu_shortcut(value and self.printer.has_mmu)
 
     def change_language(self, widget, lang):
         self._config.install_language(lang)
