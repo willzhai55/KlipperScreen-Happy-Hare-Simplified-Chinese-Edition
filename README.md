@@ -41,7 +41,7 @@ thanks to all the people who helped along the way.
 
 KlipperScreen "Happy Hare" Fork...
 
-# KlipperScreen - MMU Happy Hare edition
+# KlipperScreen - MMU Happy Hare Edition
 
 [![MMU Control](docs/img/mmu/mmu_main.png)](docs/MMU.md)
 
