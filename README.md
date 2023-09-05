@@ -18,10 +18,21 @@ will natively work with [Klipper](https://github.com/kevinOConnor/klipper) and [
 [More Screenshots](https://klipperscreen.readthedocs.io/en/latest/Panels/)
 
 <br>
+
+### Blank Screen after system update
+It has come to my attention that sometimes a system (OS) update can break KlipperScreen.  This is nothing to do with KlipperScreen but rather the installation of a slightly broken video driver `fbturbo`.  Luckily the fix is simple.  After OS upgrade run:
+
+    sudo apt purge xserver-xorg-video-fbturbo
+
+Then restart KlipperScreen.
+
 <br>
+
+<hr>
 
 # KlipperScreen - MMU Happy Hare Edition
 
+<!--
 <p align="center">
   <a aria-label="Downloads" href="https://github.com/moggieuk/Happy-Hare/releases">
     <img src="https://img.shields.io/github/release/moggieuk/Happy-Hare?display_name=tag&style=flat-square">
@@ -36,6 +47,7 @@ will natively work with [Klipper](https://github.com/kevinOConnor/klipper) and [
     <img src="https://img.shields.io/github/license/moggieuk/Happy-Hare?style=flat-square">
   </a>
 </p>
+-->
 
 [![MMU Control](docs/img/mmu/mmu_main.png)](docs/MMU.md)
 
@@ -65,10 +77,11 @@ KlipperScreen will be restarted and hopefully you should now be running the enha
 
 **Notes:**
 
-**1:** If you are installing on a rpi without Klipper and printer attached the install will not be able to find the Klipper "config" directory where the `KlipperScreen.conf` and `mmu_klipperscreen.conf` should be placed.  To fix this, specify a `-c <config_dir>` option to the install line and specify a valid directory where KlipperScreen is expecting to see its config files.
+> [!NOTE]  
+> If you are installing on a rpi without Klipper and printer attached the install will not be able to find the Klipper "config" directory where the `KlipperScreen.conf` and `mmu_klipperscreen.conf` should be placed.  To fix this, specify a `-c <config_dir>` option to the install line and specify a valid directory where KlipperScreen is expecting to see its config files.
 
-**2:**
-Expert Tip: The last step of running './install_ks -g <num_gates>' can be run many times.. if you customize the MMU part of the KlipperScreen menu and want to make use of the "replicator" function that will automatically replicate menu options for the configured number of gates, you can edit menus.conf and reference the templating there.
+> [!NOTE]  
+> Expert Tip: The last step of running './install_ks -g <num_gates>' can be run many times.. and sometimes is needed after an update to install new images or update menu structure. If you customize the MMU part of the KlipperScreen menu and want to make use of the "replicator" function that will automatically replicate menu options for the configured number of gates, you can edit menus.conf and reference the templating there.
 
 Note that the base KlipperScreen is up-to-date (and I will continue to merge with master every 2 weeks) with changes in the original but also includes extra menu functionality that can be used in the creation of your custom menus.  See the generated ercf_klipperscreen.conf for clues!
 
@@ -139,13 +152,6 @@ Then restart KlipperScreen
 If you have to do this, please let me know the details about the operating system you are running on and how you installed KlipperScreen in the first place... if I can locate the source of the issue I might be able to workaround in the future.
 
 </details>
-
-### Blank Screen after system update
-It has come to my attention that sometimes a system (OS) update can break KlipperScreen.  This is nothing to do with KlipperScreen but rather the installation of a slightly broken video driver `fbturbo`.  Luckily the fix is simple.  After OS upgrade run:
-
-    sudo apt purge xserver-xorg-video-fbturbo
-
-Then restart KlipperScreen.
 
 *All screen shots are taken with the "Colorize" theme (my preference because the buttons are more defined).  The default is z-bolt and looks slightly different*
 
