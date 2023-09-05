@@ -1,7 +1,7 @@
 # 📌 ANNOUNCEMENT: KlipperScreen-Happy Hare edition now requires an upgraded Happy Hare v2 software
 Happy Hare v2 [available here](https://github.com/moggieuk/Happy-Hare)
 
-# KlipperScreen
+# Original KlipperScreen
 
 KlipperScreen is a touchscreen GUI that interfaces with [Klipper](https://github.com/kevinOConnor/klipper) via [Moonraker](https://github.com/arksine/moonraker). It can switch between multiple printers to access them from a single location, and it doesn't even need to run on the same host, you can install it on another device and configure the IP address to access the printer.
 
@@ -127,7 +127,7 @@ If this occurs the first thing to try is to run the following, then restart Klip
 If this doesn't fix the problem I suggest installing a new font set.
 
 <details>
-<summary><sub>🔹 How to install JetBrains fonts...</sub></summary>
+<summary>🔹 How to install JetBrains fonts...</summary>
 
 Download the JetBrains fonts from (www.jetbrains.com).  Extract the zip.  Copy all the `*.ttf` fonts (you will find them under fonts/ttf in the extracted zip) into `/usr/share/fonts/truetype` directory (you will have to sudo cp else you will likely get permission denied), then cache these fonts:
 
@@ -152,6 +152,8 @@ Then restart KlipperScreen
 If you have to do this, please let me know the details about the operating system you are running on and how you installed KlipperScreen in the first place... if I can locate the source of the issue I might be able to workaround in the future.
 
 </details>
+
+<hr>
 
 *All screen shots are taken with the "Colorize" theme (my preference because the buttons are more defined).  The default is z-bolt and looks slightly different*
 
