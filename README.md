@@ -17,31 +17,25 @@ will natively work with [Klipper](https://github.com/kevinOConnor/klipper) and [
 
 [More Screenshots](https://klipperscreen.readthedocs.io/en/latest/Panels/)
 
-### About the project
-
-KlipperScreen has been created and maintained by Jordan Ruthe from 2020 to 2021
-
-|Donate to Jordan|
-|-|
-|[Patreon](https://www.patreon.com/klipperscreen)|
-|[Ko-fi](https://ko-fi.com/klipperscreen)|
-
-The current maintainer is Alfredo Monclus (alfrix) from 2021 onwards
-
-|Dontate to Alfrix|
-|-|
-|[Ko-fi](https://ko-fi.com/alfrix)|
-
-thanks to all the people who helped along the way.
-
-[Contributors](https://github.com/KlipperScreen/KlipperScreen/graphs/contributors)
-
 <br>
 <br>
-
-KlipperScreen "Happy Hare" Fork...
 
 # KlipperScreen - MMU Happy Hare Edition
+
+<p align="center">
+  <a aria-label="Downloads" href="https://github.com/moggieuk/Happy-Hare/releases">
+    <img src="https://img.shields.io/github/release/moggieuk/Happy-Hare?display_name=tag&style=flat-square">
+  </a>
+  <a aria-label="Stars" href="https://github.com/moggieuk/Happy-Hare/stargazers">
+    <img src="https://img.shields.io/github/stars/moggieuk/Happy-Hare?style=flat-square">
+  </a>
+  <a aria-label="Forks" href="https://github.com/moggieuk/Happy-Hare/network/members">
+    <img src="https://img.shields.io/github/forks/moggieuk/Happy-Hare?style=flat-square">
+  </a>
+  <a aria-label="License" href="https://github.com/moggieuk/Happy-Hare/blob/master/LICENSE">
+    <img src="https://img.shields.io/github/license/moggieuk/Happy-Hare?style=flat-square">
+  </a>
+</p>
 
 [![MMU Control](docs/img/mmu/mmu_main.png)](docs/MMU.md)
 
@@ -117,7 +111,11 @@ If this occurs the first thing to try is to run the following, then restart Klip
     fc-cache -f -v
     sudo systemctl restart KlipperScreen
 
-If this doesn't fix the problem I suggest installing a new font set:
+If this doesn't fix the problem I suggest installing a new font set.
+
+<details>
+<summary><sub>🔹 How to install JetBrains fonts...</sub></summary>
+
 Download the JetBrains fonts from (www.jetbrains.com).  Extract the zip.  Copy all the `*.ttf` fonts (you will find them under fonts/ttf in the extracted zip) into `/usr/share/fonts/truetype` directory (you will have to sudo cp else you will likely get permission denied), then cache these fonts:
 
     cd ..to where you extracted font files../fonts/ttf
@@ -139,6 +137,8 @@ Then restart KlipperScreen
     sudo systemctl restart KlipperScreen
 
 If you have to do this, please let me know the details about the operating system you are running on and how you installed KlipperScreen in the first place... if I can locate the source of the issue I might be able to workaround in the future.
+
+</details>
 
 ### Blank Screen after system update
 It has come to my attention that sometimes a system (OS) update can break KlipperScreen.  This is nothing to do with KlipperScreen but rather the installation of a slightly broken video driver `fbturbo`.  Luckily the fix is simple.  After OS upgrade run:
