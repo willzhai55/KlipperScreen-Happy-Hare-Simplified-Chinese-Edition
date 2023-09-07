@@ -422,15 +422,17 @@ class Panel(ScreenPanel):
             scale.set_fill_level(-data['min_headroom'])
         if 'headroom' in data:
             scale.set_value(-data['headroom'])
-        if 'detection_mode' in data:
-            self.update_runout_mode(data['detection_mode'])
+        if 'detection_mode' in data or 'enabled' in data:
+            self.update_runout_mode()
         if 'encoder_pos' in data:
             self.update_encoder_pos(data['encoder_pos'])
 
-    def update_runout_mode(self, detection_mode):
-        detection_mode_str = " (Auto)" if detection_mode == 2 else " (Man)" if detection_mode == 1 else ""
-        self.labels['runout_frame'].set_label(f'Clog{detection_mode_str}')
-        self.labels['runout_frame'].set_sensitive(detection_mode)
+    def update_runout_mode(self):
+        detection_mode = self._printer.get_stat('mmu_encoder mmu_encoder')['detection_mode']
+        enabled = self._printer.get_stat('mmu_encoder mmu_encoder')['enabled']
+        detection_mode_str = "Disabled" if not enabled else "Clog (Auto)" if detection_mode == 2 else "Clog (Man)" if detection_mode == 1 else "Clog Off"
+        self.labels['runout_frame'].set_label(f'{detection_mode_str}')
+        self.labels['runout_frame'].set_sensitive(detection_mode and enabled)
 
     def update_encoder_pos(self, encoder_pos=None):
         if encoder_pos == None:
