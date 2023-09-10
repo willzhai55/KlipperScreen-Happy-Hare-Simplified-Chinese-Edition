@@ -258,8 +258,6 @@ class Panel(ScreenPanel):
                     self.update_enabled()
                 if 'action' in e_data:
                     self.update_encoder_pos()
-
-            if 'mmu' in data or 'pause_resume' in data:
                 self.update_active_buttons()
             elif 'print_stats' in data and 'state' in data['print_stats']:
                 self.update_active_buttons()
@@ -491,14 +489,14 @@ class Panel(ScreenPanel):
     def update_active_buttons(self):
         mmu = self._printer.get_stat("mmu")
         printer_state = self._printer.get_stat("print_stats")['state']
-        is_paused = self._printer.get_stat("pause_resume")['is_paused']
+        is_pause_locked = mmu['is_locked']
         enabled = mmu['enabled']
         tool = mmu['tool']
         action = mmu['action']
         filament = mmu['filament']
         ui_state = []
         if enabled:
-            if printer_state == "paused" or is_paused:
+            if printer_state == "paused" or is_pause_locked:
                 ui_state.append("paused")
             elif printer_state == "printing":
                 ui_state.append("printing")

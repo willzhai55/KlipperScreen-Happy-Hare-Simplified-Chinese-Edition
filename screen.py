@@ -247,9 +247,10 @@ class KlipperScreen(Gtk.Window):
                 "manual_probe": ['is_active'],
                 "mmu": ["enabled", "is_locked", "is_homed", "tool", "next_tool", "last_tool", "last_toolchange", "gate",
                     "clog_detection", "endless_spool", "filament", "servo", "gate_status", "gate_material", "gate_color",
-                    "endless_spool_groups", "ttg_map", "filament_pos", "filament_direction", "action", "has_bypass", "sync_drive"],
+                    "endless_spool_groups", "ttg_map", "filament_pos", "filament_direction", "action", "has_bypass",
+                    "sync_drive"],
             }
-        }
+        } # Happy Hare TODO add mmu."print_job_state"
         for extruder in self.printer.get_tools():
             requested_updates['objects'][extruder] = [
                 "target", "temperature", "pressure_advance", "smooth_time", "power"]
@@ -315,7 +316,7 @@ class KlipperScreen(Gtk.Window):
         if hasattr(self.panels[panel], "activate"):
             self.panels[panel].activate()
         self.show_all()
-        if hasattr(self.panels[panel], "post_attach"): # Happy Hare
+        if hasattr(self.panels[panel], "post_attach"): # Happy Hare - Gtk.Notebook must be rededered before layer selected
             self.panels[panel].post_attach()
 
     def show_popup_message(self, message, level=3, save=True): # Happy Hare: added save=
@@ -694,7 +695,8 @@ class KlipperScreen(Gtk.Window):
 
     def state_paused(self):
         self.state_printing()
-        if self._config.get_main_config().getboolean("auto_open_extrude", fallback=True):
+        mmu_active = True if "mmu_main" in self._cur_panels else False # Happy Hare
+        if self._config.get_main_config().getboolean("auto_open_extrude", fallback=True) and not mmu_active: # Happy hare
             self.show_panel("extrude", _("Extrude"))
 
     def state_printing(self):
@@ -714,7 +716,10 @@ class KlipperScreen(Gtk.Window):
             logging.debug("Printer not initialized yet")
             self.printer.state = "not ready"
             return
+        mmu_active = True if "mmu_main" in self._cur_panels else False # Happy Hare
         self.show_panel("main_menu", None, remove_all=True, items=self._config.get_menu_items("__main"))
+        if mmu_active: # Happy Hare
+            self.show_panel("mmu_main", 'MMU')
 
     def state_startup(self):
         self.printer_initializing(_("Klipper is attempting to start"))

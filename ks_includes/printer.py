@@ -257,7 +257,7 @@ class Printer:
                 "output_pins": {"count": self.output_pin_count},
                 "gcode_macros": {"count": len(self.get_gcode_macros())},
                 "idle_timeout": self.get_stat("idle_timeout").copy(),
-                "pause_resume": self.get_stat("pause_resume").copy(), # Happy Hare: Original code was?? "pause_resume": {"is_paused": self.state == "paused"},
+                "pause_resume": {"is_paused": self.state == "paused"},
                 "power_devices": {"count": len(self.get_power_devices())},
                 "cameras": {"count": len(self.cameras)},
                 "spoolman": self.spoolman
