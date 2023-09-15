@@ -248,9 +248,9 @@ class KlipperScreen(Gtk.Window):
                 "mmu": ["enabled", "is_locked", "is_homed", "tool", "next_tool", "last_tool", "last_toolchange", "gate",
                     "clog_detection", "endless_spool", "filament", "servo", "gate_status", "gate_material", "gate_color",
                     "endless_spool_groups", "ttg_map", "filament_pos", "filament_direction", "action", "has_bypass",
-                    "sync_drive"],
+                    "sync_drive", "tool_extrusion_multipliers", "tool_speed_multipliers", "print_state"],
             }
-        } # Happy Hare TODO add mmu."print_job_state"
+        }
         for extruder in self.printer.get_tools():
             requested_updates['objects'][extruder] = [
                 "target", "temperature", "pressure_advance", "smooth_time", "power"]
@@ -316,10 +316,10 @@ class KlipperScreen(Gtk.Window):
         if hasattr(self.panels[panel], "activate"):
             self.panels[panel].activate()
         self.show_all()
-        if hasattr(self.panels[panel], "post_attach"): # Happy Hare - Gtk.Notebook must be rededered before layer selected
+        if hasattr(self.panels[panel], "post_attach"): # Happy Hare - Gtk.Notebook must be rendered before layer selected
             self.panels[panel].post_attach()
 
-    def show_popup_message(self, message, level=3, save=True): # Happy Hare: added save=
+    def show_popup_message(self, message, level=3, save=True): # Happy Hare: added `save=` functionality
         message = message.replace("// ", "") # Happy Hare added to clean up multi-line messages
         self.close_screensaver()
         if self.popup_message is not None:

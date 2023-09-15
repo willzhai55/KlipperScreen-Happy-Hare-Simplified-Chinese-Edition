@@ -290,10 +290,10 @@ class KlipperScreenConfig:
                 "value": "True"}},
             {"mmu_color_filament": {
                 "section": "main", "name": _("MMU show colored filament"), "type": "binary",
-                "value": "False"}},
+                "value": "True"}},
             {"mmu_bold_filament": {
                 "section": "main", "name": _("MMU show bold filament"), "type": "binary",
-                "value": "False"}}, # Happy Hare ^^^
+                "value": "True"}}, # Happy Hare ^^^
             {"font_size": {
                 "section": "main", "name": _("Font Size"), "type": "dropdown",
                 "value": "medium", "callback": screen.restart_ks, "options": [
