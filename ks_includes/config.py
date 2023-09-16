@@ -158,9 +158,9 @@ class KlipperScreenConfig:
 
     def validate_config(self, config, string="", remove=False):
         valid = True
-        if string:
-            msg = "Section headers have extra information after brackets possible newline issue:"
 # Happy Hare: not a valid check, attributes can be references as printer.mmu.gate_status[4] for example
+#        if string:
+#            msg = "Section headers have extra information after brackets possible newline issue:"
 #            for line in string.split('\n'):
 #                if re.match(r".+\].", line):
 #                    logging.error(line)
