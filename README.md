@@ -69,12 +69,12 @@ KlipperScreen Happy Hare edition is quite a mouthful!  It is a forked (but up-to
 
 Install and setup a base KlipperScreen from the original source. Get it working. Don't skip this step because I cannot help with basic KlipperScreen and system setup.  Once you have that installed and working, log into you Rasberry Pi and execute the following commands. You can cut'n'paste...
 
-    > cd ~
-    > mv KlipperScreen KlipperScreen.orig
-    > git clone https://github.com/moggieuk/KlipperScreen-Happy-Hare-Edition.git KlipperScreen
+    cd ~
+    mv KlipperScreen KlipperScreen.orig
+    git clone https://github.com/moggieuk/KlipperScreen-Happy-Hare-Edition.git KlipperScreen
    
-    > cd ~/KlipperScreen/happy_hare
-    > ./install_ks.sh -g <num_gates>
+    cd ~/KlipperScreen/happy_hare
+    ./install_ks.sh -g <num_gates>
    
 (where <num_gates> is the number of selectors you built with, e.g. 9)
    
