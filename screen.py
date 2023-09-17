@@ -94,12 +94,13 @@ class KlipperScreen(Gtk.Window):
     initialized = initializing = False
     popup_timeout = None
     wayland = False
+    windowed = False
 
     def __init__(self, args, version):
         try:
             super().__init__(title="KlipperScreen")
         except Exception as e:
-            logging.exception(e)
+            logging.exception(f"{e}\n\n{traceback.format_exc()}")
             raise RuntimeError from e
         self.blanking_time = 600
         self.use_dpms = True
@@ -124,12 +125,16 @@ class KlipperScreen(Gtk.Window):
             monitor = Gdk.Display.get_default().get_monitor(0)
         if monitor is None:
             raise RuntimeError("Couldn't get default monitor")
-        self.width = self._config.get_main_config().getint("width", monitor.get_geometry().width)
-        self.height = self._config.get_main_config().getint("height", monitor.get_geometry().height)
-        self.set_default_size(self.width, self.height)
-        self.set_resizable(True)
-        if not (self._config.get_main_config().get("width") or self._config.get_main_config().get("height")):
+        self.width = self._config.get_main_config().getint("width", None)
+        self.height = self._config.get_main_config().getint("height", None)
+        if self.width or self.height:
+            self.set_resizable(True)
+            self.windowed = True
+        else:
+            self.width = monitor.get_geometry().width
+            self.height = monitor.get_geometry().height
             self.fullscreen()
+        self.set_default_size(self.width, self.height)
         self.aspect_ratio = self.width / self.height
         self.vertical_mode = self.aspect_ratio < 1.0
         logging.info(f"Screen resolution: {self.width}x{self.height}")
@@ -268,12 +273,6 @@ class KlipperScreen(Gtk.Window):
         self._ws.klippy.object_subscription(requested_updates)
         # Happy Hare TODO make this extensible with variables references in custom Menus..? Can you call object_subscription more than once?
 
-    def preload(self):
-        logging.debug("Preloading panels")
-        for panel in ['move', 'temperature', 'extrude', 'job_status']:
-            self.panels[panel] = self._load_panel(panel).Panel(self, title='')
-            self.panels_reinit.append(panel)
-
     @staticmethod
     def _load_panel(panel):
         logging.debug(f"Loading panel: {panel}")
@@ -296,7 +295,7 @@ class KlipperScreen(Gtk.Window):
                 try:
                     self.panels[panel_name] = self._load_panel(panel).Panel(self, title, **kwargs)
                 except Exception as e:
-                    self.show_error_modal(f"Unable to load panel {panel}", f"{e}")
+                    self.show_error_modal(f"Unable to load panel {panel}", f"{e}\n\n{traceback.format_exc()}")
                     return
             elif panel_name in self.panels_reinit:
                 logging.info("Reinitializing panel")
@@ -305,7 +304,7 @@ class KlipperScreen(Gtk.Window):
             self._cur_panels.append(panel_name)
             self.attach_panel(panel_name)
         except Exception as e:
-            logging.exception(f"Error attaching panel:\n{e}")
+            logging.exception(f"Error attaching panel:\n{e}\n\n{traceback.format_exc()}")
 
     def attach_panel(self, panel):
         self.base_panel.add_content(self.panels[panel])
@@ -451,7 +450,7 @@ class KlipperScreen(Gtk.Window):
                 with open(theme_style_conf) as f:
                     style_options.update(json.load(f))
             except Exception as e:
-                logging.error(f"Unable to parse custom template conf file:\n{e}")
+                logging.error(f"Unable to parse custom template conf file:\n{e}\n\n{traceback.format_exc()}")
 
         self.gtk.color_list = style_options['graph_colors']
 
@@ -824,7 +823,7 @@ class KlipperScreen(Gtk.Window):
 
     def _confirm_send_action(self, widget, text, method, params=None):
         buttons = [
-            {"name": _("Continue"), "response": Gtk.ResponseType.OK},
+            {"name": _("Accept"), "response": Gtk.ResponseType.OK},
             {"name": _("Cancel"), "response": Gtk.ResponseType.CANCEL}
         ]
 
@@ -832,7 +831,7 @@ class KlipperScreen(Gtk.Window):
             j2_temp = self.env.from_string(text)
             text = j2_temp.render()
         except Exception as e:
-            logging.debug(f"Error parsing jinja for confirm_send_action\n{e}")
+            logging.debug(f"Error parsing jinja for confirm_send_action\n{e}\n\n{traceback.format_exc()}")
 
         label = Gtk.Label()
         label.set_markup(text)
@@ -944,6 +943,7 @@ class KlipperScreen(Gtk.Window):
         config = self.apiclient.send_request("printer/objects/query?configfile")
         if config is False:
             return self._init_printer("Error getting printer configuration")
+        logging.debug(config['result']['status'])
         # Reinitialize printer, in case the printer was shut down and anything has changed.
         self.printer.reinit(printer_info['result'], config['result']['status'])
         self.printer.available_commands = self.apiclient.get_gcode_help()['result']
@@ -972,7 +972,6 @@ class KlipperScreen(Gtk.Window):
         self.reinit_count = 0
         self.initializing = False
         self.printer.process_update(data['result']['status'])
-        self.preload()
         return False
 
     def init_tempstore(self):
@@ -1107,7 +1106,7 @@ def main():
     try:
         win = KlipperScreen(args, version)
     except Exception as e:
-        logging.exception("Failed to initialize window")
+        logging.exception(f"Failed to initialize window\n{e}\n\n{traceback.format_exc()}")
         raise RuntimeError from e
     win.connect("destroy", Gtk.main_quit)
     win.show_all()
@@ -1118,5 +1117,5 @@ if __name__ == "__main__":
     try:
         main()
     except Exception as ex:
-        logging.exception(f"Fatal error in main loop:\n{ex}")
+        logging.exception(f"Fatal error in main loop:\n{ex}\n\n{traceback.format_exc()}")
         sys.exit(1)
