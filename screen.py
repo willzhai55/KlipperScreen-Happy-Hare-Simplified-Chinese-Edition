@@ -175,6 +175,12 @@ class KlipperScreen(Gtk.Window):
             "startup": self.state_startup,
             "shutdown": self.state_shutdown
         }
+
+        sticky_panel=self._config.get_main_config().get("sticky_panel", None)  
+        if not sticky_panel is None:
+            for x in ["printing","ready"]:
+                state_callbacks[x]=self.state_sticky_panel 
+
         for printer in self.printers:
             printer["data"] = Printer(state_execute, state_callbacks, self.process_busy_state)
         default_printer = self._config.get_main_config().get('default_printer')
@@ -674,6 +680,20 @@ class KlipperScreen(Gtk.Window):
         self.files = None
         self.initialized = False
         self.connect_printer(self.connecting_to_printer)
+
+
+    def state_sticky_panel(self):
+        if "job_status" in self._cur_panels and wait:
+            return
+        if not self.initialized:
+            logging.debug("Printer not initialized yet")
+            self.printer.state = "not ready"
+            return        
+        sticky_panel=self._config.get_main_config().get("sticky_panel", None)        
+        self.show_panel(sticky_panel, None, remove_all=True)
+        self.base_panel.main_grid.remove(self.base_panel.action_bar)
+        self.base_panel.main_grid.remove(self.base_panel.titlebar)
+
 
     def state_disconnected(self):
         logging.debug("### Going to disconnected")
