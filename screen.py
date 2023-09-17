@@ -176,9 +176,10 @@ class KlipperScreen(Gtk.Window):
             "shutdown": self.state_shutdown
         }
 
+        # Happy Hare vvv
         sticky_panel=self._config.get_main_config().get("sticky_panel", None)  
         if not sticky_panel is None:
-            for x in ["printing","ready"]:
+            for x in ["printing", "ready"]:
                 state_callbacks[x]=self.state_sticky_panel 
 
         for printer in self.printers:
@@ -682,7 +683,7 @@ class KlipperScreen(Gtk.Window):
         self.connect_printer(self.connecting_to_printer)
 
 
-    def state_sticky_panel(self):
+    def state_sticky_panel(self): # Happy Hare
         if "job_status" in self._cur_panels and wait:
             return
         if not self.initialized:
