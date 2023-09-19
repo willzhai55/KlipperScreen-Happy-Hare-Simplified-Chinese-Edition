@@ -264,6 +264,7 @@ class Panel(ScreenPanel):
                     self.update_encoder_pos()
                 if 'print_state' in e_data:
                     self.update_active_buttons()
+                self.update_active_buttons()
 
     def init_tool_value(self):
         mmu = self._printer.get_stat("mmu")
