@@ -445,7 +445,7 @@ class Panel(ScreenPanel):
         mmu_print_state = mmu['print_state']
         filament = mmu['filament']
         action = mmu['action']
-        if mmu_print_state in ("complete", "error", "cancelled", "standby", "started"):
+        if mmu_print_state in ("complete", "error", "cancelled", "started"):
             pos_str = mmu_print_state.capitalize()
         elif action == "Idle":
             pos_str = (f"Filament: {encoder_pos}mm") if filament != "Unloaded" else "Filament: Unloaded"
