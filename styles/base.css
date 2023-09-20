@@ -625,8 +625,8 @@ popover button {
 }
 
 .mmu_tool_text {
-    margin-top: 6px;
-    margin-bottom: 6px;
+    padding-top: 6px;
+    padding-bottom: 6px;
     font-size: 1.8em;
 }
 
@@ -637,8 +637,14 @@ popover button {
 }
 
 .mmu_color_swatch {
-    font-size: 3em;
+    font-size: 2.5em;
 }
+
+.mmu_spoolman_color_swatch {
+    font-size: 2.3em;
+    padding-bottom: 6px;
+}
+
 
 .mmu_sensor_text {
     font-size: 1.6em;
@@ -658,14 +664,33 @@ popover button {
     padding-right: 15px;
 }
 
+.mmu_status_text {
+    color: #a0a0a0;
+}
+
 .mmu_gate_text {
-    margin-top: 8px;
-    margin-bottom: 8px;
+    color: #a0a0a0;
+}
+
+.mmu_tool_text {
+    padding-top: 8px;
+    padding-bottom: 8px;
+    font-size: 1.2em;
+}
+
+
+.mmu_color_image {
+    margin-top: 3px;
+    margin-bottom: 3px;
+}
+
+.mmu_filament_text {
     font-size: 1.2em;
 }
 
 .mmu_material_text {
-    font-size: 1.6em;
+    font-size: 1.2em;
+    font-weight: bold;
 }
 
 .mmu_status {

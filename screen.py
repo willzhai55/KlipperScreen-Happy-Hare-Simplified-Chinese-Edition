@@ -179,8 +179,18 @@ class KlipperScreen(Gtk.Window):
         # Happy Hare vvv
         sticky_panel=self._config.get_main_config().get("sticky_panel", None)  
         if not sticky_panel is None:
+            self.base_panel.action_bar.set_visible(False)
+            self.base_panel.action_bar.set_no_show_all(True)
+            self.base_panel.titlebar.set_visible(False)
+            self.base_panel.titlebar.set_no_show_all(True)
             for x in ["printing", "ready"]:
                 state_callbacks[x]=self.state_sticky_panel 
+        else:
+            self.base_panel.action_bar.set_visible(True)
+            self.base_panel.action_bar.set_no_show_all(False)
+            self.base_panel.titlebar.set_visible(True)
+            self.base_panel.titlebar.set_no_show_all(False)
+        # Happy Hare ^^^
 
         for printer in self.printers:
             printer["data"] = Printer(state_execute, state_callbacks, self.process_busy_state)
@@ -682,7 +692,6 @@ class KlipperScreen(Gtk.Window):
         self.initialized = False
         self.connect_printer(self.connecting_to_printer)
 
-
     def state_sticky_panel(self): # Happy Hare
         if "job_status" in self._cur_panels and wait:
             return
@@ -692,9 +701,6 @@ class KlipperScreen(Gtk.Window):
             return        
         sticky_panel=self._config.get_main_config().get("sticky_panel", None)        
         self.show_panel(sticky_panel, None, remove_all=True)
-        self.base_panel.main_grid.remove(self.base_panel.action_bar)
-        self.base_panel.main_grid.remove(self.base_panel.titlebar)
-
 
     def state_disconnected(self):
         logging.debug("### Going to disconnected")
