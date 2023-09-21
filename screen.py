@@ -268,7 +268,7 @@ class KlipperScreen(Gtk.Window):
                 "exclude_object": ["current_object", "objects", "excluded_objects"],
                 "manual_probe": ['is_active'],
                 "mmu": ["enabled", "is_locked", "is_homed", "tool", "next_tool", "last_tool", "last_toolchange", "gate",
-                    "clog_detection", "endless_spool", "filament", "servo", "gate_status", "gate_material", "gate_color",
+                    "clog_detection", "endless_spool", "filament", "servo", "gate_status", "gate_material", "gate_color","gate_spool_id",
                     "endless_spool_groups", "ttg_map", "filament_pos", "filament_direction", "action", "has_bypass",
                     "sync_drive", "tool_extrusion_multipliers", "tool_speed_multipliers", "print_state"],
             }

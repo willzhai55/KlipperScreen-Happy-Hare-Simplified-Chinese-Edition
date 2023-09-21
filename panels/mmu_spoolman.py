@@ -69,7 +69,7 @@ class Panel(ScreenPanel):
             gate_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
             gate_icon = self.labels[f'gate_icon_{i}'] = self._gtk.Image('mmu_gate')
             gate_label = self.labels[f'gate_label_{i}'] = Gtk.Label(f'#{i}')
-            gate_label.get_style_context().add_class("mmu_gate_text")
+            gate_label.get_style_context().add_class("mmu_spoolman_gate_text")
             #gate_box.pack_start(gate_icon, True, True, 0)
             gate_box.pack_start(gate_label, True, True, 0)
 
@@ -80,7 +80,7 @@ class Panel(ScreenPanel):
             color_image.get_style_context().add_class("mmu_color_image")
 
             material = self.labels[f'material_{i}'] = Gtk.Label("n/a")
-            material.get_style_context().add_class("mmu_material_text")
+            material.get_style_context().add_class("mmu_spoolman_material_text")
             material.set_xalign(0)
 
             filament = self.labels[f'filament_{i}'] = Gtk.Label("n/a")
@@ -105,7 +105,7 @@ class Panel(ScreenPanel):
 
 
             tools = self.labels[f'tools_{i}'] = Gtk.Label("n/a")
-            tools.get_style_context().add_class("mmu_tool_text")
+            tools.get_style_context().add_class("mmu_spoolman_tool_text")
             tools.set_xalign(0.3)
 
             edit = self.labels[f'edit_{i}'] = self._gtk.Button('mmu_gear', f'Edit', 'color4')
@@ -328,7 +328,6 @@ class Panel(ScreenPanel):
                 self.labels[f'color_image_{i}'].set_from_pixbuf(pixbuf.scale_simple(pixbuf.get_width()*0.9, pixbuf.get_height()*0.9, 1))
 
             #self.labels[f'usage_{i}'].set_label(usage) 
-            logging.debug(remaining_weight)
             self.labels[f'remaining_weight_{i}'].set_label(remaining_weight) 
             self.labels[f'remaining_length_{i}'].set_label(remaining_percentage) 
             color = Gdk.RGBA(0,1,0,1)
@@ -404,7 +403,8 @@ class Panel(ScreenPanel):
                 return
             elif 'mmu' in data:
                 e_data = data['mmu']
-                if 'ttg_map' in e_data or 'gate' in e_data or 'gate_status' in e_data or 'gate_material' in e_data or 'gate_color' in e_data:
+                if 'ttg_map' in e_data or 'gate' in e_data or 'gate_status' in e_data or 'gate_material' in e_data or 'gate_color' in e_data or 'gate_spool_id' in e_data:
+                    logging.debug(self._printer.get_stat("mmu")['gate_spool_id'])
                     self.refresh()
 
     def select_edit(self, widget, sel_gate):
