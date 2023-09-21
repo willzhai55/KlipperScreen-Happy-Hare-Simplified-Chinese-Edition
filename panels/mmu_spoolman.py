@@ -42,8 +42,9 @@ class Panel(ScreenPanel):
 
     def __init__(self, screen, title):
         super().__init__(screen, title)
-        self.apiClient = screen.apiclient
         self.ui_sel_tool = 0
+
+        self.apiClient = screen.apiclient
         self.spools={}
         SpoolmanSpool.theme_path = screen.theme
         GObject.type_register(SpoolmanSpool)
@@ -404,7 +405,7 @@ class Panel(ScreenPanel):
                 return
             elif 'mmu' in data:
                 e_data = data['mmu']
-                if 'ttg_map' in e_data or 'gate' in e_data or 'gate_status' in e_data or 'gate_material' in e_data or 'gate_color' in e_data:
+                if 'ttg_map' in e_data or 'gate' in e_data or 'gate_status' in e_data or 'gate_material' in e_data or 'gate_color' in e_data or 'gate_spool_id' in e_data:
                     self.refresh()
 
     def select_edit(self, widget, sel_gate):

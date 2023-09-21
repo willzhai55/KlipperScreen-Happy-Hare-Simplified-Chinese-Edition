@@ -35,6 +35,7 @@ class Panel(ScreenPanel):
             status_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
             status = self.labels[f'status_{i}'] = self._gtk.Image()
             available = self.labels[f'available_{i}'] = Gtk.Label("Unknown")
+            available.get_style_context().add_class("mmu_available_text")
             status_box.pack_start(status, True, True, 0)
             status_box.pack_start(available, True, True, 0)
 
@@ -97,9 +98,12 @@ class Panel(ScreenPanel):
                 alt_gate_str = '+(' + ', '.join(map(str, t_map['alt_gates'][:6]))
                 alt_gate_str += ', ...)' if len(t_map['alt_gates']) > 6 else ')'
 
-            if gate_status[gate] in (self.GATE_AVAILABLE, self.GATE_AVAILABLE_FROM_BUFFER):
+            if gate_status[gate] == self.GATE_AVAILABLE:
                 status_icon = 'available_icon'
                 status_str = "Available"
+            elif gate_status[gate] == self.GATE_AVAILABLE_FROM_BUFFER:
+                status_icon = 'available_icon'
+                status_str = "Buffered"
             elif gate_status[gate] == self.GATE_EMPTY:
                 status_icon = 'empty_icon'
                 status_str = "Empty"
