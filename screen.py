@@ -268,9 +268,9 @@ class KlipperScreen(Gtk.Window):
                 "exclude_object": ["current_object", "objects", "excluded_objects"],
                 "manual_probe": ['is_active'],
                 "mmu": ["enabled", "is_locked", "is_homed", "tool", "next_tool", "last_tool", "last_toolchange", "gate",
-                    "clog_detection", "endless_spool", "filament", "servo", "gate_status", "gate_material", "gate_color","gate_spool_id",
-                    "endless_spool_groups", "ttg_map", "filament_pos", "filament_direction", "action", "has_bypass",
-                    "sync_drive", "tool_extrusion_multipliers", "tool_speed_multipliers", "print_state"],
+                    "clog_detection", "endless_spool", "filament", "servo", "gate_status", "gate_material", "gate_color",
+                    "gate_spool_id", "endless_spool_groups", "ttg_map", "filament_pos", "filament_direction", "action",
+                    "has_bypass", "sync_drive", "tool_extrusion_multipliers", "tool_speed_multipliers", "print_state"],
             }
         }
         for extruder in self.printer.get_tools():
@@ -721,12 +721,14 @@ class KlipperScreen(Gtk.Window):
 
     def state_paused(self):
         self.state_printing()
+        if self._config.get_main_config().get("sticky_panel", None): return # Happy Hare
         mmu_active = True if "mmu_main" in self._cur_panels else False # Happy Hare
         if self._config.get_main_config().getboolean("auto_open_extrude", fallback=True) and not mmu_active: # Happy hare
             self.show_panel("extrude", _("Extrude"))
 
     def state_printing(self):
         self.close_screensaver()
+        if self._config.get_main_config().get("sticky_panel", None): return # Happy Hare
         for dialog in self.dialogs:
             self.gtk.remove_dialog(dialog)
         mmu_active = True if "mmu_main" in self._cur_panels else False # Happy Hare
@@ -735,6 +737,7 @@ class KlipperScreen(Gtk.Window):
             self.show_panel("mmu_main", 'MMU')
 
     def state_ready(self, wait=True):
+        if self._config.get_main_config().get("sticky_panel", None): return # Happy Hare
         # Do not return to main menu if completing a job, timeouts/user input will return
         if "job_status" in self._cur_panels and wait:
             return

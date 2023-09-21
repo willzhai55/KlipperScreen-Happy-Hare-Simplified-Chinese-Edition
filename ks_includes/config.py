@@ -176,7 +176,7 @@ class KlipperScreenConfig:
                     'invert_x', 'invert_y', 'invert_z', '24htime', 'only_heaters', 'show_cursor', 'confirm_estop',
                     'autoclose_popups', 'use_dpms', 'use_default_menu', 'side_macro_shortcut', 'use-matchbox-keyboard',
                     'show_heater_power', "show_scroll_steppers", "auto_open_extrude"
-                    'side_mmu_shortcut', 'mmu_color_gates', 'mmu_color_filament', 'mmu_bold_filament', # Happy Hare
+                    'side_mmu_shortcut', 'mmu_color_gates', 'mmu_color_filament', 'mmu_bold_filament', "mmu_use_spoolman", # Happy Hare
                 )
                 strs = (
                     'default_printer', 'language', 'print_sort_dir', 'theme', 'screen_blanking', 'font_size',
@@ -294,7 +294,10 @@ class KlipperScreenConfig:
                 "value": "True"}},
             {"mmu_bold_filament": {
                 "section": "main", "name": _("MMU show bold filament"), "type": "binary",
-                "value": "True"}}, # Happy Hare ^^^
+                "value": "True"}},
+            {"mmu_use_spoolman": {
+                "section": "main", "name": _("MMU use SpoolMan for filaments"), "type": "binary",
+                "value": "False"}}, # Happy Hare ^^^
             {"font_size": {
                 "section": "main", "name": _("Font Size"), "type": "dropdown",
                 "value": "medium", "callback": screen.restart_ks, "options": [
