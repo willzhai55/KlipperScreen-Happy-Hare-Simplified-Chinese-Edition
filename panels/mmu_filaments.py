@@ -165,7 +165,7 @@ class Panel(ScreenPanel):
         self.labels['m_entry'].connect("button-press-event", self._screen.show_keyboard)
         self.labels['m_entry'].connect("focus-in-event", self._screen.show_keyboard)
         self.labels['m_entry'].connect("changed", self.select_material)
-#        self.labels['m_entry'].grab_focus_without_selecting()
+        self.labels['m_entry'].grab_focus_without_selecting()
         self.labels['m_entry'].set_max_length(6)
 
         self.labels['id_entry'].set_vexpand(False)
@@ -173,7 +173,7 @@ class Panel(ScreenPanel):
         self.labels['id_entry'].connect("button-press-event", self._screen.show_keyboard)
         self.labels['id_entry'].connect("focus-in-event", self._screen.show_keyboard)
         self.labels['id_entry'].connect("changed", self.select_spool_id)
-#        self.labels['id_entry'].grab_focus_without_selecting()
+        self.labels['id_entry'].grab_focus_without_selecting()
         self.labels['id_entry'].set_max_length(4)
 
         self.labels['filament'].set_vexpand(False)
