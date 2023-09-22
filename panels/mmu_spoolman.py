@@ -24,8 +24,6 @@ class Panel(ScreenPanel):
     GATE_AVAILABLE = 1
     GATE_AVAILABLE_FROM_BUFFER = 2
 
- 
-
     def __init__(self, screen, title):
         super().__init__(screen, title)
         self.ui_sel_tool = 0
@@ -282,3 +280,4 @@ class Panel(ScreenPanel):
                 e_data = data['mmu']
                 if 'ttg_map' in e_data or 'gate' in e_data or 'gate_status' in e_data in e_data or 'gate_spool_id' in e_data:
                     self.refresh()
+
