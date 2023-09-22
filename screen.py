@@ -94,12 +94,13 @@ class KlipperScreen(Gtk.Window):
     initialized = initializing = False
     popup_timeout = None
     wayland = False
+    windowed = False
 
     def __init__(self, args, version):
         try:
             super().__init__(title="KlipperScreen")
         except Exception as e:
-            logging.exception(e)
+            logging.exception(f"{e}\n\n{traceback.format_exc()}")
             raise RuntimeError from e
         self.blanking_time = 600
         self.use_dpms = True
@@ -124,12 +125,16 @@ class KlipperScreen(Gtk.Window):
             monitor = Gdk.Display.get_default().get_monitor(0)
         if monitor is None:
             raise RuntimeError("Couldn't get default monitor")
-        self.width = self._config.get_main_config().getint("width", monitor.get_geometry().width)
-        self.height = self._config.get_main_config().getint("height", monitor.get_geometry().height)
-        self.set_default_size(self.width, self.height)
-        self.set_resizable(True)
-        if not (self._config.get_main_config().get("width") or self._config.get_main_config().get("height")):
+        self.width = self._config.get_main_config().getint("width", None)
+        self.height = self._config.get_main_config().getint("height", None)
+        if self.width or self.height:
+            self.set_resizable(True)
+            self.windowed = True
+        else:
+            self.width = monitor.get_geometry().width
+            self.height = monitor.get_geometry().height
             self.fullscreen()
+        self.set_default_size(self.width, self.height)
         self.aspect_ratio = self.width / self.height
         self.vertical_mode = self.aspect_ratio < 1.0
         logging.info(f"Screen resolution: {self.width}x{self.height}")
@@ -170,6 +175,23 @@ class KlipperScreen(Gtk.Window):
             "startup": self.state_startup,
             "shutdown": self.state_shutdown
         }
+
+        # Happy Hare vvv
+        sticky_panel=self._config.get_main_config().get("sticky_panel", None)  
+        if not sticky_panel is None:
+            self.base_panel.action_bar.set_visible(False)
+            self.base_panel.action_bar.set_no_show_all(True)
+            self.base_panel.titlebar.set_visible(False)
+            self.base_panel.titlebar.set_no_show_all(True)
+            for x in ["printing", "ready"]:
+                state_callbacks[x]=self.state_sticky_panel 
+        else:
+            self.base_panel.action_bar.set_visible(True)
+            self.base_panel.action_bar.set_no_show_all(False)
+            self.base_panel.titlebar.set_visible(True)
+            self.base_panel.titlebar.set_no_show_all(False)
+        # Happy Hare ^^^
+
         for printer in self.printers:
             printer["data"] = Printer(state_execute, state_callbacks, self.process_busy_state)
         default_printer = self._config.get_main_config().get('default_printer')
@@ -247,10 +269,10 @@ class KlipperScreen(Gtk.Window):
                 "manual_probe": ['is_active'],
                 "mmu": ["enabled", "is_locked", "is_homed", "tool", "next_tool", "last_tool", "last_toolchange", "gate",
                     "clog_detection", "endless_spool", "filament", "servo", "gate_status", "gate_material", "gate_color",
-                    "endless_spool_groups", "ttg_map", "filament_pos", "filament_direction", "action", "has_bypass",
-                    "sync_drive"],
+                    "gate_spool_id", "endless_spool_groups", "ttg_map", "filament_pos", "filament_direction", "action",
+                    "has_bypass", "sync_drive", "tool_extrusion_multipliers", "tool_speed_multipliers", "print_state"],
             }
-        } # Happy Hare TODO add mmu."print_job_state"
+        }
         for extruder in self.printer.get_tools():
             requested_updates['objects'][extruder] = [
                 "target", "temperature", "pressure_advance", "smooth_time", "power"]
@@ -267,12 +289,6 @@ class KlipperScreen(Gtk.Window):
 
         self._ws.klippy.object_subscription(requested_updates)
         # Happy Hare TODO make this extensible with variables references in custom Menus..? Can you call object_subscription more than once?
-
-    def preload(self):
-        logging.debug("Preloading panels")
-        for panel in ['move', 'temperature', 'extrude', 'job_status']:
-            self.panels[panel] = self._load_panel(panel).Panel(self, title='')
-            self.panels_reinit.append(panel)
 
     @staticmethod
     def _load_panel(panel):
@@ -296,7 +312,7 @@ class KlipperScreen(Gtk.Window):
                 try:
                     self.panels[panel_name] = self._load_panel(panel).Panel(self, title, **kwargs)
                 except Exception as e:
-                    self.show_error_modal(f"Unable to load panel {panel}", f"{e}")
+                    self.show_error_modal(f"Unable to load panel {panel}", f"{e}\n\n{traceback.format_exc()}")
                     return
             elif panel_name in self.panels_reinit:
                 logging.info("Reinitializing panel")
@@ -305,7 +321,7 @@ class KlipperScreen(Gtk.Window):
             self._cur_panels.append(panel_name)
             self.attach_panel(panel_name)
         except Exception as e:
-            logging.exception(f"Error attaching panel:\n{e}")
+            logging.exception(f"Error attaching panel:\n{e}\n\n{traceback.format_exc()}")
 
     def attach_panel(self, panel):
         self.base_panel.add_content(self.panels[panel])
@@ -316,10 +332,10 @@ class KlipperScreen(Gtk.Window):
         if hasattr(self.panels[panel], "activate"):
             self.panels[panel].activate()
         self.show_all()
-        if hasattr(self.panels[panel], "post_attach"): # Happy Hare - Gtk.Notebook must be rededered before layer selected
+        if hasattr(self.panels[panel], "post_attach"): # Happy Hare - Gtk.Notebook must be rendered before layer selected
             self.panels[panel].post_attach()
 
-    def show_popup_message(self, message, level=3, save=True): # Happy Hare: added save=
+    def show_popup_message(self, message, level=3, save=True): # Happy Hare: added `save=` functionality
         message = message.replace("// ", "") # Happy Hare added to clean up multi-line messages
         self.close_screensaver()
         if self.popup_message is not None:
@@ -451,7 +467,7 @@ class KlipperScreen(Gtk.Window):
                 with open(theme_style_conf) as f:
                     style_options.update(json.load(f))
             except Exception as e:
-                logging.error(f"Unable to parse custom template conf file:\n{e}")
+                logging.error(f"Unable to parse custom template conf file:\n{e}\n\n{traceback.format_exc()}")
 
         self.gtk.color_list = style_options['graph_colors']
 
@@ -676,6 +692,16 @@ class KlipperScreen(Gtk.Window):
         self.initialized = False
         self.connect_printer(self.connecting_to_printer)
 
+    def state_sticky_panel(self): # Happy Hare
+        if "job_status" in self._cur_panels and wait:
+            return
+        if not self.initialized:
+            logging.debug("Printer not initialized yet")
+            self.printer.state = "not ready"
+            return        
+        sticky_panel=self._config.get_main_config().get("sticky_panel", None)        
+        self.show_panel(sticky_panel, None, remove_all=True)
+
     def state_disconnected(self):
         logging.debug("### Going to disconnected")
         self.close_screensaver()
@@ -695,12 +721,14 @@ class KlipperScreen(Gtk.Window):
 
     def state_paused(self):
         self.state_printing()
+        if self._config.get_main_config().get("sticky_panel", None): return # Happy Hare
         mmu_active = True if "mmu_main" in self._cur_panels else False # Happy Hare
         if self._config.get_main_config().getboolean("auto_open_extrude", fallback=True) and not mmu_active: # Happy hare
             self.show_panel("extrude", _("Extrude"))
 
     def state_printing(self):
         self.close_screensaver()
+        if self._config.get_main_config().get("sticky_panel", None): return # Happy Hare
         for dialog in self.dialogs:
             self.gtk.remove_dialog(dialog)
         mmu_active = True if "mmu_main" in self._cur_panels else False # Happy Hare
@@ -709,6 +737,7 @@ class KlipperScreen(Gtk.Window):
             self.show_panel("mmu_main", 'MMU')
 
     def state_ready(self, wait=True):
+        if self._config.get_main_config().get("sticky_panel", None): return # Happy Hare
         # Do not return to main menu if completing a job, timeouts/user input will return
         if "job_status" in self._cur_panels and wait:
             return
@@ -824,7 +853,7 @@ class KlipperScreen(Gtk.Window):
 
     def _confirm_send_action(self, widget, text, method, params=None):
         buttons = [
-            {"name": _("Continue"), "response": Gtk.ResponseType.OK},
+            {"name": _("Accept"), "response": Gtk.ResponseType.OK},
             {"name": _("Cancel"), "response": Gtk.ResponseType.CANCEL}
         ]
 
@@ -832,7 +861,7 @@ class KlipperScreen(Gtk.Window):
             j2_temp = self.env.from_string(text)
             text = j2_temp.render()
         except Exception as e:
-            logging.debug(f"Error parsing jinja for confirm_send_action\n{e}")
+            logging.debug(f"Error parsing jinja for confirm_send_action\n{e}\n\n{traceback.format_exc()}")
 
         label = Gtk.Label()
         label.set_markup(text)
@@ -944,6 +973,7 @@ class KlipperScreen(Gtk.Window):
         config = self.apiclient.send_request("printer/objects/query?configfile")
         if config is False:
             return self._init_printer("Error getting printer configuration")
+        logging.debug(config['result']['status'])
         # Reinitialize printer, in case the printer was shut down and anything has changed.
         self.printer.reinit(printer_info['result'], config['result']['status'])
         self.printer.available_commands = self.apiclient.get_gcode_help()['result']
@@ -972,7 +1002,6 @@ class KlipperScreen(Gtk.Window):
         self.reinit_count = 0
         self.initializing = False
         self.printer.process_update(data['result']['status'])
-        self.preload()
         return False
 
     def init_tempstore(self):
@@ -1107,7 +1136,7 @@ def main():
     try:
         win = KlipperScreen(args, version)
     except Exception as e:
-        logging.exception("Failed to initialize window")
+        logging.exception(f"Failed to initialize window\n{e}\n\n{traceback.format_exc()}")
         raise RuntimeError from e
     win.connect("destroy", Gtk.main_quit)
     win.show_all()
@@ -1118,5 +1147,5 @@ if __name__ == "__main__":
     try:
         main()
     except Exception as ex:
-        logging.exception(f"Fatal error in main loop:\n{ex}")
+        logging.exception(f"Fatal error in main loop:\n{ex}\n\n{traceback.format_exc()}")
         sys.exit(1)

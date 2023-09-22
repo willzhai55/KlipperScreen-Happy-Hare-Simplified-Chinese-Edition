@@ -6,7 +6,7 @@
 
 This is the main screen and is accessed by clicking on the little carrot on the left navbar.   Note that you can turn off this carrot in settings in whch case buttons will automatically be added to the KlipperScreen home and print pages.  Personally I think MMU deserves this first class link on the left bar.
 
-The filament color can be displayed as shown here so long as you have your gate map ('gate_material' and 'gate_color' arrays set up either defaults in 'mmu_paramters.cfg' or set with the `MMU_SET_GATE_MAP` command).  If you have toolhead sensor you can conveniently see the state (detected/empty/disabled) near the `Manage...` button
+The filament color can be displayed as shown here so long as you have your gate map ('gate_material' and 'gate_color' arrays set up either defaults in 'mmu_paramters.cfg' or set with the `MMU_GATE_MAP` command).  If you have toolhead sensor you can conveniently see the state (detected/empty/disabled) near the `Manage...` button
 
 The philosophy behind this screen is that it works with the concept of `Tool` which is really a virtual entity in Happy Hare because of the Tool-To-Gate mapping.  When you are actually printing the panel will look a little different (see below).
 

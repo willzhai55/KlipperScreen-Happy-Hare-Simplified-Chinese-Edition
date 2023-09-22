@@ -624,12 +624,6 @@ popover button {
     margin-bottom: 12px;
 }
 
-.mmu_tool_text {
-    margin-top: 6px;
-    margin-bottom: 6px;
-    font-size: 1.8em;
-}
-
 .mmu_entry_text {
     margin-top: 6px;
     margin-bottom: 6px;
@@ -637,7 +631,7 @@ popover button {
 }
 
 .mmu_color_swatch {
-    font-size: 3em;
+    font-size: 2.8em;
 }
 
 .mmu_sensor_text {
@@ -658,14 +652,28 @@ popover button {
     padding-right: 15px;
 }
 
+.mmu_tool_text {
+    margin-top: 6px;
+    margin-bottom: 6px;
+    font-size: 1.8em;
+}
+
 .mmu_gate_text {
     margin-top: 8px;
     margin-bottom: 8px;
     font-size: 1.2em;
 }
 
+.mmu_available_text {
+    font-size: 0.8em;
+}
+
 .mmu_material_text {
-    font-size: 1.6em;
+    font-size: 1.2em;
+}
+
+.mmu_spool_id_text {
+    font-size: 1.2em;
 }
 
 .mmu_status {
@@ -710,6 +718,29 @@ popover button {
 .mmu_endless_spool_toggle {
     padding-bottom: .6em;
 }
+
+.mmu_spoolman_gate_text {
+    padding-top: 8px;
+    padding-bottom: 8px;
+    font-size: 1.2em;
+    color: #a0a0a0;
+}
+
+.mmu_spoolman_material_text {
+    font-size: 1.2em;
+}
+
+.mmu_spoolman_tool_text {
+    padding-top: 8px;
+    padding-bottom: 8px;
+    font-size: 1.2em;
+}
+
+.mmu_spoolman_color_swatch {
+    font-size: 2.3em;
+    padding-bottom: 6px;
+}
+
 
 /* Hardcoded values until creation of dynamic CSS updates */
 .graph_label_hidden {padding-left: .9em;} /* .4em on top of normal button padding */

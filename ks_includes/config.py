@@ -158,9 +158,9 @@ class KlipperScreenConfig:
 
     def validate_config(self, config, string="", remove=False):
         valid = True
-        if string:
-            msg = "Section headers have extra information after brackets possible newline issue:"
 # Happy Hare: not a valid check, attributes can be references as printer.mmu.gate_status[4] for example
+#        if string:
+#            msg = "Section headers have extra information after brackets possible newline issue:"
 #            for line in string.split('\n'):
 #                if re.match(r".+\].", line):
 #                    logging.error(line)
@@ -176,11 +176,12 @@ class KlipperScreenConfig:
                     'invert_x', 'invert_y', 'invert_z', '24htime', 'only_heaters', 'show_cursor', 'confirm_estop',
                     'autoclose_popups', 'use_dpms', 'use_default_menu', 'side_macro_shortcut', 'use-matchbox-keyboard',
                     'show_heater_power', "show_scroll_steppers", "auto_open_extrude"
-                    'side_mmu_shortcut', 'mmu_color_gates', 'mmu_color_filament', 'mmu_bold_filament', # Happy Hare
+                    'side_mmu_shortcut', 'mmu_color_gates', 'mmu_color_filament', 'mmu_bold_filament', "mmu_use_spoolman", # Happy Hare
                 )
                 strs = (
                     'default_printer', 'language', 'print_sort_dir', 'theme', 'screen_blanking', 'font_size',
                     'print_estimate_method', 'screen_blanking', "screen_on_devices", "screen_off_devices",
+                    'sticky_panel', # Happy Hare
                 )
                 numbers = (
                     'job_complete_timeout', 'job_error_timeout', 'move_speed_xy', 'move_speed_z',
@@ -290,9 +291,12 @@ class KlipperScreenConfig:
                 "value": "True"}},
             {"mmu_color_filament": {
                 "section": "main", "name": _("MMU show colored filament"), "type": "binary",
-                "value": "False"}},
+                "value": "True"}},
             {"mmu_bold_filament": {
                 "section": "main", "name": _("MMU show bold filament"), "type": "binary",
+                "value": "True"}},
+            {"mmu_use_spoolman": {
+                "section": "main", "name": _("MMU use SpoolMan for filaments"), "type": "binary",
                 "value": "False"}}, # Happy Hare ^^^
             {"font_size": {
                 "section": "main", "name": _("Font Size"), "type": "dropdown",

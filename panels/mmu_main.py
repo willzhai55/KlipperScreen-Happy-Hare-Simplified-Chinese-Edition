@@ -51,19 +51,20 @@ class Panel(ScreenPanel):
 
         # btn_states: The "gaps" are what functionality the state takes away. Multiple states are combined
         self.btn_states = {
-            'all':             ['check_gates', 'tool', 'eject', 'picker', 'pause', 'message', 'extrude', 'resume', 'manage', 'more'],
-            'printing':        [                                          'pause',                                           'more'],
-            'paused':          ['check_gates', 'tool', 'eject', 'picker',          'message', 'extrude', 'resume', 'manage', 'more'],
-            'idle':            ['check_gates', 'tool', 'eject', 'picker', 'pause', 'message', 'extrude',           'manage', 'more'],
-            'bypass_loaded':   [                       'eject',           'pause', 'message', 'extrude', 'resume', 'manage', 'more'],
-            'bypass_unloaded': ['check_gates', 'tool',          'picker', 'pause', 'message', 'extrude', 'resume', 'manage', 'more'],
-            'bypass_unknown':  ['check_gates', 'tool', 'eject', 'picker', 'pause', 'message', 'extrude', 'resume', 'manage', 'more'],
-            'tool_loaded':     ['check_gates', 'tool', 'eject', 'picker', 'pause', 'message', 'extrude', 'resume', 'manage', 'more'],
-            'tool_unloaded':   ['check_gates', 'tool',          'picker', 'pause', 'message', 'extrude', 'resume', 'manage', 'more'],
-            'tool_unknown':    ['check_gates', 'tool', 'eject', 'picker', 'pause', 'message', 'extrude', 'resume', 'manage', 'more'],
-            'no_message':      ['check_gates', 'tool', 'eject', 'picker', 'pause',            'extrude', 'resume', 'manage', 'more'],
-            'busy':            [                                                                                   'manage', 'more'],
-            'disabled':        [                                                                                                                ],
+            'all':             ['check_gates', 'tool', 'eject', 'picker', 'pause', 'message', 'extrude', 'unlock', 'resume', 'manage', 'more'],
+            'printing':        [                                          'pause',                                                     'more'],
+            'pause_locked':    ['check_gates', 'tool', 'eject', 'picker',          'message',            'unlock', 'resume', 'manage', 'more'],
+            'paused':          ['check_gates', 'tool', 'eject', 'picker',          'message', 'extrude',           'resume', 'manage', 'more'],
+            'idle':            ['check_gates', 'tool', 'eject', 'picker', 'pause', 'message', 'extrude',                     'manage', 'more'],
+            'bypass_loaded':   [                       'eject',           'pause', 'message', 'extrude', 'unlock', 'resume', 'manage', 'more'],
+            'bypass_unloaded': ['check_gates', 'tool',          'picker', 'pause', 'message', 'extrude', 'unlock', 'resume', 'manage', 'more'],
+            'bypass_unknown':  ['check_gates', 'tool', 'eject', 'picker', 'pause', 'message', 'extrude', 'unlock', 'resume', 'manage', 'more'],
+            'tool_loaded':     ['check_gates', 'tool', 'eject', 'picker', 'pause', 'message', 'extrude', 'unlock', 'resume', 'manage', 'more'],
+            'tool_unloaded':   ['check_gates', 'tool',          'picker', 'pause', 'message', 'extrude', 'unlock', 'resume', 'manage', 'more'],
+            'tool_unknown':    ['check_gates', 'tool', 'eject', 'picker', 'pause', 'message', 'extrude', 'unlock', 'resume', 'manage', 'more'],
+            'no_message':      ['check_gates', 'tool', 'eject', 'picker', 'pause',            'extrude', 'unlock', 'resume', 'manage', 'more'],
+            'busy':            [                                                                                             'manage', 'more'],
+            'disabled':        [                                                                                                             ],
         }
 
         self.labels = {
@@ -76,9 +77,10 @@ class Panel(ScreenPanel):
             'eject': self._gtk.Button('mmu_eject', 'Eject', 'color4'),
             'pause': self._gtk.Button('pause', 'MMU Pause', 'color1'),
             'message': self._gtk.Button('warning', 'Last Error', 'color1'),
+            'unlock': self._gtk.Button('heat-up', 'Unlock', 'color2'),
             'resume': self._gtk.Button('resume', 'Resume', 'color3'),
-            'extrude': self._gtk.Button('extrude', 'Extrude...', 'color2'),
-            'more': self._gtk.Button('mmu_more', 'More...', 'color4'),
+            'extrude': self._gtk.Button('extrude', 'Extrude...', 'color4'),
+            'more': self._gtk.Button('mmu_more', 'More...', 'color1'),
             'tool_icon': self._gtk.Image('mmu_extruder', self._gtk.img_width * 0.8, self._gtk.img_height * 0.8),
             'tool_label': self._gtk.Label('Unknown'),
             'filament': self._gtk.Label('Filament: Unknown ▷ Flow: 100%'),
@@ -104,6 +106,7 @@ class Panel(ScreenPanel):
         self.labels['eject'].connect("clicked", self.select_eject)
         self.labels['pause'].connect("clicked", self.select_pause)
         self.labels['message'].connect("clicked", self.select_message)
+        self.labels['unlock'].connect("clicked", self.select_unlock)
         self.labels['resume'].connect("clicked", self.select_resume)
         self.labels['extrude'].connect("clicked", self.menu_item_clicked, {"panel": "extrude", "name": "Extrude"})
         self.labels['more'].connect("clicked", self._screen._go_to_submenu, "mmu")
@@ -206,8 +209,9 @@ class Panel(ScreenPanel):
         main_grid.attach(self.labels['eject'],        8, 0, 2, 1)
         main_grid.attach(self.labels['check_gates'], 10, 0, 2, 1)
         main_grid.attach(self.labels['pause_layer'],  0, 1, 3, 1)
-        main_grid.attach(self.labels['resume'],       3, 1, 3, 1)
-        main_grid.attach(self.labels['extrude'],      6, 1, 3, 1)
+        main_grid.attach(self.labels['unlock'],       3, 1, 2, 1)
+        main_grid.attach(self.labels['resume'],       5, 1, 2, 1)
+        main_grid.attach(self.labels['extrude'],      7, 1, 2, 1)
         main_grid.attach(self.labels['more'],         9, 1, 3, 1)
 
         box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
@@ -256,10 +260,10 @@ class Panel(ScreenPanel):
                     self.update_tool()
                 if 'enabled' in e_data:
                     self.update_enabled()
-                if 'action' in e_data:
+                if 'action' in e_data or 'print_state' in e_data:
                     self.update_encoder_pos()
-                self.update_active_buttons()
-            elif 'print_stats' in data and 'state' in data['print_stats']:
+                if 'print_state' in e_data:
+                    self.update_active_buttons()
                 self.update_active_buttons()
 
     def init_tool_value(self):
@@ -322,6 +326,9 @@ class Panel(ScreenPanel):
     def select_resume(self, widget):
         self._screen._ws.klippy.gcode_script(f"RESUME")
 
+    def select_unlock(self, widget):
+        self._screen._ws.klippy.gcode_script(f"MMU_UNLOCK")
+
     def update_enabled(self):
         enabled = self._printer.get_stat('mmu', 'enabled')
         for i in range(5):
@@ -360,7 +367,6 @@ class Panel(ScreenPanel):
             self.labels['eject'].set_label(f"Eject")
 
     def update_tool_buttons(self, tool_sensitive=True):
-        printer_state = self._printer.get_stat("print_stats")['state']
         mmu = self._printer.get_stat("mmu")
         num_gates = len(mmu['gate_status'])
         tool = mmu['tool']
@@ -436,9 +442,12 @@ class Panel(ScreenPanel):
         if encoder_pos == None:
             encoder_pos = self._printer.get_stat('mmu_encoder mmu_encoder')['encoder_pos']
         mmu = self._printer.get_stat("mmu")
+        mmu_print_state = mmu['print_state']
         filament = mmu['filament']
         action = mmu['action']
-        if action == "Idle":
+        if mmu_print_state in ("complete", "error", "cancelled", "started"):
+            pos_str = mmu_print_state.capitalize()
+        elif action == "Idle":
             pos_str = (f"Filament: {encoder_pos}mm") if filament != "Unloaded" else "Filament: Unloaded"
             if self._printer.get_stat("print_stats")['state'] == "printing":
                 flow_rate = self._printer.get_stat('mmu_encoder mmu_encoder')['flow_rate']
@@ -488,17 +497,16 @@ class Panel(ScreenPanel):
     # Dynamically update button sensitivity based on state
     def update_active_buttons(self):
         mmu = self._printer.get_stat("mmu")
-        printer_state = self._printer.get_stat("print_stats")['state']
-        is_pause_locked = mmu['is_locked']
+        mmu_print_state = mmu['print_state']
         enabled = mmu['enabled']
         tool = mmu['tool']
         action = mmu['action']
         filament = mmu['filament']
         ui_state = []
         if enabled:
-            if printer_state == "paused" or is_pause_locked:
-                ui_state.append("paused")
-            elif printer_state == "printing":
+            if mmu_print_state in ("pause_locked", "paused"):
+                ui_state.append(mmu_print_state)
+            elif mmu_print_state in ("started",  "printing"):
                 ui_state.append("printing")
                 self._screen.clear_last_popup_message()
             else:
@@ -520,12 +528,12 @@ class Panel(ScreenPanel):
             if not self._screen.have_last_popup_message():
                 ui_state.append("no_message")
 
-            if not 'printing' in ui_state:
+            if not "printing" in ui_state:
                 self.labels['runout_layer'].set_current_page(0) # Manage recovery button
             else:
                 self.labels['runout_layer'].set_current_page(1) # Clog display
 
-            if not 'paused' in ui_state:
+            if ("paused" not in ui_state and "pause_locked" not in ui_state) or "no_messsage" in ui_state:
                 self.labels['pause_layer'].set_current_page(0) # Pause button
             else:
                 self.labels['pause_layer'].set_current_page(1) # Recall last error
