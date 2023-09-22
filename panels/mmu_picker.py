@@ -22,6 +22,9 @@ class Panel(ScreenPanel):
 
     DUMMY = -99
 
+    COLOR_SWATCH = '⬤'
+    EMPTY_SWATCH = '◯'
+
     def __init__(self, screen, title):
         super().__init__(screen, title)
 
@@ -42,7 +45,7 @@ class Panel(ScreenPanel):
             tool = self.labels[f'tool_{i}'] = self._gtk.Button('extruder', f'T{i}', 'color2')
             tool.connect("clicked", self.select_tool, i)
 
-            color = self.labels[f'color_{i}'] = Gtk.Label(f'⬤')
+            color = self.labels[f'color_{i}'] = Gtk.Label(self.EMPTY_SWATCH)
             color.get_style_context().add_class("mmu_color_swatch")
             color.set_xalign(0.7)
 
@@ -115,6 +118,10 @@ class Panel(ScreenPanel):
             self.labels[f'status_{i}'].set_from_pixbuf(self.labels[f'{status_icon}'])
             self.labels[f'available_{i}'].set_label(status_str)
             self.labels[f'tool_{i}'].set_sensitive(gate_status[i] in (self.GATE_AVAILABLE, self.GATE_AVAILABLE_FROM_BUFFER))
+            if gate_color[i] != '':
+                self.labels[f'color_{i}'].set_text(self.COLOR_SWATCH)
+            else:
+                self.labels[f'color_{i}'].set_text(self.EMPTY_SWATCH)
             self.labels[f'color_{i}'].override_color(Gtk.StateType.NORMAL, color)
             self.labels[f'material_{i}'].set_label(gate_material[gate][:6])
             self.labels[f'gate_{i}'].set_label(gate_str)

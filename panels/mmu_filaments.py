@@ -8,7 +8,7 @@ import logging, gi
 
 gi.require_version("Gtk", "3.0")
 
-from gi.repository import Gtk, GLib, Pango, Gdk, GdkPixbuf, GObject
+from gi.repository import Gtk, GLib, Pango, Gdk, GdkPixbuf
 from ks_includes.screen_panel import ScreenPanel
 from ks_includes.KlippyRest import KlippyRest
 from panels.spoolman import SpoolmanSpool
@@ -41,18 +41,15 @@ class Panel(ScreenPanel):
                   'silver', 'skyblue', 'slateblue', 'slategray', 'slategrey', 'snow', 'springgreen', 'steelblue', 'tan', 'teal', 'thistle', 'tomato',
                   'turquoise', 'violet', 'wheat', 'white', 'whitesmoke', 'yellow', 'yellowgreen']
 
+    COLOR_SWATCH = '⬤'
+    EMPTY_SWATCH = '◯'
+
     def __init__(self, screen, title):
         super().__init__(screen, title)
 
-        self.is_sticky = self._config.get_main_config().get("sticky_panel", None) == "mmu_filaments" # Are we in sticky mode?
-        #self.has_spoolman = self._printer.spoolman
-        self.has_spoolman = False # PAUL TEMP until panel is complete
-        self.use_spoolman = self.has_spoolman and self._config.get_main_config().getboolean("mmu_use_spoolman", False)
-
+        self.use_spoolman = self._printer.spoolman and self._config.get_main_config().getboolean("mmu_use_spoolman", False)
         self.apiClient = screen.apiclient
-        self.spools={}
-        SpoolmanSpool.theme_path = screen.theme
-        GObject.type_register(SpoolmanSpool)
+        self.spools = {}
 
         img_width = img_height = self._gtk.img_scale * self.bts * 2.0
         grid = Gtk.Grid()
@@ -75,7 +72,7 @@ class Panel(ScreenPanel):
             gate_box.pack_start(gate_icon, True, True, 0)
             gate_box.pack_start(gate_label, True, True, 0)
 
-            color = self.labels[f'color_{i}'] = Gtk.Label(f'⬤')
+            color = self.labels[f'color_{i}'] = Gtk.Label(self.EMPTY_SWATCH)
             color.get_style_context().add_class("mmu_color_swatch")
             color.set_xalign(0.7)
 
@@ -110,7 +107,7 @@ class Panel(ScreenPanel):
             'available': Gtk.Label("Unknown"),
             'gate_icon': self._gtk.Image('mmu_gate', width=img_width, height=img_height),
             'gate_label': Gtk.Label('Gate #0'),
-            'color': Gtk.Label('⬤'),
+            'color': Gtk.Label(self.EMPTY_SWATCH),
             'material': Gtk.Label('PLA'),
             'tools': Gtk.Label("n/a"),
             'spool_id': Gtk.Label("n/a"),
@@ -162,7 +159,7 @@ class Panel(ScreenPanel):
         self.labels['m_entry'].connect("button-press-event", self._screen.show_keyboard)
         self.labels['m_entry'].connect("focus-in-event", self._screen.show_keyboard)
         self.labels['m_entry'].connect("changed", self.select_material)
-        self.labels['m_entry'].grab_focus_without_selecting()
+#        self.labels['m_entry'].grab_focus_without_selecting()
         self.labels['m_entry'].set_max_length(6)
 
         self.labels['id_entry'].set_vexpand(False)
@@ -170,16 +167,13 @@ class Panel(ScreenPanel):
         self.labels['id_entry'].connect("button-press-event", self._screen.show_keyboard)
         self.labels['id_entry'].connect("focus-in-event", self._screen.show_keyboard)
         self.labels['id_entry'].connect("changed", self.select_spool_id)
-        self.labels['id_entry'].grab_focus_without_selecting()
+#        self.labels['id_entry'].grab_focus_without_selecting()
         self.labels['id_entry'].set_max_length(4)
 
         self.labels['filament'].set_vexpand(False)
         self.labels['filament'].get_style_context().add_class("mmu_recover")
         self.labels['filament'].connect("notify::active", self.select_filament)
         self.labels['filament'].set_halign(Gtk.Align.START)
-
-        self.labels['fetch'].set_vexpand(False)
-        self.labels['fetch'].connect("clicked", self.select_fetch)
 
         self.labels['cancel'].set_vexpand(False)
         self.labels['cancel'].connect("clicked", self.select_cancel_edit)
@@ -205,17 +199,12 @@ class Panel(ScreenPanel):
         pad1.set_vexpand(True)
         pad2 = Gtk.Box()
         pad2.set_vexpand(True)
-#        heading_color = Gtk.Label('Edit Filament Color')
-#        heading_color.set_yalign(1)
-#        heading_id = Gtk.Label('ID')
-#        heading_material = Gtk.Label('Material Type / Availability')
-#        heading_material.set_yalign(1)
 
         edit_grid.attach(current_gate_grid,         0, 0, 16, 1)
         edit_grid.attach(pad1,                      0, 1, 16, 1)
         edit_grid.attach(Gtk.Label('SpoolID:'),     0, 2,  2, 1)
         edit_grid.attach(self.labels['id_entry'],   2, 2,  4, 1)
-        edit_grid.attach(self.labels['fetch'],      6, 2,  2, 1)
+        edit_grid.attach(Gtk.Box(),                 6, 2,  2, 1)
         edit_grid.attach(self.labels['filament'],   8, 2,  5, 1)
         edit_grid.attach(Gtk.Box(),                13, 2,  1, 1)
         edit_grid.attach(self.labels['save'],      14, 2,  2, 2)
@@ -242,25 +231,39 @@ class Panel(ScreenPanel):
         self.labels['layers'].set_current_page(0) # Gate list layer
 
     def activate(self):
-        # Setup SpoolMan polling
-        if self.has_spoolman:
-            self.is_polling = True
-            self.timer = threading.Timer(10, self.poll_spoolman)
-            self.timer.start()
-            self.update_spoolman_info() # PAUL do we need this now or just let timer update
+        self.use_spoolman = self._printer.spoolman and self._config.get_main_config().getboolean("mmu_use_spoolman", False)
+        if self.use_spoolman:
+#            # Async fetch of SpoolMan data
+#            self.timer = threading.Timer(1, self.query_spoolman)
+#            self.timer.start()
+            self.query_spoolman()
         self.refresh()
 
     def deactivate(self):
-        self.is_polling = False
+       self.use_spoolman = False
+
+    def query_spoolman(self):
+        hide_archived=True
+        spools = self.apiClient.post_request("server/spoolman/proxy", json={
+            "request_method": "GET",
+            "path": f"/v1/spool?allow_archived={not hide_archived}",
+        })
+        if not spools or "result" not in spools:
+            logging.error("Exception when trying to fetch spools")
+            return
+        self.spools.clear()
+        for spool in spools["result"]:
+            spoolObject = SpoolmanSpool(**spool)
+            self.spools[str(spoolObject.id)]=spoolObject
 
     def refresh(self):
-        self.use_spoolman = self.has_spoolman and self._config.get_main_config().getboolean("mmu_use_spoolman", False)
+        self.use_spoolman = self._printer.spoolman and self._config.get_main_config().getboolean("mmu_use_spoolman", False)
 
         mmu = self._printer.get_stat("mmu")
         gate_status = mmu['gate_status']
+        gate_spool_id = mmu['gate_spool_id']
         gate_material = mmu['gate_material']
         gate_color = mmu['gate_color']
-        gate_spool_id = mmu['gate_spool_id']
         num_gates = len(gate_status)
 
         for i in range(num_gates):
@@ -268,49 +271,24 @@ class Panel(ScreenPanel):
             status_icon, status_str = self.get_status_details(gate_status[i])
             tool_str = self.get_tool_details(g_map['tools'])
             color = self.get_color_details(gate_color[i])
-
+            spool_id = gate_spool_id[i]
             self.labels[f'status_{i}'].clear()
             self.labels[f'status_{i}'].set_from_pixbuf(self.labels[f'{status_icon}'])
             self.labels[f'available_{i}'].set_label(status_str)
+            if gate_color[i] != '':
+                self.labels[f'color_{i}'].set_text(self.COLOR_SWATCH)
+            else:
+                self.labels[f'color_{i}'].set_text(self.EMPTY_SWATCH)
             self.labels[f'color_{i}'].override_color(Gtk.StateType.NORMAL, color)
             self.labels[f'material_{i}'].set_label(gate_material[i][:6])
             self.labels[f'tools_{i}'].set_label(tool_str)
-            self.labels[f'spool_id_{i}'].set_label(self._get_spool_id(gate_spool_id[i]))
+            self.labels[f'spool_id_{i}'].set_label(self._get_spool_id(spool_id))
 
         self.labels['layers'].set_current_page(0) # Gate list layer
 
     def _get_spool_id(self, spool_id, prefix=True):
         text = "ID: %s" if prefix else "%s"
         return text % (str(spool_id) if spool_id >= 0 else "n/a")
-
-    def update_spoolman_info(self):
-        logging.info("PAUL: update_spoolman_info()")
-        # TODO update spoolman info in editor
-
-    def poll_spoolman(self):
-        while self.is_polling:
-            self.query_spoolman()
-            GLib.timeout_add_seconds(2, self.poll_spoolman)
-            time.sleep(10)
-
-    def query_spoolman(self):
-        hide_archived=False
-        spools = self.apiClient.post_request("server/spoolman/proxy", json={
-            "request_method": "GET",
-            "path": f"/v1/spool?allow_archived={not hide_archived}",
-        })
-        if not spools or "result" not in spools:
-            #self._screen.show_error_modal("Exception when trying to fetch spools")
-            logging.error("Exception when trying to fetch spools")
-            return
-        materials=[]
-        self.spools.clear()
-        for spool in spools["result"]:
-            spoolObject = SpoolmanSpool(**spool)
-            #self._model.append(None, [spoolObject])
-            self.spools[str(spoolObject.id)]=spoolObject
-            if spoolObject.filament.material not in materials:
-                materials.append(spoolObject.filament.material)
 
     def get_status_details(self, gate_status):
         if gate_status == self.GATE_AVAILABLE:
@@ -381,11 +359,22 @@ class Panel(ScreenPanel):
         self.labels['layers'].set_current_page(1) # Edit layer
         self.update_edited_gate()
 
-        self.labels['id_entry'].set_text(self._get_spool_id(self.ui_gate_spool_id, False))
+        self.labels['id_entry'].set_text(self._get_spool_id(self.ui_gate_spool_id, prefix=False))
         self.labels['m_entry'].set_text(self.ui_gate_material)
         if self.ui_gate_color in self.W3C_COLORS:
             self.labels['c_selector'].set_active(self.W3C_COLORS.index(self.ui_gate_color))
+        else:
+            self.labels['c_selector'].set_active(-1)
         self.labels['filament'].set_active(self.ui_gate_status in (self.GATE_AVAILABLE, self.GATE_AVAILABLE_FROM_BUFFER))
+
+        allow_edit = False if self.use_spoolman else True
+        self.labels[f'c_selector'].set_sensitive(allow_edit)
+        self.labels[f'c_picker'].set_sensitive(allow_edit)
+        self.labels[f'm_entry'].set_sensitive(allow_edit)
+        if allow_edit:
+            self.labels[f'm_entry'].get_style_context().remove_class("mmu_disabled_text")
+        else:
+            self.labels[f'm_entry'].get_style_context().add_class("mmu_disabled_text")
 
     def update_edited_gate(self):
         g_map = self.gate_tool_map[self.ui_sel_gate]
@@ -396,6 +385,10 @@ class Panel(ScreenPanel):
         self.labels[f'status'].clear()
         self.labels[f'status'].set_from_pixbuf(self.labels[f'{status_icon}'])
         self.labels[f'available'].set_label(status_str)
+        if self.ui_gate_color != '':
+            self.labels['color'].set_text(self.COLOR_SWATCH)
+        else:
+            self.labels['color'].set_text(self.EMPTY_SWATCH)
         self.labels[f'color'].override_color(Gtk.StateType.NORMAL, color)
         self.labels[f'material'].set_label(self.ui_gate_material[:6])
         self.labels[f'tools'].set_label(tool_str)
@@ -408,7 +401,6 @@ class Panel(ScreenPanel):
     def select_color(self, widget):
         width, height = self._screen.get_size()
         color = self.get_color_details(self.ui_gate_color)
-
         dialog = Gtk.ColorChooserDialog()
         dialog.set_rgba(color)
         dialog.set_use_alpha(False)
@@ -436,16 +428,25 @@ class Panel(ScreenPanel):
 
     def select_spool_id(self, widget, icon_pos=None, event=None):
         text = self.labels['id_entry'].get_text()
-        spool_id = ''.join(c for c in text if c.isnum())
-        self.ui_gate_spool_id = int(spool_id)
+        spool_id = ''.join(c for c in text if c.isnumeric())
         self.labels['id_entry'].set_text(spool_id)
+        if self.use_spoolman:
+            try:
+                self.ui_gate_spool_id = int(spool_id)
+                sp = self.spools.get(str(self.ui_gate_spool_id), None)
+                if sp is not None:
+                    # Reset material and color from spoolman
+                    self.ui_gate_material = sp.filament.material if sp.filament.material is not None else ""
+                    self.ui_gate_color = sp.filament.color_hex if sp.filament.color_hex is not None else ""
+                    # Also update the rest of the edit fields
+                    self.labels['m_entry'].set_text(self.ui_gate_material)
+                    self.labels['c_selector'].set_active(-1)
+            except ValueError:
+                self.ui_gate_spool_id = -1
         self.update_edited_gate()
 
-    def select_fetch(self, widget, icon_pos=None, event=None):
-        self.query_spoolman()
-        self.update_spoolman_info()
-
     def select_filament(self, widget, param):
+        self._screen.remove_keyboard()
         if self.labels['filament'].get_active():
             self.ui_gate_status = self.GATE_AVAILABLE # Assume from spool initially
         else:
@@ -454,7 +455,7 @@ class Panel(ScreenPanel):
 
     def select_save(self, widget):
         self._screen.remove_keyboard()
-        self._screen._ws.klippy.gcode_script(f"MMU_GATE_MAP GATE={self.ui_sel_gate} COLOR={self.ui_gate_color} MATERIAL={self.ui_gate_material} AVAILABLE={self.ui_gate_status} SPOOLID={self.ui_gate_spoolid} QUIET=1")
+        self._screen._ws.klippy.gcode_script(f"MMU_GATE_MAP GATE={self.ui_sel_gate} COLOR={self.ui_gate_color} MATERIAL={self.ui_gate_material} AVAILABLE={self.ui_gate_status} SPOOLID={self.ui_gate_spool_id} QUIET=1")
         self.labels['layers'].set_current_page(0) # Gate list layer
 
     def select_cancel_edit(self, widget):
