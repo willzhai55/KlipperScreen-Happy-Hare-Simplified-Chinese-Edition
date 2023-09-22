@@ -28,7 +28,6 @@ class Panel(ScreenPanel):
         super().__init__(screen, title)
         self.ui_sel_tool = 0
 
-
         self.COLOR_RED = Gdk.RGBA(1,0,0,1)
         self.COLOR_GREEN = Gdk.RGBA(0,1,0,1)
         self.COLOR_DARK_GREY = Gdk.RGBA(0.2,0.2,0.2,1)
@@ -229,9 +228,13 @@ class Panel(ScreenPanel):
         self.is_running=False
 
     def get_status_details(self, gate_status):
-        if gate_status in (self.GATE_AVAILABLE, self.GATE_AVAILABLE_FROM_BUFFER):
+        if gate_status == self.GATE_AVAILABLE:
             status_icon = 'available_icon'
             status_str = "Available"
+            status_color = self.COLOR_GREEN
+        elif gate_status == self.GATE_AVAILABLE_FROM_BUFFER:
+            status_icon = 'available_icon'
+            status_str = "Buffered"
             status_color = self.COLOR_GREEN
         elif gate_status == self.GATE_EMPTY:
             status_icon = 'empty_icon'

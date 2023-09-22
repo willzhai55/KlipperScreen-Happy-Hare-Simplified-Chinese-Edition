@@ -51,6 +51,12 @@ class Panel(ScreenPanel):
         self.apiClient = screen.apiclient
         self.spools = {}
 
+        self.COLOR_RED = Gdk.RGBA(1,0,0,1)
+        self.COLOR_GREEN = Gdk.RGBA(0,1,0,1)
+        self.COLOR_DARK_GREY = Gdk.RGBA(0.2,0.2,0.2,1)
+        self.COLOR_LIGHT_GREY = Gdk.RGBA(0.5,0.5,0.5,1)
+        self.COLOR_ORANGE = Gdk.RGBA(1,0.8,0,1)
+
         img_width = img_height = self._gtk.img_scale * self.bts * 2.0
         grid = Gtk.Grid()
         grid.set_column_homogeneous(True)
@@ -268,13 +274,14 @@ class Panel(ScreenPanel):
 
         for i in range(num_gates):
             g_map = self.gate_tool_map[i]
-            status_icon, status_str = self.get_status_details(gate_status[i])
+            status_icon, status_str, status_color  = self.get_status_details(gate_status[i])
             tool_str = self.get_tool_details(g_map['tools'])
             color = self.get_color_details(gate_color[i])
             spool_id = gate_spool_id[i]
             self.labels[f'status_{i}'].clear()
             self.labels[f'status_{i}'].set_from_pixbuf(self.labels[f'{status_icon}'])
             self.labels[f'available_{i}'].set_label(status_str)
+            self.labels[f'available_{i}'].override_color(Gtk.StateType.NORMAL, status_color)
             if gate_color[i] != '':
                 self.labels[f'color_{i}'].set_text(self.COLOR_SWATCH)
             else:
@@ -294,16 +301,20 @@ class Panel(ScreenPanel):
         if gate_status == self.GATE_AVAILABLE:
             status_icon = 'available_icon'
             status_str = "Available"
+            status_color = self.COLOR_GREEN
         elif gate_status == self.GATE_AVAILABLE_FROM_BUFFER:
             status_icon = 'available_icon'
             status_str = "Buffered"
+            status_color = self.COLOR_GREEN
         elif gate_status == self.GATE_EMPTY:
             status_icon = 'empty_icon'
             status_str = "Empty"
+            status_color = self.COLOR_RED
         else: 
             status_icon = 'unknown_icon'
             status_str = "Unknown"
-        return status_icon, status_str
+            status_color = self.COLOR_LIGHT_GREY
+        return status_icon, status_str, status_color
 
     def get_tool_details(self, tools):
         tool_str = ''
@@ -368,31 +379,31 @@ class Panel(ScreenPanel):
         self.labels['filament'].set_active(self.ui_gate_status in (self.GATE_AVAILABLE, self.GATE_AVAILABLE_FROM_BUFFER))
 
         allow_edit = False if self.use_spoolman else True
-        self.labels[f'c_selector'].set_sensitive(allow_edit)
-        self.labels[f'c_picker'].set_sensitive(allow_edit)
-        self.labels[f'm_entry'].set_sensitive(allow_edit)
+        self.labels['c_selector'].set_sensitive(allow_edit)
+        self.labels['c_picker'].set_sensitive(allow_edit)
+        self.labels['m_entry'].set_sensitive(allow_edit)
         if allow_edit:
-            self.labels[f'm_entry'].get_style_context().remove_class("mmu_disabled_text")
+            self.labels['m_entry'].get_style_context().remove_class("mmu_disabled_text")
         else:
-            self.labels[f'm_entry'].get_style_context().add_class("mmu_disabled_text")
+            self.labels['m_entry'].get_style_context().add_class("mmu_disabled_text")
 
     def update_edited_gate(self):
         g_map = self.gate_tool_map[self.ui_sel_gate]
-        status_icon, status_str = self.get_status_details(self.ui_gate_status)
+        status_icon, status_str, status_color = self.get_status_details(self.ui_gate_status)
         tool_str = self.get_tool_details(g_map['tools'])
         color = self.get_color_details(self.ui_gate_color)
 
-        self.labels[f'status'].clear()
-        self.labels[f'status'].set_from_pixbuf(self.labels[f'{status_icon}'])
-        self.labels[f'available'].set_label(status_str)
+        self.labels['status'].clear()
+        self.labels['status'].set_from_pixbuf(self.labels[f'{status_icon}'])
+        self.labels['available'].override_color(Gtk.StateType.NORMAL, status_color)
         if self.ui_gate_color != '':
             self.labels['color'].set_text(self.COLOR_SWATCH)
         else:
             self.labels['color'].set_text(self.EMPTY_SWATCH)
-        self.labels[f'color'].override_color(Gtk.StateType.NORMAL, color)
-        self.labels[f'material'].set_label(self.ui_gate_material[:6])
-        self.labels[f'tools'].set_label(tool_str)
-        self.labels[f'spool_id'].set_label(self._get_spool_id(self.ui_gate_spool_id))
+        self.labels['color'].override_color(Gtk.StateType.NORMAL, color)
+        self.labels['material'].set_label(self.ui_gate_material[:6])
+        self.labels['tools'].set_label(tool_str)
+        self.labels['spool_id'].set_label(self._get_spool_id(self.ui_gate_spool_id))
 
     def select_w3c_color(self, widget):
         self.ui_gate_color = self.labels['c_selector'].get_active_text()
