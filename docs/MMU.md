@@ -94,6 +94,12 @@ If you really don't like typing on the Klipper console, all the important calibr
 
 Here is the set that is included by default.
 
+## Spoolman "filaments" panel
+
+![mmu_klipperscreen](img/mmu/mmm_spoolman.png)
+
+Rather than use the "Filaments" panel, if using Spoolman, you might find this useful (note however that the SpoolID be be edited in the Filaments panel or by Happy Hare with the `MMU_GATE_MAP` command.
+
 
     (\_/)
     ( *,*)
