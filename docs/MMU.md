@@ -96,10 +96,15 @@ Here is the set that is included by default.
 
 ## Spoolman "filaments" panel
 
-![mmu_klipperscreen](img/mmu/mmm_spoolman.png)
+![mmu_klipperscreen](img/mmu/mmu_spoolman.png)
 
 Rather than use the "Filaments" panel, if using Spoolman, you might find this useful (note however that the SpoolID be be edited in the Filaments panel or by Happy Hare with the `MMU_GATE_MAP` command.
 
+## MMU Options
+
+![mmu_klipperscreen](img/mmu/mmu_options.png)
+
+The MMU functionality can be customized with a few settings in the KlipperScreen configuration menu.
 
     (\_/)
     ( *,*)
