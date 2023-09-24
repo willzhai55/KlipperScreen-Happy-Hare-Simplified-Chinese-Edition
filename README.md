@@ -158,9 +158,7 @@ If you have to do this, please let me know the details about the operating syste
 
 </details>
 
-<hr>
+## A description of all the [MMU panels can be found here](docs/MMU.md)...
 
 *All screen shots are taken with the "Colorize" theme (my preference because the buttons are more defined).  The default is z-bolt and looks slightly different*
-
-## Now go read the [rest of the doc here](docs/MMU.md)...
 
