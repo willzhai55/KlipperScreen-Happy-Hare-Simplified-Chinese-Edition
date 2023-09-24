@@ -888,15 +888,21 @@ class KlipperScreen(Gtk.Window):
     def _send_action(self, widget, method, params):
         logging.info(f"{method}: {params}")
         if isinstance(widget, Gtk.Button):
-            self.gtk.Button_busy(widget, True)
-            self._ws.send_method(method, params, self.enable_widget, widget)
+            change_sensitive = not params.get('show_disabled', False) # Happy Hare: Hack to avoid conflict of busy spinner and dynamic sensitivity
+            self.gtk.Button_busy(widget, True, change_sensitive)
+            self._ws.send_method(method, params, self.enable_widget, widget, change_sensitive)
         else:
             self._ws.send_method(method, params)
 
-    def enable_widget(self, *args):
+    def enable_widget(self, *args): # Happy Hare: Added change_sensitive hack
+        change_sensitive = True
+        for x in args:
+            if isinstance(x, bool):
+                change_sensitive = x
+                break
         for x in args:
             if isinstance(x, Gtk.Button):
-                GLib.timeout_add(150, self.gtk.Button_busy, x, False)
+                GLib.timeout_add(150, self.gtk.Button_busy, x, False, change_sensitive)
 
     def printer_initializing(self, msg, remove=False):
         if 'splash_screen' not in self.panels or remove:

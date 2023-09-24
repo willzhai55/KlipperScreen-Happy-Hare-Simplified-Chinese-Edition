@@ -13,7 +13,7 @@ class Panel(ScreenPanel):
 
     def __init__(self, screen, title, items=None):
         super().__init__(screen, title)
-        self.menu_callbacks = {}
+        self.menu_callbacks = {} # Happy Hare
         self.items = items
         self.create_menu_items()
         self.grid = self._gtk.HomogeneousGrid()
@@ -37,6 +37,7 @@ class Panel(ScreenPanel):
         if action != "notify_status_update":
             return
 
+        # Happy Hare vvv
         unique_cbs = []
         for x in data:
             for i in data[x]:
@@ -48,14 +49,15 @@ class Panel(ScreenPanel):
         # Call specific associated callbacks
         for cb in unique_cbs:
             cb[0](cb[1])
+        # Happy Hare ^^^
 
-    def register_callback(self, var, method, arg):
+    def register_callback(self, var, method, arg): # Happy Hare
         if var in self.menu_callbacks:
             self.menu_callbacks[var].append([method, arg])
         else:
             self.menu_callbacks[var] = [[method, arg]]
 
-    def check_enable(self, i):
+    def check_enable(self, i): # Happy Hare
         item = self.items[i]
         key = list(item.keys())[0]
         enable = self.evaluate_enable(item[key]['enable'])
@@ -69,7 +71,7 @@ class Panel(ScreenPanel):
         show_list = []
         for item in items:
             key = list(item)[0]
-            if item[key]['show_disabled'] and self.evaluate_enable(item[key]['show_disabled']):
+            if item[key].get('show_disabled', "False").strip().lower() == "true": # Happy Hare
                 show_list.append(key)
                 if self.evaluate_enable(item[key]['enable']):
                     self.labels[key].set_sensitive(True)
@@ -108,7 +110,8 @@ class Panel(ScreenPanel):
     def create_menu_items(self):
         count = 0
         for i in self.items:
-            if self.evaluate_enable(i[next(iter(i))]['enable']):
+            x = i[next(iter(i))] # Happy Hare 'show_disabled' check to speed up!
+            if x.get('show_disabled', "False").strip().lower() == "true" or self.evaluate_enable(x['enable']):
                 count += 1
         scale = 1.1 if 12 < count <= 16 else None  # hack to fit a 4th row
         for i in range(len(self.items)):
@@ -140,11 +143,12 @@ class Panel(ScreenPanel):
                 if item['confirm'] is not None:
                     b.connect("clicked", self._screen._confirm_send_action, item['confirm'], item['method'], params)
                 else:
+                    params['show_disabled'] = item.get('show_disabled', "False").strip().lower() == "true" # Happy Hare: Need to know if dynamic sensitivity
                     b.connect("clicked", self._screen._send_action, item['method'], params)
             else:
                 b.connect("clicked", self._screen._go_to_submenu, key)
 
-            if item['refresh_on'] is not None:
+            if item['refresh_on'] is not None: # Happy Hare
                 for var in item['refresh_on'].split(', '):
                     self.register_callback(var, self.check_enable, i)
 

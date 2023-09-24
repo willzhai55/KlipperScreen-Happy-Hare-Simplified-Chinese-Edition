@@ -204,7 +204,7 @@ class KlipperScreenConfig:
                 strs = ('gcode', '')
                 numbers = [f'{option}' for option in config[section] if option != 'gcode']
             elif section.startswith('menu '):
-                strs = ('name', 'icon', 'panel', 'method', 'params', 'enable', 'confirm', 'style', 'show_disabled', 'refresh_on')
+                strs = ('name', 'icon', 'panel', 'method', 'params', 'enable', 'confirm', 'style', 'show_disabled', 'refresh_on') # Happy Hare: Added show_disabled, refresh_on
             elif section == 'bed_screws':
                 # This section may be deprecated in favor of moving this options under the printer section
                 numbers = ('rotation', '')
@@ -611,8 +611,8 @@ class KlipperScreenConfig:
             "enable": cfg.get("enable", "True"),
             "params": cfg.get("params", "{}"),
             "style": cfg.get("style", None),
-            "show_disabled": cfg.get("show_disabled", False),
-            "refresh_on": cfg.get("refresh_on", None)
+            "show_disabled": cfg.get("show_disabled", "False"), # Happy Hare
+            "refresh_on": cfg.get("refresh_on", None) # Happy Hare
         }
 
         return {name[(len(menu) + 6):]: item}
