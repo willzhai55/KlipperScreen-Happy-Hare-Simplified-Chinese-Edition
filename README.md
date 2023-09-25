@@ -32,7 +32,7 @@ It has come to my attention that sometimes a system (OS) update can break Klippe
 ### Happy Hare version incompatibility
 If you are upgrading and see a message like this when accessing the main MMU panel it is probably because of a version mismatch with Happy Hare on your printer.  Follow the instructions in the popup!
 
-![mmu_version_mismatch](docs/img/mmu/mmu_version_mismatch.png)
+<img src="https://github.com/moggieuk/KlipperScreen-Happy-Hare-Edition/blob/master/docs/img/mmu/mmu_version_error.png" width=50%>
 
 <br>
 
