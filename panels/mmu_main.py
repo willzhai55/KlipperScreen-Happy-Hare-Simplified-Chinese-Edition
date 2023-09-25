@@ -268,10 +268,10 @@ class Panel(ScreenPanel):
                     self.update_active_buttons()
             except KeyError:
                 # Almost certainly a mismatch of Happy Hare on the printer
-                msg = "You are problably trying to connect to an incompatible"
+                msg = "You are probably trying to connect to an incompatible"
                 msg += "\nversion of Happy Hare on your printer. Ensure Happy Hare"
                 msg += "\nis up-to-date, re-run Happy-Hare/install.sh on the"
-                msg += "\nprinter to ensure setup, rhen restart Klipper."
+                msg += "\nprinter, then make sure you restart Klipper."
                 msg += "\n\nI'll bet this will work out for you :-)"
                 self._screen.show_popup_message(msg, 3, save=True)
 
