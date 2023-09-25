@@ -83,7 +83,7 @@ class Panel(ScreenPanel):
             'more': self._gtk.Button('mmu_more', 'More...', 'color1'),
             'tool_icon': self._gtk.Image('mmu_extruder', self._gtk.img_width * 0.8, self._gtk.img_height * 0.8),
             'tool_label': self._gtk.Label('Unknown'),
-            'filament': self._gtk.Label('Filament: Unknown ▷ Flow: 100%'),
+            'filament': self._gtk.Label('Filament: Unknown'),
             'sensor': self._gtk.Label('Ts:'),
             'sensor_state': self._gtk.Label('   '),
             'select_bypass_img': self._gtk.Image('mmu_select_bypass'), # Alternative for tool
@@ -243,28 +243,37 @@ class Panel(ScreenPanel):
 
     def process_update(self, action, data):
         if action == "notify_status_update":
-            if 'mmu_encoder mmu_encoder' in data: # There is only one mmu_encoder
-                ee_data = data['mmu_encoder mmu_encoder']
-                self.update_encoder(ee_data)
+            try:
+                if 'mmu_encoder mmu_encoder' in data: # There is only one mmu_encoder
+                    ee_data = data['mmu_encoder mmu_encoder']
+                    self.update_encoder(ee_data)
 
-            if 'filament_switch_sensor toolhead_sensor' in data:
-                self.update_filament_status()
-
-            if 'mmu' in data:
-                e_data = data['mmu']
-                if 'tool' in e_data or 'gate' in e_data or 'ttg_map' in e_data or 'gate_status' in e_data or 'gate_color' in e_data:
-                    self.update_status()
-                if 'tool' in e_data or 'filament_pos' in e_data or 'filament_direction' in e_data:
+                if 'filament_switch_sensor toolhead_sensor' in data:
                     self.update_filament_status()
-                if 'tool' in e_data or 'next_tool' in e_data or 'sync_drive' in e_data:
-                    self.update_tool()
-                if 'enabled' in e_data:
-                    self.update_enabled()
-                if 'action' in e_data or 'print_state' in e_data:
-                    self.update_encoder_pos()
-                if 'print_state' in e_data:
+
+                if 'mmu' in data:
+                    e_data = data['mmu']
+                    if 'tool' in e_data or 'gate' in e_data or 'ttg_map' in e_data or 'gate_status' in e_data or 'gate_color' in e_data:
+                        self.update_status()
+                    if 'tool' in e_data or 'filament_pos' in e_data or 'filament_direction' in e_data:
+                        self.update_filament_status()
+                    if 'tool' in e_data or 'next_tool' in e_data or 'sync_drive' in e_data:
+                        self.update_tool()
+                    if 'enabled' in e_data:
+                        self.update_enabled()
+                    if 'action' in e_data or 'print_state' in e_data:
+                        self.update_encoder_pos()
+                    if 'print_state' in e_data:
+                        self.update_active_buttons()
                     self.update_active_buttons()
-                self.update_active_buttons()
+            except KeyError:
+                # Almost certainly a mismatch of Happy Hare on the printer
+                msg = "You are problably trying to connect to an incompatible"
+                msg += "\nversion of Happy Hare on your printer. Ensure Happy Hare"
+                msg += "\nis up-to-date, re-run Happy-Hare/install.sh on the"
+                msg += "\nprinter to ensure setup, rhen restart Klipper."
+                msg += "\n\nI'll bet this will work out for you :-)"
+                self._screen.show_popup_message(msg, 3, save=True)
 
     def init_tool_value(self):
         mmu = self._printer.get_stat("mmu")
@@ -442,6 +451,7 @@ class Panel(ScreenPanel):
         if encoder_pos == None:
             encoder_pos = self._printer.get_stat('mmu_encoder mmu_encoder')['encoder_pos']
         mmu = self._printer.get_stat("mmu")
+        paul = mmu['paul']
         mmu_print_state = mmu['print_state']
         filament = mmu['filament']
         action = mmu['action']

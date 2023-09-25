@@ -29,7 +29,10 @@ It has come to my attention that sometimes a system (OS) update can break Klippe
 
     sudo apt purge xserver-xorg-video-fbturbo
 
-Then restart KlipperScreen.
+### Happy Hare version incompatibility
+If you are upgrading and see a message like this when accessing the main MMU panel it is probably because of a version mismatch with Happy Hare on your printer.  Follow the instructions in the popup!
+
+![mmu_version_mismatch](docs/img/mmu/mmu_version_mismatch.png)
 
 <br>
 
