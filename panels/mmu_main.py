@@ -451,7 +451,6 @@ class Panel(ScreenPanel):
         if encoder_pos == None:
             encoder_pos = self._printer.get_stat('mmu_encoder mmu_encoder')['encoder_pos']
         mmu = self._printer.get_stat("mmu")
-        paul = mmu['paul']
         mmu_print_state = mmu['print_state']
         filament = mmu['filament']
         action = mmu['action']
