@@ -1,42 +1,10 @@
 # 📌 ANNOUNCEMENT: KlipperScreen-Happy Hare edition now requires an upgraded Happy Hare v2 software
 Happy Hare v2 [available here](https://github.com/moggieuk/Happy-Hare)
+
 <br>
 > [!IMPORTANT]  
 > Also after updating KlipperScreen be sure to re-run `happy_hare/install_ks.sh -g <num_gates>` to install new images and update menus.
 
-<hr>
-
-# Original KlipperScreen
-
-KlipperScreen is a touchscreen GUI that interfaces with [Klipper](https://github.com/kevinOConnor/klipper) via [Moonraker](https://github.com/arksine/moonraker). It can switch between multiple printers to access them from a single location, and it doesn't even need to run on the same host, you can install it on another device and configure the IP address to access the printer.
-
-### Documentation [![Documentation Status](https://readthedocs.org/projects/klipperscreen/badge/?version=latest)](https://klipperscreen.readthedocs.io/en/latest/?badge=latest)
-
-[Click here to access the documentation.](https://klipperscreen.readthedocs.io/en/latest/)
-
-### Inspiration
-KlipperScreen was inspired by [OctoScreen](https://github.com/Z-Bolt/OctoScreen/) and the need for a touchscreen GUI that
-will natively work with [Klipper](https://github.com/kevinOConnor/klipper) and [Moonraker](https://github.com/arksine/moonraker).
-
-[![Main Menu](docs/img/panels/main_panel.png)](https://klipperscreen.readthedocs.io/en/latest/Panels/)
-
-[More Screenshots](https://klipperscreen.readthedocs.io/en/latest/Panels/)
-
-<br>
-
-### Blank Screen after system update
-It has come to my attention that sometimes a system (OS) update can break KlipperScreen.  This is nothing to do with KlipperScreen but rather the installation of a slightly broken video driver `fbturbo`.  Luckily the fix is simple.  After OS upgrade run:
-
-    sudo apt purge xserver-xorg-video-fbturbo
-
-### Happy Hare version incompatibility
-If you are upgrading and see a message like this when accessing the main MMU panel it is probably because of a version mismatch with Happy Hare on your printer.  Follow the instructions in the popup!
-
-<img src="https://github.com/moggieuk/KlipperScreen-Happy-Hare-Edition/blob/master/docs/img/mmu/mmu_version_error.png" width=50%>
-
-<br>
-
-<hr>
 
 # KlipperScreen - MMU Happy Hare Edition
 
@@ -62,7 +30,7 @@ If you are upgrading and see a message like this when accessing the main MMU pan
 Read more on how [MMU Panels work...](docs/MMU.md)
 
 ## Introduction
-KlipperScreen Happy Hare edition is quite a mouthful!  It is a forked (but up-to-date) version of KlipperScreen designed to run/manage any MMU using the Happy Hare driver software.
+KlipperScreen Happy Hare edition is quite a mouthful!  It is a forked (but up-to-date) version of KlipperScreen designed to run/manage any MMU using the Happy Hare driver software.  [Click here to access the original documentation.](https://klipperscreen.readthedocs.io/en/latest/)
 
 :pushpin: KlipperScreen is an amazing piece of software but unfortunally lacks the level of panel integration and features I needed for this project.  I hope in the future to have changes integrated so that this becomes a layered install rather than a fork.  Until then you must follow these install directions closely. **Also note that I regularly (every 2 weeks) re-merge with the master project so the Happy Hare addition is only additive and all original functionality is untouched.**
 
@@ -94,9 +62,7 @@ KlipperScreen will be restarted and hopefully you should now be running the enha
 Note that the base KlipperScreen is up-to-date (and I will continue to merge with master every 2 weeks) with changes in the original but also includes extra menu functionality that can be used in the creation of your custom menus.  See the generated ercf_klipperscreen.conf for clues!
 
 ## Request
-Remember that this is v1.0, no doubt there are cornmer cases that I haven't considered and I'd like your feedback.  I can offer limited help on the Discord channels so would prefer if you submit an issue report via github so I can manage them.  This project and Happy Hare itself have taken a lot of time. I have a lot more planned so I need your help in organizing my work.
-
-Also, some folks have asked about making a donation to cover the cost of the all the coffee I'm drinking.  I'm not doing this for any financial reward but it you feel inclined a donation to PayPal https://www.paypal.me/moggieuk will certainly be spent making your life with MMU more enjoyable.
+I can offer limited help on the Discord channels so would prefer if you submit an issue report via github so I can manage them.  Also, some folks have asked about making a donation to cover the cost of the all the coffee I'm drinking.  I'm not doing this for any financial reward but it you feel inclined a donation to PayPal https://www.paypal.me/moggieuk will certainly be spent making your life with MMU more enjoyable.
 
 Thank you!
 
@@ -161,7 +127,19 @@ If you have to do this, please let me know the details about the operating syste
 
 </details>
 
+### Blank Screen after system update
+It has come to my attention that sometimes a system (OS) update can break KlipperScreen.  This is nothing to do with KlipperScreen but rather the installation of a slightly broken video driver `fbturbo`.  Luckily the fix is simple.  After OS upgrade run:
+
+    sudo apt purge xserver-xorg-video-fbturbo
+
+### Happy Hare version incompatibility
+If you are upgrading and see a message like this when accessing the main MMU panel it is probably because of a version mismatch with Happy Hare on your printer.  Follow the instructions in the popup!
+
+<img src="https://github.com/moggieuk/KlipperScreen-Happy-Hare-Edition/blob/master/docs/img/mmu/mmu_version_error.png" width=50%>
+
 ## A description of all the [MMU panels can be found here](docs/MMU.md)...
+
+The original Klipperscreen panels can be [found here](https://klipperscreen.readthedocs.io/en/latest/Panels/)
 
 *All screen shots are taken with the "Colorize" theme (my preference because the buttons are more defined).  The default is z-bolt and looks slightly different*
 
