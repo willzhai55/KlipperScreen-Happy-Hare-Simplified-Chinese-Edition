@@ -135,18 +135,36 @@ EOF
 install_update_manager() {
     echo -e "${INFO}Adding update manager to moonraker.conf"
     echo "${KLIPPER_CONFIG_HOME}/moonraker.conf"
+    HH_GIT='origin: https://github.com/moggieuk/KlipperScreen-Happy-Hare-Edition.git'
+    O1_GIT='origin: https://github.com/jordanruthe/KlipperScreen.git'
+    O2_GIT='origin: https://github.com/KlipperScreen/KlipperScreen.git'
+
     if [ -f "${KLIPPER_CONFIG_HOME}/moonraker.conf" ]; then
-        orig_section=$(grep -c '\[update_manager KlipperScreen\]' \
+        orig_section=$(egrep -c '^\[update_manager KlipperScreen\]' \
             ${KLIPPER_CONFIG_HOME}/moonraker.conf || true)
-        if [ "${orig_section}" -ne 0 ]; then
-            echo -e "${WARNING}Original [update_manager KlipperScreen] commented out in moonraker.conf"
+        hh_section=$(egrep -c '^\[update_manager KlipperScreen-happy_hare\]' \
+            ${KLIPPER_CONFIG_HOME}/moonraker.conf || true)
+        orig_origin1=$(egrep -c "^${O1_GIT}" ${KLIPPER_CONFIG_HOME}/moonraker.conf || true)
+        orig_origin2=$(egrep -c "^${O2_GIT}" ${KLIPPER_CONFIG_HOME}/moonraker.conf || true)
+        hh_origin2=$(egrep -c "^${HH_GIT}" ${KLIPPER_CONFIG_HOME}/moonraker.conf || true)
+
+        if [ "${orig_section}" -ne 0 -a "${orig_origin1}" -ne 0 ]; then
+            echo -e "${WARNING}Original [update_manager KlipperScreen] updated github origin to Happy Hare fork"
+            cat ${KLIPPER_CONFIG_HOME}/moonraker.conf | sed -e "s%^${O1_GIT}%${HH_GIT}%" \
+                    > /tmp/moonraker.conf.tmp && mv /tmp/moonraker.conf.tmp ${KLIPPER_CONFIG_HOME}/moonraker.conf
+            restart_moonraker
+        elif [ "${orig_section}" -ne 0 -a "${orig_origin2}" -ne 0 ]; then
+            echo -e "${WARNING}Original [update_manager KlipperScreen] updated github origin to Happy Hare fork"
+            cat ${KLIPPER_CONFIG_HOME}/moonraker.conf | sed -e "s%^${O2_GIT}%${HH_GIT}%" \
+                    > /tmp/moonraker.conf.tmp && mv /tmp/moonraker.conf.tmp ${KLIPPER_CONFIG_HOME}/moonraker.conf
+            restart_moonraker
+        elif [ "${hh_section}" -ne 0 ]; then
+            echo -e "${WARNING}Restoring [update_manager KlipperScreen] name for Happy Hare"
             cat ${KLIPPER_CONFIG_HOME}/moonraker.conf | sed -e " \
-                /^\[update_manager KlipperScreen\]/,+7 s/^/#/; \
+                s/^\[update_manager KlipperScreen-happy_hare\]/\[update_manager KlipperScreen\]/ \
                     " > /tmp/moonraker.conf.tmp && mv /tmp/moonraker.conf.tmp ${KLIPPER_CONFIG_HOME}/moonraker.conf
-        fi
-        update_section=$(grep -c '\[update_manager KlipperScreen-happy_hare\]' \
-            ${KLIPPER_CONFIG_HOME}/moonraker.conf || true)
-        if [ "${update_section}" -eq 0 ]; then
+            restart_moonraker
+	elif [ "${orig_section}" -eq 0 -a "${hh_section}" -eq 0 ]; then
             echo "" >> ${KLIPPER_CONFIG_HOME}/moonraker.conf
             while read -r line; do
                 echo -e "${line}" >> ${KLIPPER_CONFIG_HOME}/moonraker.conf
@@ -156,6 +174,11 @@ install_update_manager() {
         else
             echo -e "${WARNING}[update_manager KlipperScreen-happy_hare] already exist in moonraker.conf - skipping install"
         fi
+# Not used anymore
+#            echo -e "${WARNING}Original [update_manager KlipperScreen] commented out in moonraker.conf"
+#            cat ${KLIPPER_CONFIG_HOME}/moonraker.conf | sed -e " \
+#                /^\[update_manager KlipperScreen\]/,+7 s/^/#/; \
+#                    " > /tmp/moonraker.conf.tmp && mv /tmp/moonraker.conf.tmp ${KLIPPER_CONFIG_HOME}/moonraker.conf
     else
         echo -e "${WARNING}Moonraker.conf not found!"
     fi
