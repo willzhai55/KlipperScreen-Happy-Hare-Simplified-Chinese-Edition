@@ -68,14 +68,14 @@ I can offer limited help on the Discord channels so would prefer if you submit a
 Thank you!
 
 ## Caveats & Possible problems / workarounds
-I have only tested on a single screen.  A 640x480 resolution BTT TFT5.0.   I am not a UI programming expert and it is possible that you might find layout problems on other (likely smaller) displays.  Also, I have only tested in and optimized for horizonal orientation.  I doubt it will be effective in vertical but I don't know of any Voron owners with vertically mounted panels.
+I have only tested on a single screen.  A 640x480 resolution BTT TFT5.0.   It is possible that you might find layout problems on other (likely smaller) displays.  Also, I have only tested in and optimized for horizonal orientation.  I doubt it will be effective in vertical but I don't know of any Voron owners with vertically mounted panels.
 
 ### Moonraker warning
 The install updates moonraker so that KlipperScreen-happy_hare can be upgraded with update-manager. It comments out the original and inserts Happy Hare specific logic.  The one consequence of this is that you may see the following warning from Moonraker:
 
 ![mmu_panel_printing](docs/img/mmu/moonraker_warning.png)
 
-This is simply because I didn't want to call my software by the original name "KlipperScreen".  The fix this, click on the bell icon with line through it and select "Never" so the warning never appears again.  Note that the functionality of restarting "KlipperScreen" is still available via Mainsail.
+This is simply because I didn't want to call my software by the original name "KlipperScreen".  The fix this you have two options:, (i) click on the bell icon with line through it and select "Never" so the warning never appears again or (ii) manually rename `[update_manager KlipperScreen-happy_hare]` to ` [update_manager KlipperScreen]`.  Note that regardless of warning the functionality of restarting "KlipperScreen" is still available via Mainsail.
 
 JFYI the installer will comment out the existing original entry in moonraker if it exists and add the following:
 
