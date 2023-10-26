@@ -266,7 +266,7 @@ class Printer:
                 "temperature_devices": {"count": self.tempdevcount},
                 "fans": {"count": self.fancount},
                 "output_pins": {"count": self.output_pin_count},
-                "gcode_macros": {"count": len(self.get_gcode_macros())},
+                "gcode_macros": {"count": len(self.get_gcode_macros()), "list": self.get_gcode_macros()},
                 "idle_timeout": self.get_stat("idle_timeout").copy(),
                 "pause_resume": {"is_paused": self.state == "paused"},
                 "power_devices": {"count": len(self.get_power_devices())},
@@ -291,11 +291,12 @@ class Printer:
         return data
 
     def get_leds(self):
-        leds = []
-        led_types = ["dotstar", "led", "neopixel", "pca9533", "pca9632"]
-        for led_type in led_types:
-            leds.extend(iter(self.get_config_section_list(f"{led_type} ")))
-        return leds
+        return [
+            led
+            for led_type in ["dotstar", "led", "neopixel", "pca9533", "pca9632"]
+            for led in self.get_config_section_list(f"{led_type} ")
+            if not led.split()[1].startswith("_")
+        ]
 
     def get_led_color_order(self, led):
         if led not in self.config or led not in self.data:

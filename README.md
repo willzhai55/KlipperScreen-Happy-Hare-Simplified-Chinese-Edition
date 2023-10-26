@@ -1,8 +1,6 @@
 # 📌 ANNOUNCEMENT: KlipperScreen-Happy Hare edition now requires an upgraded Happy Hare v2 software
 Happy Hare v2 [available here](https://github.com/moggieuk/Happy-Hare)
 
-<br>
-
 > [!IMPORTANT]  
 > Also after updating KlipperScreen be sure to re-run `happy_hare/install_ks.sh -g <num_gates>` to install new images and update menus.
 
