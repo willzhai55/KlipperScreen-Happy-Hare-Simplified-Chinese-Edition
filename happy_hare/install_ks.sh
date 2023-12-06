@@ -222,6 +222,6 @@ echo "Done.  Enjoy KlipperScreen Happy Hare Edition!"
 echo -e "${INFO}"
 echo '(\_/)'
 echo '( *,*)'
-echo '(")_(") MMU Ready'
+echo '(")_(") Happy Hare Ready'
 echo
 

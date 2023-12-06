@@ -123,8 +123,12 @@ class Panel(ScreenPanel):
             sensors.set_row_spacing(5)
             sensors.set_halign(Gtk.Align.CENTER)
             sensors.set_valign(Gtk.Align.CENTER)
+            skipped = 0 # Happy Hare
             for s, x in enumerate(filament_sensors):
-                if s > limit:
+                if "mmu_pre_gate" in x or "mmu_gate" in x: # Happy Hare added. Filter out less useful sensors because there could be a lot!
+                    skipped += 1 # Happy Hare
+                    continue
+                if s - skipped > limit: # Happy Hare (added - skipped)
                     break
                 name = x[23:].strip()
                 self.labels[x] = {
@@ -206,10 +210,11 @@ class Panel(ScreenPanel):
             if x in data:
                 if 'enabled' in data[x]:
                     self._printer.set_dev_stat(x, "enabled", data[x]['enabled'])
-                    self.labels[x]['switch'].set_active(data[x]['enabled'])
+                    if x in self.labels: # Happy Hare. Fix bug where not all sensors may be included on panel
+                        self.labels[x]['switch'].set_active(data[x]['enabled'])
                 if 'filament_detected' in data[x]:
                     self._printer.set_dev_stat(x, "filament_detected", data[x]['filament_detected'])
-                    if self._printer.get_stat(x, "enabled"):
+                    if self._printer.get_stat(x, "enabled") and x in self.labels: # Happy Hare. Fix bug where not all sensors may be included on panel
                         if data[x]['filament_detected']:
                             self.labels[x]['box'].get_style_context().remove_class("filament_sensor_empty")
                             self.labels[x]['box'].get_style_context().add_class("filament_sensor_detected")
