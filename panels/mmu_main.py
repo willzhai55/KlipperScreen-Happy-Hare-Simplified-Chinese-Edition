@@ -594,10 +594,9 @@ class Panel(ScreenPanel):
         msg_selct = "Selct: "
         for g in range(num_gates):
             color = self.get_rgb_color(gate_color[g])
-            filament_not_buffered_icon = ("▄") if not markup or color == "" else (f"<span color='{color}'>▄</span>")
             filament_icon = ("█") if not markup or color == "" else (f"<span color='{color}'>█</span>")
             msg_gates += ("│#%d " % g)[:4]
-            msg_avail += "│ %s " % (filament_not_buffered_icon if gate_status[g] == self.GATE_AVAILABLE else filament_icon if gate_status[g] == self.GATE_AVAILABLE_FROM_BUFFER else " " if gate_status[g] == self.GATE_EMPTY else "?")
+            msg_avail += "│ %s " % (filament_icon if gate_status[g] in [self.GATE_AVAILABLE, self.GATE_AVAILABLE_FROM_BUFFER] else " " if gate_status[g] == self.GATE_EMPTY else "?")
             tool_str = ""
             prefix = ""
             for t in range(num_gates):
