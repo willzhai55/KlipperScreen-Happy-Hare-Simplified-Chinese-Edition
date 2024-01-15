@@ -324,8 +324,6 @@ class Panel(ScreenPanel):
         return tool_str
 
     def get_color_details(self, gate_color):
-        if gate_color == None:
-            gate_color = ''
         color = Gdk.RGBA()
         if not Gdk.RGBA.parse(color, gate_color):
             Gdk.RGBA.parse(color, '#' + gate_color)
@@ -407,6 +405,8 @@ class Panel(ScreenPanel):
 
     def select_w3c_color(self, widget):
         self.ui_gate_color = self.labels['c_selector'].get_active_text()
+        if self.ui_gate_color is None:
+            self.ui_gate_color = ''
         self.update_edited_gate()
 
     def select_color(self, widget):
@@ -426,6 +426,8 @@ class Panel(ScreenPanel):
             color_str = color.to_string()
             self.labels['c_selector'].set_active(-1)
             self.ui_gate_color = self.rgba_to_hex(color)
+            if self.ui_gate_color is None:
+                self.ui_gate_color = ''
             self.update_edited_gate()
         dialog.destroy()
 
@@ -448,7 +450,7 @@ class Panel(ScreenPanel):
                 if sp is not None:
                     # Reset material and color from spoolman
                     self.ui_gate_material = sp.filament.material if sp.filament.material is not None else ""
-                    self.ui_gate_color = sp.filament.color_hex[:6].lower() if sp.filament.color_hex is not None else ""
+                    self.ui_gate_color = sp.filament.color_hex[:6].lower() if hasattr(sp.filament, 'color_hex') else ""
                     # Also update the rest of the edit fields
                     self.labels['m_entry'].set_text(self.ui_gate_material)
                     self.labels['c_selector'].set_active(-1)
@@ -466,7 +468,6 @@ class Panel(ScreenPanel):
 
     def select_save(self, widget):
         self._screen.remove_keyboard()
-        logging.info(f"MMU_GATE_MAP GATE={self.ui_sel_gate} COLOR={self.ui_gate_color} MATERIAL={self.ui_gate_material} AVAILABLE={self.ui_gate_status} SPOOLID={self.ui_gate_spool_id} QUIET=1")
         self._screen._ws.klippy.gcode_script(f"MMU_GATE_MAP GATE={self.ui_sel_gate} COLOR={self.ui_gate_color} MATERIAL={self.ui_gate_material} AVAILABLE={self.ui_gate_status} SPOOLID={self.ui_gate_spool_id} QUIET=1")
         self.labels['layers'].set_current_page(0) # Gate list layer
 
