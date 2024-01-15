@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-10-20 00:09-0300\n"
+"POT-Creation-Date: 2024-01-12 21:42-0300\n"
 "PO-Revision-Date: 2023-10-25 21:10+0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -197,6 +197,9 @@ msgstr "%s Kurtarmak istiyor musunuz?"
 msgid "Elapsed:"
 msgstr "Geçen:"
 
+msgid "Ended official support in June 2023"
+msgstr ""
+
 msgid "Error"
 msgstr "Hata"
 
@@ -365,6 +368,9 @@ msgstr "Klipper başlatılmaya çalışılıyor"
 msgid "Klipper will reboot"
 msgstr "Klipper yeniden başlayacak"
 
+msgid "KlipperScreen will drop support in June 2024"
+msgstr ""
+
 msgid ""
 "LOAD_FILAMENT/UNLOAD_FILAMENT are hidden and should be used from extrude"
 msgstr "FILEMENT_YUKLE/FILEMENT_KALDIR gizlidir ve extrude'dan kullanılmalıdır"
@@ -392,6 +398,9 @@ msgstr "Limitler"
 
 msgid "Load"
 msgstr "Yükle"
+
+msgid "Loading..."
+msgstr ""
 
 msgid "Lower Nozzle"
 msgstr "Nozzle düşür"
@@ -471,6 +480,12 @@ msgstr "Yeni"
 msgid "No elegible macros:"
 msgstr "Uygun makro yok:"
 
+msgid "No mesh has been loaded"
+msgstr ""
+
+msgid "No wireless interface has been found"
+msgstr ""
+
 msgid ""
 "Not supported for auto-detection, it needs to be configured in klipperscreen."
 "conf"
@@ -478,8 +493,17 @@ msgstr ""
 "Otomatik algılama desteklenmiyor, klipperscreen.conf dosyasından "
 "yapılandırmanız gerekli"
 
+msgid "Not working or not configured"
+msgstr ""
+
 msgid "Nothing selected"
 msgstr "Hiçbir şey seçilmedi"
+
+msgid "Notification log empty"
+msgstr ""
+
+msgid "Notifications"
+msgstr ""
 
 #, python-format
 msgid "Outdated by %d"
@@ -740,6 +764,12 @@ msgstr "Yükleniyor"
 msgid "Uploaded"
 msgstr "Yüklendi"
 
+msgid "Warning"
+msgstr ""
+
+msgid "WebRTC is not supported by the backend trying Stream"
+msgstr ""
+
 msgid "XY Move Speed (mm/s)"
 msgstr "XY Hareket hızı (mm/s)"
 
@@ -796,9 +826,6 @@ msgstr "mm/s²"
 
 msgid "mm³/s"
 msgstr "mm³/s"
-
-#~ msgid "KlipperScreen will reboot"
-#~ msgstr "KlipperScreen yeniden başlayacak"
 
 #~ msgid "Continue"
 #~ msgstr "Devam et"

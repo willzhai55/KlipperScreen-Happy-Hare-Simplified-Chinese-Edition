@@ -82,10 +82,10 @@ class Panel(ScreenPanel):
             'extrude': self._gtk.Button('extrude', 'Extrude...', 'color4'),
             'more': self._gtk.Button('mmu_more', 'More...', 'color1'),
             'tool_icon': self._gtk.Image('mmu_extruder', self._gtk.img_width * 0.8, self._gtk.img_height * 0.8),
-            'tool_label': self._gtk.Label('Unknown'),
-            'filament': self._gtk.Label('Filament: Unknown'),
-            'sensor': self._gtk.Label('Ts:'),
-            'sensor_state': self._gtk.Label('   '),
+            'tool_label': Gtk.Label('Unknown'),
+            'filament': Gtk.Label('Filament: Unknown'),
+            'sensor': Gtk.Label('Ts:'),
+            'sensor_state': Gtk.Label('   '),
             'select_bypass_img': self._gtk.Image('mmu_select_bypass'), # Alternative for tool
             'load_bypass_img': self._gtk.Image('mmu_load_bypass'),     # Alternative for picker
             'unload_bypass_img': self._gtk.Image('mmu_unload_bypass'), # Alternative for eject

@@ -20,7 +20,7 @@ class Panel(ScreenPanel):
         logging.info(f"Z offset: {self.z_offset}")
         self.widgets['zposition'] = Gtk.Label(label="Z: ?")
 
-        pos = self._gtk.HomogeneousGrid()
+        pos = Gtk.Grid(row_homogeneous=True, column_homogeneous=True)
         pos.attach(self.widgets['zposition'], 0, 1, 2, 1)
         if self.z_offset is not None:
             self.widgets['zoffset'] = Gtk.Label(label="?")
@@ -64,9 +64,8 @@ class Panel(ScreenPanel):
 
         logging.info(f"Available functions for calibration: {functions}")
 
-        self.labels['popover'] = Gtk.Popover()
+        self.labels['popover'] = Gtk.Popover(position=Gtk.PositionType.BOTTOM)
         self.labels['popover'].add(pobox)
-        self.labels['popover'].set_position(Gtk.PositionType.BOTTOM)
 
         if len(functions) > 1:
             self.buttons['start'].connect("clicked", self.on_popover_clicked)
@@ -79,14 +78,9 @@ class Panel(ScreenPanel):
             self.widgets[i].set_direction(Gtk.TextDirection.LTR)
             self.widgets[i].connect("clicked", self.change_distance, i)
             ctx = self.widgets[i].get_style_context()
-            if (self._screen.lang_ltr and j == 0) or (not self._screen.lang_ltr and j == len(self.distances) - 1):
-                ctx.add_class("distbutton_top")
-            elif (not self._screen.lang_ltr and j == 0) or (self._screen.lang_ltr and j == len(self.distances) - 1):
-                ctx.add_class("distbutton_bottom")
-            else:
-                ctx.add_class("distbutton")
+            ctx.add_class("horizontal_togglebuttons")
             if i == self.distance:
-                ctx.add_class("distbutton_active")
+                ctx.add_class("horizontal_togglebuttons_active")
             distgrid.attach(self.widgets[i], j, 0, 1, 1)
 
         self.widgets['move_dist'] = Gtk.Label(_("Move Distance (mm)"))
@@ -94,8 +88,7 @@ class Panel(ScreenPanel):
         distances.pack_start(self.widgets['move_dist'], True, True, 0)
         distances.pack_start(distgrid, True, True, 0)
 
-        grid = Gtk.Grid()
-        grid.set_column_homogeneous(True)
+        grid = Gtk.Grid(column_homogeneous=True)
         if self._screen.vertical_mode:
             grid.attach(self.buttons['zpos'], 0, 1, 1, 1)
             grid.attach(self.buttons['zneg'], 0, 2, 1, 1)
@@ -128,17 +121,20 @@ class Panel(ScreenPanel):
         self.buttons['start'].set_sensitive(False)
         if self._printer.get_stat("toolhead", "homed_axes") != "xyz":
             self._screen._ws.klippy.gcode_script("G28")
-        if method == "probe":
-            self._move_to_position()
-            self._screen._ws.klippy.gcode_script("PROBE_CALIBRATE")
-        elif method == "mesh":
+        self._screen._ws.klippy.gcode_script("SET_GCODE_OFFSET Z=0")
+        if method == "mesh":
             self._screen._ws.klippy.gcode_script("BED_MESH_CALIBRATE")
-        elif method == "delta":
-            self._screen._ws.klippy.gcode_script("DELTA_CALIBRATE")
-        elif method == "delta_manual":
-            self._screen._ws.klippy.gcode_script("DELTA_CALIBRATE METHOD=manual")
-        elif method == "endstop":
-            self._screen._ws.klippy.gcode_script("Z_ENDSTOP_CALIBRATE")
+        else:
+            self._screen._ws.klippy.gcode_script("BED_MESH_CLEAR")
+            if method == "probe":
+                self._move_to_position()
+                self._screen._ws.klippy.gcode_script("PROBE_CALIBRATE")
+            elif method == "delta":
+                self._screen._ws.klippy.gcode_script("DELTA_CALIBRATE")
+            elif method == "delta_manual":
+                self._screen._ws.klippy.gcode_script("DELTA_CALIBRATE METHOD=manual")
+            elif method == "endstop":
+                self._screen._ws.klippy.gcode_script("Z_ENDSTOP_CALIBRATE")
 
     def _move_to_position(self):
         x_position = y_position = None
@@ -246,8 +242,8 @@ class Panel(ScreenPanel):
 
     def change_distance(self, widget, distance):
         logging.info(f"### Distance {distance}")
-        self.widgets[f"{self.distance}"].get_style_context().remove_class("distbutton_active")
-        self.widgets[f"{distance}"].get_style_context().add_class("distbutton_active")
+        self.widgets[f"{self.distance}"].get_style_context().remove_class("horizontal_togglebuttons_active")
+        self.widgets[f"{distance}"].get_style_context().add_class("horizontal_togglebuttons_active")
         self.distance = distance
 
     def move(self, widget, direction):

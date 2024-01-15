@@ -187,7 +187,10 @@ class Panel(ScreenPanel):
             if str(gate_spool_id[i]) in self.spools:
                 spool=self.spools[str(gate_spool_id[i])]
                 material=spool.filament.material
-                vendor=spool.filament.vendor.name
+                if spool.filament.vendor:
+                    vendor=spool.filament.vendor.name
+                else:
+                    vendor = "n/a"
                 filament=spool.filament.name
                 pixbuf=spool.icon
                 used_length=spool.used_length/10.0
@@ -199,7 +202,8 @@ class Panel(ScreenPanel):
                     remaining_weight=f"{remaining_weight_val:.0f}g"
                     remaining_percentage_val=100/(spool.filament.weight/spool.remaining_weight)
                     remaining_percentage=f"{remaining_percentage_val:.0f}%"
-                color_hex=spool.filament.color_hex
+
+                color_hex=spool.filament.color_hex[:6].lower() if hasattr(spool.filament, 'color_hex') else ''
                 color = Gdk.RGBA()
                 if not Gdk.RGBA.parse(color, color_hex):
                     Gdk.RGBA.parse(color, '#' + color_hex)

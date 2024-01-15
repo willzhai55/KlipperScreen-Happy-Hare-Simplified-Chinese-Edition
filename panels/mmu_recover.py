@@ -44,10 +44,10 @@ class Panel(ScreenPanel):
 
         self.labels = {
             't_decrease': self._gtk.Button('decrease', None, scale=self.bts * 1.2),
-            'tool': self._gtk.Label("T0"),
+            'tool': Gtk.Label("T0"),
             't_increase': self._gtk.Button('increase', None, scale=self.bts * 1.2),
             'g_decrease': self._gtk.Button('decrease', None, scale=self.bts * 1.2),
-            'gate': self._gtk.Label("Gate #0"),
+            'gate': Gtk.Label("Gate #0"),
             'g_increase': self._gtk.Button('increase', None, scale=self.bts * 1.2),
             'filament': Gtk.CheckButton("Filament: Unknown"),
             'reset': self._gtk.Button('mmu_reset', 'Reset MMU', 'color1'),
