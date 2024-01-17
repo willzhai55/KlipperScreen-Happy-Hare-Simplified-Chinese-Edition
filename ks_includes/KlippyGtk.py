@@ -175,7 +175,7 @@ class KlippyGtk:
         return b
 
     @staticmethod
-    def Button_busy(widget, busy, change_sensitive): # Happy Hare: added change_sensitive to avoid collision with dynamic state buttons
+    def Button_busy(widget, busy, change_sensitive=False): # Happy Hare: added change_sensitive to avoid collision with dynamic state buttons
         spinner = find_widget(widget, Gtk.Spinner)
         image = find_widget(widget, Gtk.Image)
         if busy:
