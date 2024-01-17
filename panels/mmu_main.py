@@ -278,6 +278,7 @@ class Panel(ScreenPanel):
                 msg += "\nprinter, then make sure you restart Klipper."
                 msg += "\n\nI'll bet this will work out for you :-)"
                 self._screen.show_popup_message(msg, 3, save=True)
+                logging.info("Happy Hare: %s" % str(ke))
 
     def init_tool_value(self):
         mmu = self._printer.get_stat("mmu")
@@ -442,7 +443,8 @@ class Panel(ScreenPanel):
         if 'detection_mode' in data or 'enabled' in data:
             self.update_runout_mode()
         if 'encoder_pos' in data:
-            self.update_movement(data['encoder_pos'], data['flow_rate'])
+            flow_rate = self._printer.get_stat('mmu_encoder mmu_encoder')['flow_rate']
+            self.update_movement(data['encoder_pos'], flow_rate)
 
     def update_runout_mode(self):
         detection_mode = self._printer.get_stat('mmu_encoder mmu_encoder')['detection_mode']
