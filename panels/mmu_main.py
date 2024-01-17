@@ -262,11 +262,15 @@ class Panel(ScreenPanel):
                     if 'enabled' in e_data:
                         self.update_enabled()
                     if 'action' in e_data or 'print_state' in e_data:
-                        self.update_encoder_pos()
+                        ee_data = self._printer.get_stat('mmu_encoder mmu_encoder', None)
+                        if ee_data:
+                            self.update_movement(ee_data['encoder_pos'], ee_data['flow_rate'])
+                        else:
+                            self.update_movement()
                     if 'print_state' in e_data:
                         self.update_active_buttons()
                     self.update_active_buttons()
-            except KeyError:
+            except KeyError as ke:
                 # Almost certainly a mismatch of Happy Hare on the printer
                 msg = "You are probably trying to connect to an incompatible"
                 msg += "\nversion of Happy Hare on your printer. Ensure Happy Hare"
@@ -438,7 +442,7 @@ class Panel(ScreenPanel):
         if 'detection_mode' in data or 'enabled' in data:
             self.update_runout_mode()
         if 'encoder_pos' in data:
-            self.update_encoder_pos(data['encoder_pos'])
+            self.update_movement(data['encoder_pos'], data['flow_rate'])
 
     def update_runout_mode(self):
         detection_mode = self._printer.get_stat('mmu_encoder mmu_encoder')['detection_mode']
@@ -447,10 +451,10 @@ class Panel(ScreenPanel):
         self.labels['runout_frame'].set_label(f'{detection_mode_str}')
         self.labels['runout_frame'].set_sensitive(detection_mode and enabled)
 
-    def update_encoder_pos(self, encoder_pos=None):
-        if encoder_pos == None:
-            encoder_pos = self._printer.get_stat('mmu_encoder mmu_encoder')['encoder_pos']
+    def update_movement(self, encoder_pos=None, flow_rate=None):
         mmu = self._printer.get_stat("mmu")
+        if encoder_pos == None:
+            encoder_pos = mmu['filament_position'] # Use real position instead
         mmu_print_state = mmu['print_state']
         filament = mmu['filament']
         action = mmu['action']
@@ -458,8 +462,7 @@ class Panel(ScreenPanel):
             pos_str = mmu_print_state.capitalize()
         elif action == "Idle":
             pos_str = (f"Filament: {encoder_pos}mm") if filament != "Unloaded" else "Filament: Unloaded"
-            if self._printer.get_stat("print_stats")['state'] == "printing":
-                flow_rate = self._printer.get_stat('mmu_encoder mmu_encoder')['flow_rate']
+            if flow_rate and self._printer.get_stat("print_stats")['state'] == "printing":
                 pos_str += f"  ➥ {flow_rate}%"
         elif action == "Loading" or action == "Unloading":
             pos_str = (f"{action}: {encoder_pos}mm")
@@ -537,7 +540,7 @@ class Panel(ScreenPanel):
             if not self._screen.have_last_popup_message():
                 ui_state.append("no_message")
 
-            if not "printing" in ui_state:
+            if not "printing" in ui_state or not self._printer.get_stat('mmu_encoder mmu_encoder', None):
                 self.labels['runout_layer'].set_current_page(0) # Manage recovery button
             else:
                 self.labels['runout_layer'].set_current_page(1) # Clog display
