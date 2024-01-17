@@ -860,7 +860,7 @@ class KlipperScreen(Gtk.Window):
                 elif data.startswith("!! "):
                     self.show_popup_message(data[3:], 3)
                 elif "unknown" in data.lower() and \
-                        not ("TESTZ" in data or "MEASURE_AXES_NOISE" in data or "ACCELEROMETER_QUERY" in data or "MMU" in data or "from Unknown to" in data or "Tool Unknown" in data): # Happy Hare modified
+                        not ("TESTZ" in data or "MEASURE_AXES_NOISE" in data or "ACCELEROMETER_QUERY" in data or "MMU" in data or "TTG Map" or "Gates / Filaments" or "from Unknown to" in data or "Tool Unknown" in data): # Happy Hare modified
                     if data.startswith("// "):
                         self.show_popup_message(data[3:])
                     else:
