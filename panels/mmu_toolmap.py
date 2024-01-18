@@ -330,7 +330,7 @@ class Panel(ScreenPanel):
         else:
             label.set_text("This will set the MMU TTG map and ALL EndlessSpool groups\n\nto the configuration defined on this panel\n\nAre you sure you want to continue?")
 
-        grid = self._gtk.HomogeneousGrid()
+        grid = Gtk.Grid(row_homogeneous=True, column_homogeneous=True)
         grid.attach(label, 0, 0, 1, 1)
         buttons = [
             {"name": _("Apply"), "response": Gtk.ResponseType.APPLY},
