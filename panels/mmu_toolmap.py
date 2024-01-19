@@ -77,6 +77,8 @@ class Panel(ScreenPanel):
         self.labels['reset'].set_halign(Gtk.Align.CENTER)
         self.labels['reset'].set_valign(Gtk.Align.START)
         self.labels['reset'].set_vexpand(False)
+        self.labels['reset'].get_style_context().add_class("mmu_es_gate")
+        self.labels['reset'].get_style_context().add_class("mmu_es_gate_selected")
         self.labels['es_group'].set_xalign(0)
         self.labels['es_group'].get_style_context().add_class("mmu_endless_spool_toggle")
         self.labels['endless_spool'].get_style_context().add_class("mmu_endless_spool_toggle")
@@ -151,13 +153,13 @@ class Panel(ScreenPanel):
         scroll.add(grid)
         self.content.add(scroll)
 
+    def activate(self):
         mmu = self._printer.get_stat("mmu")
         self.ui_ttg_map = mmu['ttg_map']
         self.ui_endless_spool_groups = self.map_unique_groups(mmu['endless_spool_groups'])
         self.ui_sel_es_group = self.ui_endless_spool_groups[self.ui_ttg_map[self.ui_sel_tool]]
         self.ui_es_enabled = mmu['endless_spool']
 
-    def activate(self):
         self.labels['endless_spool'].set_active(self.ui_es_enabled == 1)
         self.update_map()
         self.update_es_group()
@@ -242,7 +244,7 @@ class Panel(ScreenPanel):
             else:
                 msg += ' ' if cnt == 0 else '┃'
             self.labels[f'toolmap{y}'].set_text(msg)
-        self.labels[f'es_gate{gate}'].get_style_context().add_class("distbutton_active")
+        self.labels[f'es_gate{gate}'].get_style_context().add_class("mmu_es_gate_selected")
         self.labels['tool'].set_label(f"T{tool}")
         self.labels['gate'].set_label(f"Gate #{gate}")
 
@@ -250,9 +252,9 @@ class Panel(ScreenPanel):
         gates_in_group = self.build_es_spool_gate_group(self.ui_sel_es_group)
         for g in range(len(self.ui_ttg_map)):
             if g in gates_in_group:
-                self.labels[f"es_gate{g}"].get_style_context().add_class("distbutton_active")
+                self.labels[f"es_gate{g}"].get_style_context().add_class("mmu_es_gate_selected")
             else:
-                self.labels[f"es_gate{g}"].get_style_context().remove_class("distbutton_active")
+                self.labels[f"es_gate{g}"].get_style_context().remove_class("mmu_es_gate_selected")
             self.labels[f"es_gate{g}"].set_sensitive(self.ui_es_enabled == 1)
         grp = self.convert_number_to_letter(self.ui_sel_es_group)
         self.labels['es_group'].set_markup(f"<b>ES Group: {grp}</b>")

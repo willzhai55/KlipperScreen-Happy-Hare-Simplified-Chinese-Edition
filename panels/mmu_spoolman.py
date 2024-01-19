@@ -115,7 +115,6 @@ class Panel(ScreenPanel):
         layers.insert_page(scroll, None, 0)
 
         self.content.add(layers)
-        self.gate_tool_map = self.build_gate_tool_map()
 
     def async_spools_refresh(self):
         while self.is_running:
@@ -148,6 +147,7 @@ class Panel(ScreenPanel):
         self.refresh()
 
     def refresh(self):
+        self.gate_tool_map = self.build_gate_tool_map()
         mmu = self._printer.get_stat("mmu")
         gate_status = mmu['gate_status']
         gate_material = mmu['gate_material']
@@ -253,8 +253,8 @@ class Panel(ScreenPanel):
     def get_tool_details(self, tools):
         tool_str = ''
         if len(tools) > 0:
-            tool_str = 'T' + ', '.join(map(str, tools[:2]))
-            tool_str += ', ...' if len(tools) > 2 else ''
+            tool_str = 'T' + ', '.join(map(str, tools[:1]))
+            tool_str += '..' if len(tools) > 1 else ''
         return tool_str
 
     def get_color_details(self, gate_color):

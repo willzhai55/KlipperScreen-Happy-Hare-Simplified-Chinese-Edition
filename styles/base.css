@@ -719,6 +719,15 @@ trough progress {
     min-height: 2em;
 }
 
+.mmu_es_gate_selected {
+    background: @active;
+}
+
+.mmu_es_gate_reset {
+    padding-top: 1em;
+    background: @active;
+}
+
 .mmu_endless_spool_toggle {
     padding-bottom: .6em;
 }

@@ -230,7 +230,6 @@ class Panel(ScreenPanel):
         layers.insert_page(edit_grid, None, 1)
 
         self.content.add(layers)
-        self.gate_tool_map = self.build_gate_tool_map()
 
     def post_attach(self):
         # Gtk Notebook will only change layer after show_all() hence this extra callback to fix state
@@ -264,6 +263,7 @@ class Panel(ScreenPanel):
 
     def refresh(self):
         self.use_spoolman = self._printer.spoolman and self._config.get_main_config().getboolean("mmu_use_spoolman", False)
+        self.gate_tool_map = self.build_gate_tool_map()
 
         mmu = self._printer.get_stat("mmu")
         gate_status = mmu['gate_status']
@@ -320,7 +320,7 @@ class Panel(ScreenPanel):
         tool_str = ''
         if len(tools) > 0:
             tool_str = 'T' + ', '.join(map(str, tools[:2]))
-            tool_str += ', ...' if len(tools) > 2 else ''
+            tool_str += '...' if len(tools) > 2 else ''
         return tool_str
 
     def get_color_details(self, gate_color):
