@@ -12,8 +12,9 @@ from gi.repository import Gtk, Gdk, GLib, Pango
 from ks_includes.screen_panel import ScreenPanel
 
 class Panel(ScreenPanel):
-    TOOL_UNKNOWN = -1
-    TOOL_BYPASS = -2
+    # These are a subset of constants from main Happy Hare for convenience and coding consistency
+    TOOL_GATE_UNKNOWN = -1
+    TOOL_GATE_BYPASS = -2
 
     GATE_UNKNOWN = -1
     GATE_EMPTY = 0
@@ -22,17 +23,24 @@ class Panel(ScreenPanel):
 
     FILAMENT_POS_UNKNOWN = -1
     FILAMENT_POS_UNLOADED = 0
-    FILAMENT_POS_START_BOWDEN = 1
-    FILAMENT_POS_IN_BOWDEN = 2
-    FILAMENT_POS_END_BOWDEN = 3
-    FILAMENT_POS_HOMED_EXTRUDER = 4
-    FILAMENT_POS_EXTRUDER_ENTRY = 5
-    FILAMENT_POS_HOMED_TS = 6
-    FILAMENT_POS_IN_EXTRUDER = 7    # AKA FILAMENT_POS_PAST_TS
-    FILAMENT_POS_LOADED = 8         # AKA FILAMENT_POS_HOMED_NOZZLE
+    FILAMENT_POS_HOMED_GATE = 1
+    FILAMENT_POS_START_BOWDEN = 2
+    FILAMENT_POS_IN_BOWDEN = 3
+    FILAMENT_POS_END_BOWDEN = 4
+    FILAMENT_POS_HOMED_ENTRY = 5
+    FILAMENT_POS_HOMED_EXTRUDER = 6
+    FILAMENT_POS_EXTRUDER_ENTRY = 7
+    FILAMENT_POS_HOMED_TS = 8
+    FILAMENT_POS_IN_EXTRUDER = 9    # AKA FILAMENT_POS_PAST_TS
+    FILAMENT_POS_LOADED = 10        # AKA FILAMENT_POS_HOMED_NOZZLE
 
     DIRECTION_LOAD = 1
     DIRECTION_UNLOAD = -1
+
+    ENDSTOP_ENCODER  = "encoder"    # Fake Gate endstop
+    ENDSTOP_GATE     = "mmu_gate"   # Gate
+    ENDSTOP_EXTRUDER = "extruder"   # Extruder
+    ENDSTOP_TOOLHEAD = "toolhead"
 
     NOT_SET = -99
 
@@ -47,7 +55,7 @@ class Panel(ScreenPanel):
         self.min_tool = 0
         self.has_bypass = self._printer.get_stat("mmu")['has_bypass']
         if self.has_bypass:
-            self.min_tool = self.TOOL_BYPASS
+            self.min_tool = self.TOOL_GATE_BYPASS
 
         # btn_states: The "gaps" are what functionality the state takes away. Multiple states are combined
         self.btn_states = {
@@ -248,7 +256,7 @@ class Panel(ScreenPanel):
                     ee_data = data['mmu_encoder mmu_encoder']
                     self.update_encoder(ee_data)
 
-                if 'filament_switch_sensor toolhead_sensor' in data:
+                if 'filament_switch_sensor toolhead_sensor' in data or 'filament_switch_sensor mmu_gate_sensor' in data or 'filament_switch_sensor extruder_sensor' in data:
                     self.update_filament_status()
 
                 if 'mmu' in data:
@@ -282,7 +290,7 @@ class Panel(ScreenPanel):
 
     def init_tool_value(self):
         mmu = self._printer.get_stat("mmu")
-        if self.ui_sel_tool == self.NOT_SET and mmu['tool'] != self.TOOL_UNKNOWN:
+        if self.ui_sel_tool == self.NOT_SET and mmu['tool'] != self.TOOL_GATE_UNKNOWN:
             self.ui_sel_tool = mmu['tool']
         else:
             self.ui_sel_tool = 0
@@ -304,14 +312,14 @@ class Panel(ScreenPanel):
         tool = mmu['tool']
         if param < 0 and self.ui_sel_tool > self.min_tool:
             self.ui_sel_tool -= 1
-            if self.ui_sel_tool == self.TOOL_UNKNOWN:
-                self.ui_sel_tool = self.TOOL_BYPASS
+            if self.ui_sel_tool == self.TOOL_GATE_UNKNOWN:
+                self.ui_sel_tool = self.TOOL_GATE_BYPASS
         elif param > 0 and self.ui_sel_tool < num_gates - 1:
             self.ui_sel_tool += 1
-            if self.ui_sel_tool == self.TOOL_UNKNOWN:
+            if self.ui_sel_tool == self.TOOL_GATE_UNKNOWN:
                 self.ui_sel_tool = 0
         elif param == 0:
-            if self.ui_sel_tool == self.TOOL_BYPASS:
+            if self.ui_sel_tool == self.TOOL_GATE_BYPASS:
                 self._screen._ws.klippy.gcode_script(f"MMU_SELECT_BYPASS")
             elif self.ui_sel_tool != tool or mmu['filament'] != "Loaded":
                 self._screen._ws.klippy.gcode_script(f"MMU_CHANGE_TOOL TOOL={self.ui_sel_tool} QUIET=1")
@@ -325,7 +333,7 @@ class Panel(ScreenPanel):
         # This is a multipurpose button to select subpanel or load bypass
         mmu = self._printer.get_stat("mmu")
         tool = mmu['tool']
-        if self.ui_sel_tool == self.TOOL_BYPASS:
+        if self.ui_sel_tool == self.TOOL_GATE_BYPASS:
             self._screen._ws.klippy.gcode_script(f"MMU_LOAD EXTRUDER_ONLY=1")
         else:
             self._screen.show_panel('mmu_picker', 'MMU Tool Picker')
@@ -358,7 +366,7 @@ class Panel(ScreenPanel):
         next_tool = mmu['next_tool']
         last_tool = mmu['last_tool']
         sync_drive = mmu['sync_drive']
-        if next_tool != self.TOOL_UNKNOWN:
+        if next_tool != self.TOOL_GATE_UNKNOWN:
             # Change in progress
             text = ("T%d " % last_tool) if (last_tool >= 0 and last_tool != next_tool) else "Bypass " if last_tool == -2 else "Unknown " if last_tool == -1 else ""
             text += ("> T%d" % next_tool) if next_tool >= 0 else ""
@@ -369,7 +377,7 @@ class Panel(ScreenPanel):
             self.labels['tool_icon'].set_from_pixbuf(self.labels['sync_drive_pixbuf'])
         else:
             self.labels['tool_icon'].set_from_pixbuf(self.labels['tool_icon_pixbuf'])
-        if tool == self.TOOL_BYPASS:
+        if tool == self.TOOL_GATE_BYPASS:
             self.labels['picker'].set_image(self.labels['load_bypass_img'])
             self.labels['picker'].set_label(f"Load")
             self.labels['eject'].set_image(self.labels['unload_bypass_img'])
@@ -389,7 +397,7 @@ class Panel(ScreenPanel):
         action = mmu['action']
 
         # Set sensitivity of +/- buttons
-        if (tool == self.TOOL_BYPASS and filament == "Loaded") or not tool_sensitive:
+        if (tool == self.TOOL_GATE_BYPASS and filament == "Loaded") or not tool_sensitive:
             self.labels['t_decrease'].set_sensitive(False)
             self.labels['t_increase'].set_sensitive(False)
         else:
@@ -411,7 +419,7 @@ class Panel(ScreenPanel):
                     self.labels['tool'].set_sensitive(False)
                 else:
                     self.labels['tool'].set_sensitive(tool_sensitive)
-            elif self.ui_sel_tool == self.TOOL_BYPASS:
+            elif self.ui_sel_tool == self.TOOL_GATE_BYPASS:
                 self.labels['tool'].set_label(f"Bypass")
                 self.labels['tool'].set_sensitive(tool_sensitive)
             else:
@@ -421,7 +429,7 @@ class Panel(ScreenPanel):
             self.labels['tool'].set_label(action)
             self.labels['tool'].set_sensitive(False)
 
-        if self.ui_sel_tool == self.TOOL_BYPASS:
+        if self.ui_sel_tool == self.TOOL_GATE_BYPASS:
             self.labels['tool'].set_image(self.labels['select_bypass_img'])
         else:
             self.labels['tool'].set_image(self.labels['tool_img'])
@@ -478,12 +486,13 @@ class Panel(ScreenPanel):
         else:
             self.labels['status5'].set_label(self.get_filament_text(bold=self.bold_filament))
 
-        if self.check_toolhead_sensor() != None:
-            if self.check_toolhead_sensor() == 1:
+        ts = self._check_sensor(self.ENDSTOP_TOOLHEAD)
+        if ts != None:
+            if ts == 1:
                 self.labels['sensor'].get_style_context().remove_class("mmu_disabled_text")
                 self.labels['sensor_state'].set_label("●  ")
                 c_name = "green"
-            elif self.check_toolhead_sensor() == 0:
+            elif ts == 0:
                 self.labels['sensor'].get_style_context().remove_class("mmu_disabled_text")
                 self.labels['sensor_state'].set_label("○  ")
                 c_name = "red"
@@ -525,7 +534,7 @@ class Panel(ScreenPanel):
                 self._screen.clear_last_popup_message()
             else:
                 ui_state.append("idle")
-            if tool == self.TOOL_BYPASS:
+            if tool == self.TOOL_GATE_BYPASS:
                 if filament == "Loaded":
                     ui_state.append("bypass_loaded")
                 elif filament == "Unloaded":
@@ -628,71 +637,95 @@ class Panel(ScreenPanel):
         tool = mmu['tool']
         filament_pos = mmu['filament_pos']
         filament_direction = mmu['filament_direction']
+        gate_color = mmu['gate_color']
+        cs = self._printer.get_config_section("mmu")
+        gate_homing_endstop = cs['gate_homing_endstop']
 
-        if filament_pos == self.FILAMENT_POS_LOADED:
-            move_str = "LOADED"
-        elif filament_pos == self.FILAMENT_POS_UNLOADED:
-            move_str = "UNLOADED"
-        elif filament_pos == self.FILAMENT_POS_UNKNOWN:
-            move_str = "UNKNOWN"
-        elif filament_direction == self.DIRECTION_LOAD:
-            move_str = " ▷▷▷"
-        elif filament_direction == self.DIRECTION_UNLOAD:
-            move_str = " ◁◁◁"
-        else:
-            move_str = ""
-        tool_str = (f"T{tool} ")[:3] if tool >=0 else "T? "
-        sensor_str = "│Ts│" if (self.check_toolhead_sensor() != None and self.check_toolhead_sensor() != -1) else ""
-        sensor_str_homed = "┫Ts│" if self.check_toolhead_sensor() != None else ""
-        if tool == self.TOOL_BYPASS and filament_pos == self.FILAMENT_POS_LOADED:
-            visual = "BYPASS ^━━━$│En│^━━━━━━━━━━━━━━━━━━$│Nz│^━$▶ %s" % (move_str)
-        elif tool == self.TOOL_BYPASS:
-            visual = "BYPASS ^━$▶┈│En│┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈│Nz│   %s" % (move_str)
-        elif filament_pos == self.FILAMENT_POS_UNKNOWN:
-            visual     = "%s ┈┈┈│En│┈┈┈┈┈┈┈┈┈┈│Ex│┈┈┈%s┈┈│Nz│   %s" % (tool_str, sensor_str, move_str)
-        elif filament_pos == self.FILAMENT_POS_UNLOADED:
-            visual     = "%s ^━$▶┈│En│┈┈┈┈┈┈┈┈┈┈│Ex│┈┈┈%s┈┈│Nz│   %s" % (tool_str, sensor_str, move_str)
-        elif filament_pos == self.FILAMENT_POS_START_BOWDEN:
-            visual     = "%s ^━━━$│En│^━$▶┈┈┈┈┈┈┈┈│Ex│┈┈┈%s┈┈│Nz│   %s" % (tool_str, sensor_str, move_str)
-        elif filament_pos == self.FILAMENT_POS_IN_BOWDEN:
-            visual     = "%s ^━━━$│En│^━━━━$▶┈┈┈┈┈│Ex│┈┈┈%s┈┈│Nz│   %s" % (tool_str, sensor_str, move_str)
-        elif filament_pos == self.FILAMENT_POS_END_BOWDEN:
-            visual     = "%s ^━━━$│En│^━━━━━━━━$▶┈│Ex│┈┈┈%s┈┈│Nz│   %s" % (tool_str, sensor_str, move_str)
-        elif filament_pos == self.FILAMENT_POS_HOMED_EXTRUDER:
-            visual     = "%s ^━━━$│En│^━━━━━━━━━$▶┫Ex│┈┈┈%s┈┈│Nz│   %s" % (tool_str, sensor_str, move_str)
-        elif filament_pos == self.FILAMENT_POS_EXTRUDER_ENTRY:
-            visual     = "%s ^━━━$│En│^━━━━━━━━━━$│Ex│^━$▶┈%s┈┈│Nz│   %s" % (tool_str, sensor_str_homed, move_str)
-        elif filament_pos == self.FILAMENT_POS_HOMED_TS:
-            visual     = "%s ^━━━$│En│^━━━━━━━━━━$│Ex│^━━$▶%s┈┈│Nz│   %s" % (tool_str, sensor_str_homed, move_str)
-        elif filament_pos == self.FILAMENT_POS_IN_EXTRUDER:
-            visual     = "%s ^━━━$│En│^━━━━━━━━━━$│Ex│^━━━$%s▶┈│Nz│   %s" % (tool_str, sensor_str, move_str)
-        elif filament_pos == self.FILAMENT_POS_LOADED:
-            visual     = "%s ^━━━$│En│^━━━━━━━━━━$│Ex│^━━━$%s^━━$│Nz│^━$▶ %s" % (tool_str, sensor_str, move_str)
+        arrow = "▶"
+        line = "━"
+        space = "┈"
+        home  = "┫"
+        gate  = "│"
+        gs = es = ts = '○'
+        past  = lambda pos: arrow if filament_pos >= pos else space
+        homed = lambda pos: (gate,arrow) if filament_pos > pos else (home,space) if filament_pos == pos else (gate,space)
+        nozz  = lambda pos: (arrow,home,arrow) if filament_pos == pos else (space,gate,' ')
+        trig  = lambda name, sensor: re.sub(r'[a-zA-Z○]', '●', name) if self._check_sensor(sensor) else name
+        bseg = 4 + 2 * sum(not self._has_sensor(sensor) for sensor in [self.ENDSTOP_ENCODER, self.ENDSTOP_GATE, self.ENDSTOP_EXTRUDER, self.ENDSTOP_TOOLHEAD]) - (tool == self.TOOL_GATE_BYPASS)
 
-        #if filament_direction == self.DIRECTION_UNLOAD and filament_pos != self.FILAMENT_POS_UNLOADED:
-        #    visual = visual.replace("▶", "◀")
+        t_str   = ("T%s " % str(tool))[:3] if tool >= 0 else "BYPASS " if tool == self.TOOL_GATE_BYPASS else "T? "
+        g_str   = "{0}{0}".format(past(self.FILAMENT_POS_UNLOADED))
+        gs_str  = "{0}{2}{1}{1}{1}".format(*homed(self.FILAMENT_POS_HOMED_GATE), trig(gs, self.ENDSTOP_GATE)) if self._has_sensor(self.ENDSTOP_GATE) else ""
+        en_str  = "En{0}{0}".format(past(self.FILAMENT_POS_IN_BOWDEN if gate_homing_endstop == self.ENDSTOP_GATE else self.FILAMENT_POS_START_BOWDEN)) if self._has_sensor(self.ENDSTOP_ENCODER) else ""
+        bowden1 = "{0}".format(past(self.FILAMENT_POS_IN_BOWDEN)) * bseg
+        bowden2 = "{0}".format(past(self.FILAMENT_POS_END_BOWDEN)) * bseg
+        es_str  = "{0}{2}{1}{1}{1}".format(*homed(self.FILAMENT_POS_HOMED_ENTRY), trig(es, self.ENDSTOP_EXTRUDER)) if self._has_sensor(self.ENDSTOP_EXTRUDER) else ""
+        ex_str  = "{0}{2}{1}{1}{1}".format(*homed(self.FILAMENT_POS_HOMED_EXTRUDER), "Ex")
+        ts_str  = "{0}{2}{1}{1}{1}".format(*homed(self.FILAMENT_POS_HOMED_TS), trig(ts, self.ENDSTOP_TOOLHEAD)) if self._has_sensor(self.ENDSTOP_TOOLHEAD) else ""
+        nz_str  = "{0}{1}Nz{2}{2}".format(*nozz(self.FILAMENT_POS_LOADED))
+        summary = " LOADED" if filament_pos == self.FILAMENT_POS_LOADED else " UNLOADED" if filament_pos == self.FILAMENT_POS_UNLOADED else " UNKNOWN" if filament_pos == self.FILAMENT_POS_UNKNOWN else " ▷▷▷" if filament_direction == self.DIRECTION_LOAD else " ◁◁◁" if filament_direction == self.DIRECTION_UNLOAD else ""
+
+        visual = "".join((t_str, g_str, gs_str, en_str, bowden1, bowden2, es_str, ex_str, ts_str, nz_str, summary))
+
+        last_index = visual.rfind("▶")
+        visual = visual.replace("▶", "━")
+        if last_index != -1:
+                visual = visual[:last_index] + "▶" + visual[last_index + 1:]
+
+        if markup:
+            if mmu['gate'] >= 0:
+                color = self.get_rgb_color(gate_color[mmu['gate']])
+                if color != "":
+                    visual = self._add_markup(visual, color)
+
         if bold:
             visual = visual.replace("━", "█").replace("▶", "▌")
-        if markup:
-            gate_color = mmu['gate_color']
-            gate = mmu['gate']
-            if gate >= 0:
-                color = self.get_rgb_color(gate_color[gate])
-                if color != "":
-                    visual = visual.replace("^", (f"<span color='{color}'>")).replace("$", "</span>")
-                    return visual
-        visual = visual.replace("^", "").replace("$", "")
+
         return visual
 
-    def check_toolhead_sensor(self):
-        sensor = self._printer.get_stat("filament_switch_sensor toolhead_sensor")
-        if sensor == {}:
-            return None
-        if sensor['enabled']:
-            if sensor['filament_detected']:
-                return 1
+    def _add_markup(self, string, color):
+        result = ""
+        in_sequence = False
+        for i, char in enumerate(string):
+            if char == "━":
+                if not in_sequence:
+                    #result += "s"
+                    result += f"<span color='{color}'>"
+                    in_sequence = True
+                if i + 1 == len(string) or string[i + 1] != "━":
+                    #result += char + "e"
+                    result += char + f"</span>"
+                    in_sequence = False
+                else:
+                    result += char
             else:
-                return 0
-        else:
+                result += char
+        return result
+
+    def _check_sensor(self, s):
+        if s == self.ENDSTOP_ENCODER:
+            encoder = self._printer.get_stat('mmu_encoder mmu_encoder', None)
+            if encoder:
+                return True
+            else:
+                return None
+
+        sensor = self._printer.get_stat(f"filament_switch_sensor {s}_sensor")
+        if sensor:
+            if sensor['enabled']:
+                if sensor['filament_detected']:
+                    return 1
+                else:
+                    return 0
             return -1
+        return None
+
+    def _has_sensor(self, s):
+        if s == self.ENDSTOP_ENCODER:
+            return self._printer.get_stat('mmu_encoder mmu_encoder', None)
+
+        sensor = self._printer.get_stat(f"filament_switch_sensor {s}_sensor")
+        if sensor:
+            return sensor['enabled']
+        return False
 
