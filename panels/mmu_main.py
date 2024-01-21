@@ -647,21 +647,22 @@ class Panel(ScreenPanel):
         home  = "┫"
         gate  = "│"
         gs = es = ts = '○'
+        # PAUL 
         past  = lambda pos: arrow if filament_pos >= pos else space
-        homed = lambda pos: (gate,arrow) if filament_pos > pos else (home,space) if filament_pos == pos else (gate,space)
+        homed = lambda pos, sensor: (gate,arrow,sensor) if filament_pos > pos else (home,space,sensor) if filament_pos == pos else (gate,space,sensor)
         nozz  = lambda pos: (arrow,home,arrow) if filament_pos == pos else (space,gate,' ')
         trig  = lambda name, sensor: re.sub(r'[a-zA-Z○]', '●', name) if self._check_sensor(sensor) else name
         bseg = 4 + 2 * sum(not self._has_sensor(sensor) for sensor in [self.ENDSTOP_ENCODER, self.ENDSTOP_GATE, self.ENDSTOP_EXTRUDER, self.ENDSTOP_TOOLHEAD]) - (tool == self.TOOL_GATE_BYPASS)
 
         t_str   = ("T%s " % str(tool))[:3] if tool >= 0 else "BYPASS " if tool == self.TOOL_GATE_BYPASS else "T? "
         g_str   = "{0}{0}".format(past(self.FILAMENT_POS_UNLOADED))
-        gs_str  = "{0}{2}{1}{1}{1}".format(*homed(self.FILAMENT_POS_HOMED_GATE), trig(gs, self.ENDSTOP_GATE)) if self._has_sensor(self.ENDSTOP_GATE) else ""
+        gs_str  = "{0}{2}{1}{1}{1}".format(*homed(self.FILAMENT_POS_HOMED_GATE, trig(gs, self.ENDSTOP_GATE))) if self._has_sensor(self.ENDSTOP_GATE) else ""
         en_str  = "En{0}{0}".format(past(self.FILAMENT_POS_IN_BOWDEN if gate_homing_endstop == self.ENDSTOP_GATE else self.FILAMENT_POS_START_BOWDEN)) if self._has_sensor(self.ENDSTOP_ENCODER) else ""
         bowden1 = "{0}".format(past(self.FILAMENT_POS_IN_BOWDEN)) * bseg
         bowden2 = "{0}".format(past(self.FILAMENT_POS_END_BOWDEN)) * bseg
-        es_str  = "{0}{2}{1}{1}{1}".format(*homed(self.FILAMENT_POS_HOMED_ENTRY), trig(es, self.ENDSTOP_EXTRUDER)) if self._has_sensor(self.ENDSTOP_EXTRUDER) else ""
-        ex_str  = "{0}{2}{1}{1}{1}".format(*homed(self.FILAMENT_POS_HOMED_EXTRUDER), "Ex")
-        ts_str  = "{0}{2}{1}{1}{1}".format(*homed(self.FILAMENT_POS_HOMED_TS), trig(ts, self.ENDSTOP_TOOLHEAD)) if self._has_sensor(self.ENDSTOP_TOOLHEAD) else ""
+        es_str  = "{0}{2}{1}{1}{1}".format(*homed(self.FILAMENT_POS_HOMED_ENTRY, trig(es, self.ENDSTOP_EXTRUDER))) if self._has_sensor(self.ENDSTOP_EXTRUDER) else ""
+        ex_str  = "{0}{2}{1}{1}{1}".format(*homed(self.FILAMENT_POS_HOMED_EXTRUDER, "Ex"))
+        ts_str  = "{0}{2}{1}{1}{1}".format(*homed(self.FILAMENT_POS_HOMED_TS, trig(ts, self.ENDSTOP_TOOLHEAD))) if self._has_sensor(self.ENDSTOP_TOOLHEAD) else ""
         nz_str  = "{0}{1}Nz{2}{2}".format(*nozz(self.FILAMENT_POS_LOADED))
         summary = " LOADED" if filament_pos == self.FILAMENT_POS_LOADED else " UNLOADED" if filament_pos == self.FILAMENT_POS_UNLOADED else " UNKNOWN" if filament_pos == self.FILAMENT_POS_UNKNOWN else " ▷▷▷" if filament_direction == self.DIRECTION_LOAD else " ◁◁◁" if filament_direction == self.DIRECTION_UNLOAD else ""
 
