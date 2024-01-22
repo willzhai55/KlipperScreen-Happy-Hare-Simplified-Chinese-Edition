@@ -646,12 +646,11 @@ class Panel(ScreenPanel):
         space = "┈"
         home  = "┫"
         gate  = "│"
-        gs = es = ts = '○'
-        # PAUL 
+        gs = es = ts = '◯'
         past  = lambda pos: arrow if filament_pos >= pos else space
         homed = lambda pos, sensor: (gate,arrow,sensor) if filament_pos > pos else (home,space,sensor) if filament_pos == pos else (gate,space,sensor)
         nozz  = lambda pos: (arrow,home,arrow) if filament_pos == pos else (space,gate,' ')
-        trig  = lambda name, sensor: re.sub(r'[a-zA-Z○]', '●', name) if self._check_sensor(sensor) else name
+        trig  = lambda name, sensor: re.sub(r'[a-zA-Z◯]', '●', name) if self._check_sensor(sensor) else name
         bseg = 4 + 2 * sum(not self._has_sensor(sensor) for sensor in [self.ENDSTOP_ENCODER, self.ENDSTOP_GATE, self.ENDSTOP_EXTRUDER, self.ENDSTOP_TOOLHEAD]) - (tool == self.TOOL_GATE_BYPASS)
 
         t_str   = ("T%s " % str(tool))[:3] if tool >= 0 else "BYPASS " if tool == self.TOOL_GATE_BYPASS else "T? "
@@ -680,7 +679,7 @@ class Panel(ScreenPanel):
                     visual = self._add_markup(visual, color)
 
         if bold:
-            visual = visual.replace("━", "█").replace("▶", "▌")
+            visual = visual.replace('━', '█').replace('▶', '▌').replace('●', '◙')
 
         return visual
 
