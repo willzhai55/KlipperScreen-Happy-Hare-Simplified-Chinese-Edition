@@ -644,12 +644,12 @@ class Panel(ScreenPanel):
         arrow = "▶"
         line = "━"
         space = "┈"
-        home  = "┫"
-        gate  = "│"
+        home  = "▉" if bold else "┫"
+        gate  = "┤"
         gs = es = ts = '◯'
         past  = lambda pos: arrow if filament_pos >= pos else space
-        homed = lambda pos, sensor: (gate,arrow,sensor) if filament_pos > pos else (home,space,sensor) if filament_pos == pos else (gate,space,sensor)
-        nozz  = lambda pos: (arrow,home,arrow) if filament_pos == pos else (space,gate,' ')
+        homed = lambda pos, sensor: (arrow,arrow,sensor) if filament_pos > pos else (home,space,sensor) if filament_pos == pos else (space,space,sensor)
+        nozz  = lambda pos: (arrow,arrow,arrow) if filament_pos == pos else (space,gate,' ')
         trig  = lambda name, sensor: re.sub(r'[a-zA-Z◯]', '●', name) if self._check_sensor(sensor) else name
         bseg = 4 + 2 * sum(not self._has_sensor(sensor) for sensor in [self.ENDSTOP_ENCODER, self.ENDSTOP_GATE, self.ENDSTOP_EXTRUDER, self.ENDSTOP_TOOLHEAD]) - (tool == self.TOOL_GATE_BYPASS)
 
@@ -667,10 +667,11 @@ class Panel(ScreenPanel):
 
         visual = "".join((t_str, g_str, gs_str, en_str, bowden1, bowden2, es_str, ex_str, ts_str, nz_str, summary))
 
-        last_index = visual.rfind("▶")
-        visual = visual.replace("▶", "━")
-        if last_index != -1:
-                visual = visual[:last_index] + "▶" + visual[last_index + 1:]
+        last_home = visual.rfind(home)
+        last_index = visual.rfind(arrow)
+        visual = visual.replace(arrow, line)
+        if last_index != -1 and (last_home == -1 or not bold):
+                visual = visual[:last_index] + arrow + visual[last_index + 1:]
 
         if markup:
             if mmu['gate'] >= 0:
@@ -679,21 +680,20 @@ class Panel(ScreenPanel):
                     visual = self._add_markup(visual, color)
 
         if bold:
-            visual = visual.replace('━', '█').replace('▶', '▌').replace('●', '◙')
+            visual = visual.replace(line, '█').replace(arrow, '▌')
 
         return visual
 
     def _add_markup(self, string, color):
         result = ""
+        cc = "━●█"
         in_sequence = False
         for i, char in enumerate(string):
-            if char == "━":
+            if char in cc:
                 if not in_sequence:
-                    #result += "s"
                     result += f"<span color='{color}'>"
                     in_sequence = True
-                if i + 1 == len(string) or string[i + 1] != "━":
-                    #result += char + "e"
+                if i + 1 == len(string) or not string[i + 1] in cc:
                     result += char + f"</span>"
                     in_sequence = False
                 else:
