@@ -7,6 +7,12 @@
 #
 # Screen Capture: scrot -s -D :0.0
 #
+SCRIPT="$(readlink -f "$0")"
+SCRIPTFILE="$(basename "$SCRIPT")"
+SCRIPTPATH="$(dirname "$SCRIPT")"
+SCRIPTNAME="$0"
+ARGS=( "$@" )
+
 KLIPPER_CONFIG_HOME="${HOME}/printer_data/config"
 OLD_KLIPPER_CONFIG_HOME="${HOME}/klipper_config"
 
@@ -37,6 +43,37 @@ ERROR="${B_RED}"
 WARNING="${B_YELLOW}"
 PROMPT="${CYAN}"
 INPUT="${OFF}"
+
+self_update() {
+    [ "$UPDATE_GUARD" ] && return
+    export UPDATE_GUARD=YES
+    clear
+
+    cd "$SCRIPTPATH"
+    BRANCH=$(timeout 3s git branch --show-current)
+    [ -z "${BRANCH}" ] && {
+        echo -e "${B_GREEN}Timeout talking to github. Skipping upgrade check"
+        return
+    }
+
+    echo -e "${B_GREEN}Running on '${BRANCH}' branch"
+    git fetch --quiet
+    git diff --quiet --exit-code "origin/$BRANCH"
+    [ $? -eq 1 ] && {
+        echo -e "${B_GREEN}Found a new version of KlipperScreen - Happy Hare on github, updating..."
+        [ -n "$(git status --porcelain)" ] && {
+            git stash push -m 'local changes stashed before self update' --quiet
+        }
+        git pull --quiet --force
+        git checkout $BRANCH --quiet
+        git pull --quiet --force
+        echo -e "${B_GREEN}Running the new install script..."
+        cd - >/dev/null
+        exec "$SCRIPTNAME" "${ARGS[@]}"
+        exit 1 # Exit this old instance
+    }
+    echo -e "${B_GREEN}Already the latest version."
+}
 
 function nextsuffix {
     local name="$1"
@@ -194,17 +231,24 @@ restart_moonraker() {
     sudo systemctl restart moonraker
 }
 
-# Force script to exit if an error occurs
-set -e
-clear
+usage() {
+    echo -e "${EMPHASIZE}"
+    echo "Usage: $0 [-c <klipper_config_dir>] [-g <number_of_gates>] [-z]"
+    echo
+    echo "-z skip github check"
+    echo
+    exit 1
+}
 
 # Find SRCDIR from the pathname of this script
 SRCDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )"/ && pwd )"
 
-while getopts "c:g:" arg; do
+while getopts "c:g:z" arg; do
     case $arg in
         c) KLIPPER_CONFIG_HOME=${OPTARG};;
         g) num_gates=$OPTARG;;
+	z) SKIP_UPDATE=1;;
+        *) usage;;
     esac
 done
 if [ -z "$num_gates" ]; then
@@ -212,7 +256,11 @@ if [ -z "$num_gates" ]; then
     exit 1
 fi
 
+clear
 verify_not_root
+[ -z "${SKIP_UPDATE}" ] && {
+    self_update # Make sure the repo is up-to-date
+}
 verify_home_dirs
 install_klipper_screen
 install_update_manager
