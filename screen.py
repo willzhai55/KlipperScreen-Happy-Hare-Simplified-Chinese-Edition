@@ -107,6 +107,7 @@ class KlipperScreen(Gtk.Window):
         except Exception as e:
             logging.exception(f"{e}\n\n{traceback.format_exc()}")
             raise RuntimeError from e
+        GLib.set_prgname('KlipperScreen')
         self.blanking_time = 600
         self.use_dpms = True
         self.apiclient = None
@@ -210,7 +211,7 @@ class KlipperScreen(Gtk.Window):
         # Happy Hare ^^^
 
         for printer in self.printers:
-            printer["data"] = Printer(state_execute, state_callbacks, self.process_busy_state)
+            printer["data"] = Printer(state_execute, state_callbacks)
         default_printer = self._config.get_main_config().get('default_printer')
         logging.debug(f"Default printer: {default_printer}")
         if [True for p in self.printers if default_printer in p]:
@@ -285,6 +286,7 @@ class KlipperScreen(Gtk.Window):
                 "motion_report": ["live_position", "live_velocity", "live_extruder_velocity"],
                 "exclude_object": ["current_object", "objects", "excluded_objects"],
                 "manual_probe": ['is_active'],
+                "screws_tilt_adjust": ['results', 'error'],
                 "mmu": ["enabled", "is_locked", "is_homed", "tool", "next_tool", "last_tool", "last_toolchange", "gate",
                     "clog_detection", "endless_spool", "filament", "servo", "gate_status", "gate_material", "gate_color",
                     "gate_spool_id", "endless_spool_groups", "ttg_map", "filament_pos", "filament_direction", "action",
@@ -352,7 +354,6 @@ class KlipperScreen(Gtk.Window):
         logging.debug(f"Current panel hierarchy: {' > '.join(self._cur_panels)}")
         if hasattr(self.panels[panel], "process_update"):
             self.process_update("notify_status_update", self.printer.data)
-            self.process_update("notify_busy", self.printer.busy)
         if hasattr(self.panels[panel], "activate"):
             self.panels[panel].activate()
         self.show_all()
@@ -702,11 +703,8 @@ class KlipperScreen(Gtk.Window):
         self.base_panel.show_heaters(False)
         self.show_panel("printer_select", _("Printer Select"), remove_all=True)
 
-    def process_busy_state(self, busy):
-        self.process_update("notify_busy", busy)
-        return False
-
     def websocket_disconnected(self, msg):
+        logging.debug("### websocket_disconnected")
         self.printer_initializing(msg, remove=True)
         self.printer.state = "disconnected"
         self.connecting = True
@@ -726,6 +724,7 @@ class KlipperScreen(Gtk.Window):
 
     def state_disconnected(self):
         logging.debug("### Going to disconnected")
+        self.printer.stop_tempstore_updates()
         self.close_screensaver()
         self.initialized = False
         self.reinit_count = 0
@@ -777,6 +776,7 @@ class KlipperScreen(Gtk.Window):
 
     def state_shutdown(self):
         self.close_screensaver()
+        self.printer.stop_tempstore_updates()
         msg = self.printer.get_stat("webhooks", "state_message")
         msg = msg if "ready" not in msg else ""
         self.printer_initializing(_("Klipper has shutdown") + "\n\n" + msg, remove=True)
@@ -831,6 +831,8 @@ class KlipperScreen(Gtk.Window):
             self.printer.process_update(data)
             if 'manual_probe' in data and data['manual_probe']['is_active'] and 'zcalibrate' not in self._cur_panels:
                 self.show_panel("zcalibrate", _('Z Calibrate'))
+            if "screws_tilt_adjust" in data and 'bed_level' not in self._cur_panels:
+                self.show_panel("bed_level", _('Bed Level'))
         elif action == "notify_filelist_changed":
             if self.files is not None:
                 self.files.process_update(data)
@@ -1064,8 +1066,6 @@ class KlipperScreen(Gtk.Window):
                                                                                extra_items))
         if data is False:
             return self._init_printer("Error getting printer object data with extra items")
-        if len(self.printer.get_temp_devices()) > 0:
-            self.init_tempstore()
 
         self.files.set_gcodes_path()
         self.files.refresh_files()
@@ -1079,6 +1079,8 @@ class KlipperScreen(Gtk.Window):
         return False
 
     def init_tempstore(self):
+        if len(self.printer.get_temp_devices()) == 0:
+            return
         tempstore = self.apiclient.send_request("server/temperature_store")
         if tempstore and 'result' in tempstore and tempstore['result']:
             self.printer.init_temp_store(tempstore['result'])
@@ -1184,7 +1186,8 @@ def main():
     homedir = os.path.expanduser("~")
 
     parser.add_argument(
-        "-c", "--configfile", default=os.path.join(homedir, "KlipperScreen.conf"), metavar='<configfile>',
+        "-c", "--configfile",
+        default="", metavar='<configfile>',
         help="Location of KlipperScreen configuration file"
     )
     logdir = os.path.join(homedir, "printer_data", "logs")
