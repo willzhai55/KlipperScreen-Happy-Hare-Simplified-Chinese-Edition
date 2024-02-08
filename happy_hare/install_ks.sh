@@ -16,6 +16,8 @@ ARGS=( "$@" )
 KLIPPER_CONFIG_HOME="${HOME}/printer_data/config"
 OLD_KLIPPER_CONFIG_HOME="${HOME}/klipper_config"
 
+set -e # Exit immediately on error
+
 declare -A PIN 2>/dev/null || {
     echo "Please run this script with ./bash $0"
     exit 1
@@ -75,7 +77,7 @@ self_update() {
         exit 1 # Exit this old instance
     }
     GIT_VER=$(git describe --tags)
-    echo -e "${B_GREEN}Already the latest version: ${GIT_VER}"
+    echo -e "${B_GREEN}Already at the latest version: ${GIT_VER}"
 }
 
 function nextsuffix {
