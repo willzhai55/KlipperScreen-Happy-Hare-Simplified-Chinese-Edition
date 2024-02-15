@@ -743,6 +743,7 @@ class KlipperScreen(Gtk.Window):
     def state_paused(self):
         self.state_printing()
         if self._config.get_main_config().get("sticky_panel", None): return # Happy Hare
+        if self.prompt is not None: return # Happy Hare
         mmu_active = True if "mmu_main" in self._cur_panels else False # Happy Hare
         if self._config.get_main_config().getboolean("auto_open_extrude", fallback=True) and not mmu_active: # Happy hare
             self.show_panel("extrude", _("Extrude"))
@@ -750,6 +751,7 @@ class KlipperScreen(Gtk.Window):
     def state_printing(self):
         self.close_screensaver()
         if self._config.get_main_config().get("sticky_panel", None): return # Happy Hare
+        if self.prompt is not None: return # Happy Hare
         for dialog in self.dialogs:
             self.gtk.remove_dialog(dialog)
         mmu_active = True if "mmu_main" in self._cur_panels else False # Happy Hare
@@ -766,6 +768,7 @@ class KlipperScreen(Gtk.Window):
             logging.debug("Printer not initialized yet")
             self.printer.state = "not ready"
             return
+        if self.prompt is not None: return # Happy Hare
         mmu_active = True if "mmu_main" in self._cur_panels else False # Happy Hare
         self.show_panel("main_menu", None, remove_all=True, items=self._config.get_menu_items("__main"))
         if mmu_active: # Happy Hare
