@@ -29,8 +29,10 @@ class Prompt:
             self.text = ""
             self.buttons = []
             return
-        elif data.startswith('prompt_text'):
-            self.text = data.replace('prompt_text ', '')
+        elif data.startswith('prompt_text'): # Happy Hare modified to allow multiple text lines (per spec)
+            if not self.text == "":
+                self.text += "\n\n"
+            self.text += data.replace('prompt_text ', '')
             return
         elif data.startswith('prompt_button ') or data.startswith('prompt_footer_button'):
             data = data.replace('prompt_button ', '')
