@@ -193,32 +193,31 @@ class Panel(ScreenPanel):
 
     def gen_map(self, htool=-1, hgate=-1):
         num_gates = len(self.ui_ttg_map)
-        tool_map = [[0 for y in range(num_gates)] for x in range(num_gates+4)]
-    
-        for tool in range(num_gates):
-            gate = self.ui_ttg_map[tool]
-            bold = 16 if (gate == hgate or tool == htool) else 1
+        tool_map = [[0] * num_gates for _ in range(num_gates + 4)]
+
+        for tool, gate in enumerate(self.ui_ttg_map):
+            bold = 16 if gate == hgate or tool == htool else 1
             y = tool
             tool_map[0][tool] |= 256 | (bold >> 3)
             for x in range(tool+1):
-                tool_map[x+1][y] = tool_map[x+1][y] | (10 * bold)
+                tool_map[x+1][y] |= (10 * bold)
             if gate == tool:
-                tool_map[tool+2][y] = tool_map[tool+2][y] | (10 * bold)
+                tool_map[tool+2][y] |= (10 * bold)
             else:
                 if gate > tool:
-                    tool_map[tool+2][y] = tool_map[tool+2][y] | (12 * bold)
-                    dir = 1
+                    tool_map[tool+2][y] |= (12 * bold)
+                    direction = 1
                 else:
-                    tool_map[tool+2][y] = tool_map[tool+2][y] | (9 * bold)
-                    dir = -1
-                for y in range(tool + dir, tool + (gate - tool), dir):
-                    tool_map[tool+2][y] = tool_map[tool+2][y] | (5 * bold)
+                    tool_map[tool+2][y] |= (9 * bold)
+                    direction = -1
+                for y in range(tool + direction, tool + (gate - tool), direction):
+                    tool_map[tool+2][y] |= (5 * bold)
                 if gate > tool:
-                    tool_map[tool+2][y+1] = tool_map[tool+2][y+1] | (3 * bold)
+                    tool_map[tool+2][y+1] |= (3 * bold)
                 else:
-                    tool_map[tool+2][y-1] = tool_map[tool+2][y-1] | (6 * bold)
+                    tool_map[tool+2][y-1] |= (6 * bold)
             for x in range(tool+3, num_gates+3):
-                tool_map[x][gate] = tool_map[x][gate] | (10 * bold)
+                tool_map[x][gate] |= (10 * bold)
             tool_map[num_gates+3][gate] |= 257 | (bold >> 3)
         return tool_map
 
@@ -227,7 +226,6 @@ class Panel(ScreenPanel):
         gate = self.ui_ttg_map[tool]
         es_group = self.ui_endless_spool_groups[self.ui_ttg_map[self.ui_sel_tool]]
         gates_in_group = self.build_es_spool_gate_group(es_group)
-
         self.labels['tool'].set_text(f"T{tool}")
         tool_map = self.gen_map(htool=tool, hgate=-1)
         grp = '╸' if len(gates_in_group) == 1 else '┓' + ('┫' * (len(gates_in_group) - 2)) + '┛'
