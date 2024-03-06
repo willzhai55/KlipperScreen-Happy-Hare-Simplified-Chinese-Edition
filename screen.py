@@ -368,7 +368,7 @@ class KlipperScreen(Gtk.Window):
         self.notification_log.append(log_entry)
         self.process_update("notify_log", log_entry)
 
-    def show_popup_message(self, message, level=3, save=True): # Happy Hare: added `save=` functionality
+    def show_popup_message(self, message, level=3, save=True, monospace=False): # Happy Hare: added `save=, monospace=` functionality
         message = message.replace("// ", "") # Happy Hare added to clean up multi-line messages
         if (datetime.now() - self.last_popup_time).seconds < 1:
             return
@@ -400,6 +400,8 @@ class KlipperScreen(Gtk.Window):
         popup = Gtk.Popover(relative_to=self.base_panel.titlebar,
                             halign=Gtk.Align.CENTER, width_request=int(self.width * .9))
         popup.get_style_context().add_class("message_popup_popover")
+        if monospace: # Happy Hare added
+            popup.get_style_context().add_class("mmu_monospace_popup")
         popup.add(msg)
         popup.popup()
 
@@ -884,7 +886,7 @@ class KlipperScreen(Gtk.Window):
                     )
                 elif data.startswith("// MMU"): # Happy Hare
                     if not data.startswith("// MMU [") and not data.startswith("// MMU BYPASS"):
-                        self.show_popup_message(data[3:], level=1)
+                        self.show_popup_message(data[3:], level=1, monospace=True)
         self.process_update(action, data)
 
     def process_update(self, *args):

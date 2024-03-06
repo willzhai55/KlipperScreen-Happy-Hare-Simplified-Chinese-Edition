@@ -615,6 +615,8 @@ trough progress {
     border-bottom: .4em solid @color1;
 }
 
+/* vvv Happy Hare added vvv */
+
 .mmu_runout slider, .mmu_runout highlight, .mmu_runout fill {
     min-height: 0;
 }
@@ -754,3 +756,6 @@ trough progress {
     padding-bottom: 6px;
 }
 
+.mmu_monospace_popup {
+    font-family: Free Mono;
+}
