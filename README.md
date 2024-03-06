@@ -101,6 +101,10 @@ If this occurs the first thing to try is to run the following, then restart Klip
 
 If this doesn't fix the problem I suggest installing a new font set.
 
+> [!NOTE]  
+> A very useful way of listing the fonts you have installed on your system by family is with:
+> > fc-list : family | sort | uniq
+
 <details>
 <summary>🔹 How to install JetBrains fonts...</summary>
 
