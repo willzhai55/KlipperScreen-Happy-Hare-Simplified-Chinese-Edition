@@ -337,7 +337,7 @@ class Panel(ScreenPanel):
         if self.flow_timeout is not None:
             GLib.source_remove(self.flow_timeout)
             self.flow_timeout = None
-        self._files.remove_file_callback(self._callback_metadata)
+        self._files.remove_callback(self._callback_metadata)
 
     def create_buttons(self):
 
@@ -373,8 +373,15 @@ class Panel(ScreenPanel):
                             + "\n\n"
                             + _("Saved offset: %s") % saved_z_offset)
         elif device == "endstop":
-            label.set_label(_("Apply %s%.3f offset to Endstop?") % (sign, abs(self.zoffset)))
-
+            saved_z_offset = None
+            msg = _("Apply %s%.3f offset to Endstop?") % (sign, abs(self.zoffset))
+            if 'stepper_z' in self._printer.get_config_section_list():
+                saved_z_offset = self._printer.get_config_section('stepper_z')['position_endstop']
+            elif 'stepper_a' in self._printer.get_config_section_list():
+                saved_z_offset = self._printer.get_config_section('stepper_a')['position_endstop']
+            if saved_z_offset:
+                msg += "\n\n" + _("Saved offset: %s") % saved_z_offset
+            label.set_label(msg)
         buttons = [
             {"name": _("Apply"), "response": Gtk.ResponseType.APPLY, "style": 'dialog-default'},
             {"name": _("Cancel"), "response": Gtk.ResponseType.CANCEL, "style": 'dialog-error'}
@@ -447,10 +454,11 @@ class Panel(ScreenPanel):
         for arg in args:
             self.buttons[arg].set_sensitive(False)
 
-    def _callback_metadata(self, newfiles, deletedfiles, modifiedfiles):
-        if self.filename in modifiedfiles:
+    def _callback_metadata(self, action, item):
+        if action == "update_metadata" and self.filename in item:
+            logging.info("Callback complete")
             self.update_file_metadata()
-            self._files.remove_file_callback(self._callback_metadata)
+            self._files.remove_callback(self._callback_metadata)
 
     def new_print(self):
         self._screen.close_screensaver()
@@ -803,6 +811,6 @@ class Panel(ScreenPanel):
                 self.labels['filament_total'].set_label(f"{float(self.file_metadata['filament_total']) / 1000:.1f} m")
         else:
             logging.debug("Cannot find file metadata. Listening for updated metadata")
-            self._screen.files.add_file_callback(self._callback_metadata)
+            self._screen.files.add_callback(self._callback_metadata)
             self._files.request_metadata(self.filename)
         self.show_file_thumbnail()

@@ -7,9 +7,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: KlipperScreen\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-01-12 21:42-0300\n"
-"PO-Revision-Date: 2024-01-21 12:01+0000\n"
-"Last-Translator: Guilouz <guilouz6@hotmail.com>\n"
+"POT-Creation-Date: 2024-03-02 17:39-0300\n"
+"PO-Revision-Date: 2024-02-26 01:39+0000\n"
+"Last-Translator: Nackophilz <zrv4flra@anonaddy.me>\n"
 "Language-Team: French <https://hosted.weblate.org/projects/klipperscreen/"
 "klipperscreen/fr/>\n"
 "Language: fr\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Generator: Weblate 5.4-dev\n"
+"X-Generator: Weblate 5.5-dev\n"
 
 #, python-format
 msgid "%s will be updated to version"
@@ -204,6 +204,18 @@ msgstr "Fin du support officiel en juin 2023"
 msgid "Error"
 msgstr "Erreur"
 
+msgid "Error clearing active spool"
+msgstr ""
+
+msgid "Error getting active spool"
+msgstr ""
+
+msgid "Error setting active spool"
+msgstr ""
+
+msgid "Error trying to fetch spools"
+msgstr ""
+
 msgid "Estimated Time Method"
 msgstr "Méthode d'estimation de la durée"
 
@@ -215,6 +227,9 @@ msgstr "Extra Grande"
 
 msgid "Extrude"
 msgstr "Extrusion"
+
+msgid "Extruders"
+msgstr ""
 
 msgid "Extrusion +"
 msgstr "Extrusion +"
@@ -373,7 +388,7 @@ msgid "Klipper will reboot"
 msgstr "Klipper va redémarrer"
 
 msgid "KlipperScreen will drop support in June 2024"
-msgstr ""
+msgstr "KlipperScreen ne sera plus pris en charge en juin 2024"
 
 msgid ""
 "LOAD_FILAMENT/UNLOAD_FILAMENT are hidden and should be used from extrude"
@@ -406,6 +421,9 @@ msgid "Load"
 msgstr "Charger"
 
 msgid "Loading..."
+msgstr "Chargement..."
+
+msgid "Lost Connection to Moonraker"
 msgstr ""
 
 msgid "Lower Nozzle"
@@ -487,10 +505,10 @@ msgid "No elegible macros:"
 msgstr "Macros non éligibles :"
 
 msgid "No mesh has been loaded"
-msgstr ""
+msgstr "Aucune maille n'a été chargée"
 
 msgid "No wireless interface has been found"
-msgstr ""
+msgstr "Aucune interface sans fil n'a été trouvée"
 
 msgid ""
 "Not supported for auto-detection, it needs to be configured in klipperscreen."
@@ -500,16 +518,16 @@ msgstr ""
 "dans klipperscreen.conf"
 
 msgid "Not working or not configured"
-msgstr ""
+msgstr "Ne fonctionne pas ou n'est pas configuré"
 
 msgid "Nothing selected"
 msgstr "Rien de sélectionné"
 
 msgid "Notification log empty"
-msgstr ""
+msgstr "Le journal des notifications est vide"
 
 msgid "Notifications"
-msgstr ""
+msgstr "Notifications"
 
 #, python-format
 msgid "Outdated by %d"
@@ -772,10 +790,10 @@ msgid "Uploaded"
 msgstr "Envoyé"
 
 msgid "Warning"
-msgstr ""
+msgstr "Attention"
 
 msgid "WebRTC is not supported by the backend trying Stream"
-msgstr ""
+msgstr "WebRTC n'est pas pris en charge par le backend essai du Stream"
 
 msgid "XY Move Speed (mm/s)"
 msgstr "Vitesse de déplacement XY (mm/s)"

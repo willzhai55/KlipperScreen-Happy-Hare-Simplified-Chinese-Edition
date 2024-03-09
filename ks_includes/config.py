@@ -182,6 +182,7 @@ class KlipperScreenConfig:
                 )
                 strs = (
                     'default_printer', 'language', 'print_sort_dir', 'theme', 'screen_blanking', 'font_size',
+                    'print_estimate_method', 'screen_blanking', "screen_on_devices", "screen_off_devices", 'print_view',
                     'print_estimate_method', 'screen_blanking', "screen_on_devices", "screen_off_devices",
                     'sticky_panel', # Happy Hare
                 )
@@ -333,6 +334,7 @@ class KlipperScreenConfig:
             {"move_speed_xy": {"section": "main", "name": _("XY Move Speed (mm/s)"), "type": None, "value": "50"}},
             {"move_speed_z": {"section": "main", "name": _("Z Move Speed (mm/s)"), "type": None, "value": "10"}},
             {"print_sort_dir": {"section": "main", "type": None, "value": "name_asc"}},
+            {"print_view": {"section": "main", "type": None, "value": "thumbs"}},
         ]
 
         self.configurable_options.extend(panel_options)
