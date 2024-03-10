@@ -892,7 +892,7 @@ class KlipperScreen(Gtk.Window):
                     )
                 elif data.startswith("// MMU"): # Happy Hare
                     if not data.startswith("// MMU [") and not data.startswith("// MMU BYPASS"):
-                        self.show_popup_message(data[3:], level=1, monospace=True)
+                        self.show_popup_message(data[3:], level=1, monospace=data.startswith("// MMU Statistics:"))
         self.process_update(action, data)
 
     def process_update(self, *args):
