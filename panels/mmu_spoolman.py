@@ -200,7 +200,7 @@ class Panel(ScreenPanel):
                 if hasattr(spool,"remaining_weight"):
                     remaining_weight_val=spool.remaining_weight
                     remaining_weight=f"{remaining_weight_val:.0f}g"
-                    remaining_percentage_val=100/(spool.filament.weight/spool.remaining_weight)
+                    remaining_percentage_val=100/(spool.filament.weight/spool.remaining_weight) if spool.remaining_weight else 0
                     remaining_percentage=f"{remaining_percentage_val:.0f}%"
 
                 color_hex=spool.filament.color_hex[:6].lower() if hasattr(spool.filament, 'color_hex') else ''
