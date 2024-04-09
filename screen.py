@@ -125,7 +125,8 @@ class KlipperScreen(Gtk.Window):
 
         self.connect("key-press-event", self._key_press_event)
         self.connect("configure_event", self.update_size)
-        monitor_amount = Gdk.Display.get_n_monitors(Gdk.Display.get_default())
+        display = Gdk.Display.get_default()
+        monitor_amount = Gdk.Display.get_n_monitors(display)
         try:
             mon_n = int(args.monitor)
             if not (-1 < mon_n < monitor_amount):
@@ -133,8 +134,9 @@ class KlipperScreen(Gtk.Window):
         except ValueError:
             mon_n = 0
         logging.info(f"Monitors: {monitor_amount} using number: {mon_n}")
-        monitor = Gdk.Display.get_default().get_monitor(mon_n)
-        self.wayland = Gdk.Display.get_default().get_primary_monitor() is None
+        monitor = display.get_monitor(mon_n)
+        self.wayland = display.get_name().startswith('wayland') or display.get_primary_monitor() is None
+        logging.info(f"Wayland: {self.wayland} Display name: {display.get_name()}")
         self.width = self._config.get_main_config().getint("width", None)
         self.height = self._config.get_main_config().getint("height", None)
         if 'XDG_CURRENT_DESKTOP' in os.environ:
@@ -285,7 +287,7 @@ class KlipperScreen(Gtk.Window):
                 "print_stats": ["print_duration", "total_duration", "filament_used", "filename", "state", "message",
                                 "info"],
                 "toolhead": ["homed_axes", "estimated_print_time", "print_time", "position", "extruder",
-                             "max_accel", "max_accel_to_decel", "max_velocity", "square_corner_velocity"],
+                             "max_accel", "minimum_cruise_ratio", "max_velocity", "square_corner_velocity"],
                 "virtual_sdcard": ["file_position", "is_active", "progress"],
                 "webhooks": ["state", "state_message"],
                 "firmware_retraction": ["retract_length", "retract_speed", "unretract_extra_length", "unretract_speed"],
@@ -456,8 +458,8 @@ class KlipperScreen(Gtk.Window):
         version = Gtk.Label(label=f"{functions.get_software_version()}", halign=Gtk.Align.END)
 
         help_msg = _("Provide KlipperScreen.log when asking for help.\n")
-        message = Gtk.Label(label=f"{help_msg}\n\n{e}", wrap=True)
-        scroll = self.gtk.ScrolledWindow(steppers=False)
+        message = Gtk.Label(label=f"{help_msg}\n\n{e}", wrap=True, wrap_mode=Pango.WrapMode.CHAR)
+        scroll = self.gtk.ScrolledWindow()
         scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
         scroll.add(message)
 
@@ -778,6 +780,7 @@ class KlipperScreen(Gtk.Window):
             return
         if self.prompt is not None: return # Happy Hare
         mmu_active = True if "mmu_main" in self._cur_panels else False # Happy Hare
+        self.files.refresh_files()
         self.show_panel("main_menu", None, remove_all=True, items=self._config.get_menu_items("__main"))
         if mmu_active: # Happy Hare
             self.show_panel("mmu_main", 'MMU')
@@ -1077,7 +1080,6 @@ class KlipperScreen(Gtk.Window):
             return self._init_printer("Error getting printer object data with extra items")
 
         self.files.set_gcodes_path()
-        self.files.refresh_files()
 
         logging.info("Printer initialized")
         self.initialized = True
@@ -1097,6 +1099,9 @@ class KlipperScreen(Gtk.Window):
                 self.panels[self._cur_panels[-1]].update_graph_visibility()
         else:
             logging.error(f'Tempstore not ready: {tempstore} Retrying in 5 seconds')
+            GLib.timeout_add_seconds(5, self.init_tempstore)
+            return
+        if set(self.printer.tempstore) != set(self.printer.get_temp_devices()):
             GLib.timeout_add_seconds(5, self.init_tempstore)
             return
         server_config = self.apiclient.send_request("server/config")

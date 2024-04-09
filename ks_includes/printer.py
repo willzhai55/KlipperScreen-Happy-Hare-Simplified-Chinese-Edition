@@ -257,35 +257,25 @@ class Printer:
 
     # Called only from main menu and generic menu panels for variable evaluation
     def get_printer_status_data(self):
-        data = {
+        return {
+            "moonraker": {
+                "power_devices": {"count": len(self.get_power_devices())},
+                "cameras": {"count": len(self.cameras)},
+                "spoolman": self.spoolman,
+            },
             "printer": {
+                "pause_resume": {"is_paused": self.state == "paused"},
                 "extruders": {"count": self.extrudercount},
                 "temperature_devices": {"count": self.tempdevcount},
                 "fans": {"count": self.fancount},
                 "output_pins": {"count": self.output_pin_count},
                 "gcode_macros": {"count": len(self.get_gcode_macros()), "list": self.get_gcode_macros()},
-                "idle_timeout": self.get_stat("idle_timeout").copy(),
-                "pause_resume": {"is_paused": self.state == "paused"},
-                "power_devices": {"count": len(self.get_power_devices())},
-                "cameras": {"count": len(self.cameras)},
-                "spoolman": self.spoolman,
+                "idle_timeout": self.get_stat("idle_timeout").copy(), # Happy Hare: Added back because used in menu sensitivity
                 "leds": {"count": self.ledcount},
+                **({"mmu": self.get_stat("mmu")} if self.has_mmu else {}), # Happy Hare
+                "config_sections": [section for section in self.config.keys()],
             }
         }
-
-        if self.has_mmu: # Happy Hare
-            data["printer"]["mmu"] = self.get_stat("mmu")
-
-        sections = ["bed_mesh", "bltouch", "probe", "quad_gantry_level", "z_tilt"]
-        for section in sections:
-            if self.config_section_exists(section):
-                data["printer"][section] = self.get_config_section(section).copy()
-
-        sections = ["firmware_retraction", "input_shaper", "bed_screws", "screws_tilt_adjust"]
-        for section in sections:
-            data["printer"][section] = self.config_section_exists(section)
-
-        return data
 
     def get_leds(self):
         return [
@@ -364,6 +354,9 @@ class Printer:
     def device_has_target(self, device):
         return "target" in self.devices[device]
 
+    def device_has_power(self, device):
+        return "power" in self.devices[device]
+
     def get_temp_store(self, device, section=False, results=0):
         if device not in self.tempstore:
             return False
@@ -382,6 +375,9 @@ class Printer:
             temp[section] = self.tempstore[device][section][-results:]
         return temp
 
+    def get_tempstore_size(self):
+        return self.tempstore_size
+
     def get_temp_devices(self):
         if self.temp_devices is None:
             devices = [
@@ -399,7 +395,7 @@ class Printer:
         return self.tools.index(tool)
 
     def init_temp_store(self, tempstore):
-        if self.tempstore and list(self.tempstore) != list(tempstore):
+        if self.tempstore and set(self.tempstore) != set(tempstore):
             logging.debug("Tempstore has changed")
             self.tempstore = tempstore
             self.change_state(self.state)

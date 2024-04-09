@@ -6,16 +6,17 @@ This article describes how to use KlipperScreen through a remote connection.
     The experience may not be equal to run KlipperScreen natively.
     Depending on the device or the network you may encounter performance degradation or other issues.
 
-##  On the Host device (for example a Raspberry Pi):
+##  On the Host device:
 
+The host device could be for example a Raspberry Pi
 
-1. [First installl KlipperScreen](Installation.md)
+1. [First install KlipperScreen](Installation.md)
 2. Install a vnc server package, for example:
     ```bash
     sudo apt install tigervnc-standalone-server
     ```
 
-3. Create `launch_KlipperScreen.sh`:
+3. Create `~/KlipperScreen/scripts/launch_KlipperScreen.sh`:
 
     ```bash
     #!/usr/bin/env bash
@@ -27,12 +28,17 @@ This article describes how to use KlipperScreen through a remote connection.
     !!! tip
         To change resolution add: `-geometry 1280x720` to the arguments of Xtigervnc
 
-4. Restart KlipperScreen or reboot the system:
+4. Make the script executable
     ```bash
-    sudo systemctl service KlipperScreen restart
+    chmod +x ~/KlipperScreen/scripts/launch_KlipperScreen.sh
     ```
 
-5. On KlipperScreen set the following configuration:
+5. Restart KlipperScreen or reboot the system:
+    ```bash
+    sudo systemctl restart KlipperScreen.service
+    ```
+
+6. On KlipperScreen set the following configuration:
 
 Turn off DPMS and Display timeout:
 
@@ -40,21 +46,22 @@ Turn off DPMS and Display timeout:
 
 ## On the remote device:
 
-1. Installa a VNC viewer and  configure it to the ip of the host.
+1. Install a VNC viewer and  configure it to the ip of the host.
 
 
 ???+ example "Example using an iPad"
+    #### Example using an iPad
     * Install a VNC viewer for example: `RealVNC Viewer: Remote Desktop`
-    #### Prevent unwanted rotation of UI:
+    ##### Prevent unwanted rotation of UI:
     * Go to `Settings` > `General` >  Set `Use side switch to` to `Lock Rotation`
-    #### Avoid accidentally switching between apps:
+    ##### Avoid accidentally switching between apps:
     * Go to `Restrictions` > Set passcode > Enable restrictions.
     * Open
     * Triple-click "Home" button
     * Guided access pops up
     * Press "Start"
     * Now iPad is locked to VNC viewer until "Guided access" mode is disabled by triple-clicking "Home" button and entering the restrictions password.
-    #### On the VNC viewer:
+    ##### On the VNC viewer:
     * Press "+" button at the top right
     * Enter IP address of your print host.
     * Press "Save"

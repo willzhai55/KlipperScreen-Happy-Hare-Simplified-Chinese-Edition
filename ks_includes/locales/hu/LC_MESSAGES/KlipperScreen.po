@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: KlipperScreen\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-02 17:39-0300\n"
-"PO-Revision-Date: 2024-01-16 10:02+0000\n"
+"POT-Creation-Date: 2024-04-03 14:35-0300\n"
+"PO-Revision-Date: 2024-04-04 16:28+0000\n"
 "Last-Translator: \"Zs.Antal\" <zsikaiantal@icloud.com>\n"
 "Language-Team: Hungarian <https://hosted.weblate.org/projects/klipperscreen/"
 "klipperscreen/hu/>\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.4-dev\n"
+"X-Generator: Weblate 5.5-dev\n"
 
 #, python-format
 msgid "%s will be updated to version"
@@ -100,6 +100,9 @@ msgstr "Ágyháló"
 
 msgid "Bed screw configuration:"
 msgstr "Az ágycsavar konfigurációja:"
+
+msgid "Both"
+msgstr "Mindkettő"
 
 msgid "Calibrate"
 msgstr "Kalibrálás"
@@ -193,6 +196,9 @@ msgstr "Vissza akarod állítani %s-t?"
 msgid "Elapsed:"
 msgstr "Eltelt:"
 
+msgid "Emergency Stop"
+msgstr "Vész STOP"
+
 msgid "Ended official support in June 2023"
 msgstr "A hivatalos támogatás 2023 júniusában véget ért"
 
@@ -200,16 +206,19 @@ msgid "Error"
 msgstr "Hiba"
 
 msgid "Error clearing active spool"
-msgstr ""
+msgstr "Hiba az aktív tekercs törlésekor"
 
 msgid "Error getting active spool"
-msgstr ""
+msgstr "Hiba az aktív tekercs lekérésekor"
 
 msgid "Error setting active spool"
-msgstr ""
+msgstr "Hiba az aktív tekercs beállításakor"
 
 msgid "Error trying to fetch spools"
-msgstr ""
+msgstr "Hiba a tekercsek lekérésekor"
+
+msgid "Error: Couldn't get a position to probe"
+msgstr "Hiba: Nem sikerült beállítani a mérni kívánt pozíciót"
 
 msgid "Estimated Time Method"
 msgstr "Becsült idő módszer"
@@ -224,7 +233,7 @@ msgid "Extrude"
 msgstr "Száladagolás"
 
 msgid "Extruders"
-msgstr ""
+msgstr "Adagolók"
 
 msgid "Extrusion +"
 msgstr "Adagolás +"
@@ -415,7 +424,7 @@ msgid "Loading..."
 msgstr "Betöltés..."
 
 msgid "Lost Connection to Moonraker"
-msgstr ""
+msgstr "Megszakadt a kapcsolat a Moonraker-el"
 
 msgid "Lower Nozzle"
 msgstr "Fúvóka le"
@@ -437,9 +446,6 @@ msgstr "Max"
 
 msgid "Max Acceleration"
 msgstr "Max gyorsulás"
-
-msgid "Max Acceleration to Deceleration"
-msgstr "Lassulás max gyorsulása"
 
 msgid "Max Velocity"
 msgstr "Max sebesség"
@@ -464,6 +470,9 @@ msgstr "Menü"
 
 msgid "Mesh calibrate"
 msgstr "Háló kalibrálása"
+
+msgid "Minimum Cruise Ratio"
+msgstr "Minimális utazási arány"
 
 msgid "Modified"
 msgstr "Módosított"
@@ -841,3 +850,6 @@ msgstr "mm/s²"
 
 msgid "mm³/s"
 msgstr "mm³/s"
+
+#~ msgid "Max Acceleration to Deceleration"
+#~ msgstr "Lassulás max gyorsulása"

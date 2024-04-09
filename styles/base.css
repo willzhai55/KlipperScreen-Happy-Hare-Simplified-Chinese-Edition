@@ -653,7 +653,7 @@ trough progress {
 }
 
 .mmu_color_swatch {
-    font-size: 2.8em;
+    font-size: 2.3em;
 }
 
 .mmu_sensor_text {
@@ -681,6 +681,12 @@ trough progress {
 }
 
 .mmu_gate_text {
+    margin-top: 8px;
+    margin-bottom: 8px;
+    font-size: 1.2em;
+}
+
+.mmu_spoolid_text {
     margin-top: 8px;
     margin-bottom: 8px;
     font-size: 1.2em;
@@ -774,4 +780,9 @@ trough progress {
 
 .mmu_monospace_popup {
     font-family: Free Mono;
+}
+
+.mmu_combobox box button {
+    border: 0;
+    padding: 0 1em;
 }

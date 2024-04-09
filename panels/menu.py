@@ -6,6 +6,7 @@ gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 from jinja2 import Template
 from ks_includes.screen_panel import ScreenPanel
+from ks_includes.widgets.autogrid import AutoGrid
 
 
 class Panel(ScreenPanel):
@@ -16,9 +17,9 @@ class Panel(ScreenPanel):
         self.items = items
         self.j2_data = self._printer.get_printer_status_data()
         self.create_menu_items()
-        self.grid = Gtk.Grid(row_homogeneous=True, column_homogeneous=True)
         self.scroll = self._gtk.ScrolledWindow()
         self.scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
+        self.autogrid = AutoGrid()
 
     def activate(self):
         self.j2_data = self._printer.get_printer_status_data()
@@ -27,18 +28,15 @@ class Panel(ScreenPanel):
     def add_content(self):
         for child in self.scroll.get_children():
             self.scroll.remove(child)
-        if self._screen.vertical_mode:
-            self.scroll.add(self.arrangeMenuItems(self.items, 3))
-        else:
-            self.scroll.add(self.arrangeMenuItems(self.items, 4))
+        self.scroll.add(self.arrangeMenuItems(self.items))
         if not self.content.get_children():
             self.content.add(self.scroll)
 
+    # Happy Hare vvv
     def process_update(self, action, data):
         if action != "notify_status_update":
             return
 
-        # Happy Hare vvv
         unique_cbs = []
         for x in data:
             for i in data[x]:
@@ -50,7 +48,6 @@ class Panel(ScreenPanel):
         # Call specific associated callbacks
         for cb in unique_cbs:
             cb[0](cb[1])
-        # Happy Hare ^^^
 
     def register_callback(self, var, method, arg): # Happy Hare
         if var in self.menu_callbacks:
@@ -63,57 +60,42 @@ class Panel(ScreenPanel):
         key = list(item.keys())[0]
         enable = self.evaluate_enable(item[key]['enable'])
         self.labels[key].set_sensitive(enable)
+    # Happy Hare ^^^
 
-    def arrangeMenuItems(self, items, columns, expand_last=False):
-        for child in self.grid.get_children():
-            self.grid.remove(child)
-        length = len(items)
-        i = 0
-        show_list = []
+    def arrangeMenuItems(self, items, columns=None, expand_last=False):
+        self.autogrid.clear()
+        enabled = []
         for item in items:
             key = list(item)[0]
             if item[key].get('show_disabled', "False").strip().lower() == "true": # Happy Hare
-                show_list.append(key)
                 if self.evaluate_enable(item[key]['enable']):
                     self.labels[key].set_sensitive(True)
                 else:
                     self.labels[key].set_sensitive(False)
+                enabled.append(self.labels[key])
             else:
                 if self.evaluate_enable(item[key]['enable']):
-                    show_list.append(key)
-                    self.labels[key].set_sensitive(True)
+                    enabled.append(self.labels[key])
                 else:
                     # Just don't show the button
                     logging.debug(f"X > {key}")
-
-        length = len(show_list)
-        if columns == 4:
-            if length <= 4:
-                # Arrange 2 x 2
-               columns = 2
-            elif 4 < length <= 6:
-                # Arrange 3 x 2
-                columns = 3
-
-        for key in show_list:
-            col = i % columns
-            row = int(i / columns)
-
-            width = height = 1
-            if expand_last is True and i + 1 == length and length % 2 == 1:
-                width = 2
-
-            self.grid.attach(self.labels[key], col, row, width, height)
-            i += 1
-        return self.grid
+# Happy Hare Upstream logic:
+#            if not self.evaluate_enable(item[key]['enable']):
+#                logging.debug(f"X > {key}")
+#                continue
+#            enabled.append(self.labels[key])
+        self.autogrid.__init__(enabled, columns, expand_last, self._screen.vertical_mode)
+        return self.autogrid
 
     def create_menu_items(self):
+        # Happy Hare vvv
         count = 0
         for i in self.items:
             x = i[next(iter(i))] # Happy Hare 'show_disabled' check to speed up!
             if x.get('show_disabled', "False").strip().lower() == "true" or self.evaluate_enable(x['enable']):
                 count += 1
-        #count = sum(bool(self.evaluate_enable(i[next(iter(i))]['enable'])) for i in self.items)
+        #count = sum(bool(self.evaluate_enable(i[next(iter(i))]['enable'])) for i in self.items) # Happy Hare: Don't count disabled items it show_disabled
+        # Happy Hare ^^^
 
         scale = 1.1 if 12 < count <= 16 else None  # hack to fit a 4th row
         for i in range(len(self.items)):
@@ -162,8 +144,7 @@ class Panel(ScreenPanel):
                 }
         try:
             j2_temp = Template(enable, autoescape=True)
-            result = j2_temp.render(self.j2_data)
-            return result == 'True'
+            return j2_temp.render(self.j2_data) == 'True'
         except Exception as e:
             logging.debug(f"Error evaluating enable statement: {enable}\n{e}")
             return False

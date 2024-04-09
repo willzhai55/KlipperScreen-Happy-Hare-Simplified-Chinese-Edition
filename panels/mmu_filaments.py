@@ -57,13 +57,14 @@ class Panel(ScreenPanel):
         self.COLOR_LIGHT_GREY = Gdk.RGBA(0.5,0.5,0.5,1)
         self.COLOR_ORANGE = Gdk.RGBA(1,0.8,0,1)
 
-        img_width = img_height = self._gtk.img_scale * self.bts * 2.0
+        img_width = img_height = self._gtk.img_scale * self.bts * 1.5
         grid = Gtk.Grid()
         grid.set_column_homogeneous(True)
         grid.set_row_spacing(10)
 
         mmu = self._printer.get_stat("mmu")
         num_gates = len(mmu['gate_status'])
+
         for i in range(num_gates):
             status_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
             status = self.labels[f'status_{i}'] = self._gtk.Image()
@@ -91,7 +92,7 @@ class Panel(ScreenPanel):
             tools.set_xalign(0)
 
             spool_id = self.labels[f'spool_id_{i}'] = Gtk.Label("n/a")
-            spool_id.get_style_context().add_class("mmu_spoolid_text")
+            spool_id.get_style_context().add_class("mmu_spool_id_text")
             spool_id.set_xalign(0)
 
             edit = self.labels[f'edit_{i}'] = self._gtk.Button('mmu_gear', f'Edit', 'color4')
@@ -156,6 +157,7 @@ class Panel(ScreenPanel):
         for i in range(len(self.W3C_COLORS)):
             self.labels['c_selector'].append_text(self.W3C_COLORS[i])
         self.labels['c_selector'].connect("changed", self.select_w3c_color)
+        self.labels['c_selector'].get_style_context().add_class("mmu_combobox")
 
         self.labels['c_picker'].set_vexpand(False)
         self.labels['c_picker'].connect("clicked", self.select_color)
@@ -164,6 +166,7 @@ class Panel(ScreenPanel):
         self.labels['m_entry'].get_style_context().add_class("mmu_entry_text")
         self.labels['m_entry'].connect("button-press-event", self._screen.show_keyboard)
         self.labels['m_entry'].connect("focus-in-event", self._screen.show_keyboard)
+        self.labels['m_entry'].connect("focus-out-event", self._screen.remove_keyboard)
         self.labels['m_entry'].connect("changed", self.select_material)
         self.labels['m_entry'].grab_focus_without_selecting()
         self.labels['m_entry'].set_max_length(6)
@@ -172,6 +175,7 @@ class Panel(ScreenPanel):
         self.labels['id_entry'].get_style_context().add_class("mmu_entry_text")
         self.labels['id_entry'].connect("button-press-event", self._screen.show_keyboard)
         self.labels['id_entry'].connect("focus-in-event", self._screen.show_keyboard)
+        self.labels['id_entry'].connect("focus-out-event", self._screen.remove_keyboard)
         self.labels['id_entry'].connect("changed", self.select_spool_id)
         self.labels['id_entry'].grab_focus_without_selecting()
         self.labels['id_entry'].set_max_length(4)
@@ -197,28 +201,25 @@ class Panel(ScreenPanel):
         current_gate_grid.attach(self.labels['cancel'],   14, 0, 2, 1)
 
         edit_grid = Gtk.Grid()
-        edit_grid.set_column_homogeneous(True)
+        edit_grid.set_column_homogeneous(False)
         grid.set_row_spacing(0)
         grid.set_row_spacing(0)
 
-        pad1 = Gtk.Box()
-        pad1.set_vexpand(True)
-        pad2 = Gtk.Box()
-        pad2.set_vexpand(True)
+        pad = Gtk.Box()
+        pad.set_vexpand(True)
 
         edit_grid.attach(current_gate_grid,         0, 0, 16, 1)
-        edit_grid.attach(pad1,                      0, 1, 16, 1)
-        edit_grid.attach(Gtk.Label('SpoolID:'),     0, 2,  2, 1)
-        edit_grid.attach(self.labels['id_entry'],   2, 2,  4, 1)
-        edit_grid.attach(Gtk.Box(),                 6, 2,  2, 1)
-        edit_grid.attach(self.labels['filament'],   8, 2,  5, 1)
+        edit_grid.attach(Gtk.Label('SpoolID:'),     0, 1,  2, 1)
+        edit_grid.attach(self.labels['id_entry'],   2, 1,  4, 1)
+        edit_grid.attach(Gtk.Box(),                 6, 1,  2, 1)
+        edit_grid.attach(self.labels['filament'],   8, 1,  5, 1)
+        edit_grid.attach(Gtk.Box(),                13, 1,  1, 1)
+        edit_grid.attach(self.labels['save'],      14, 1,  2, 2)
+        edit_grid.attach(self.labels['c_selector'], 0, 2,  6, 1)
+        edit_grid.attach(self.labels['c_picker'],   6, 2,  2, 1)
+        edit_grid.attach(self.labels['m_entry'],    8, 2,  5, 1)
         edit_grid.attach(Gtk.Box(),                13, 2,  1, 1)
-        edit_grid.attach(self.labels['save'],      14, 2,  2, 2)
-        edit_grid.attach(self.labels['c_selector'], 0, 3,  6, 1)
-        edit_grid.attach(self.labels['c_picker'],   6, 3,  2, 1)
-        edit_grid.attach(self.labels['m_entry'],    8, 3,  5, 1)
-        edit_grid.attach(Gtk.Box(),                13, 3,  1, 1)
-        edit_grid.attach(pad2,                      0, 4, 16, 1)
+        edit_grid.attach(pad,                       0, 3, 16, 1)
 
         scroll = self._gtk.ScrolledWindow()
         scroll.set_policy(Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC)
@@ -443,9 +444,9 @@ class Panel(ScreenPanel):
         text = self.labels['id_entry'].get_text()
         spool_id = ''.join(c for c in text if c.isnumeric())
         self.labels['id_entry'].set_text(spool_id)
-        if self.use_spoolman:
-            try:
-                self.ui_gate_spool_id = int(spool_id)
+        try:
+            self.ui_gate_spool_id = int(spool_id)
+            if self.use_spoolman:
                 sp = self.spools.get(str(self.ui_gate_spool_id), None)
                 if sp is not None:
                     # Reset material and color from spoolman
@@ -454,12 +455,13 @@ class Panel(ScreenPanel):
                     # Also update the rest of the edit fields
                     self.labels['m_entry'].set_text(self.ui_gate_material)
                     self.labels['c_selector'].set_active(-1)
-            except ValueError:
-                self.ui_gate_spool_id = -1
+        except ValueError:
+            self.ui_gate_spool_id = -1
         self.update_edited_gate()
 
     def select_filament(self, widget, param):
         self._screen.remove_keyboard()
+        self._screen.set_focus(None)
         if self.labels['filament'].get_active():
             self.ui_gate_status = self.GATE_AVAILABLE # Assume from spool initially
         else:
@@ -468,10 +470,12 @@ class Panel(ScreenPanel):
 
     def select_save(self, widget):
         self._screen.remove_keyboard()
+        self._screen.set_focus(None)
         self._screen._ws.klippy.gcode_script(f"MMU_GATE_MAP GATE={self.ui_sel_gate} COLOR={self.ui_gate_color} MATERIAL={self.ui_gate_material} AVAILABLE={self.ui_gate_status} SPOOLID={self.ui_gate_spool_id} QUIET=1")
         self.labels['layers'].set_current_page(0) # Gate list layer
 
     def select_cancel_edit(self, widget):
         self._screen.remove_keyboard()
+        self._screen.set_focus(None)
         self.labels['layers'].set_current_page(0) # Gate list layer
 

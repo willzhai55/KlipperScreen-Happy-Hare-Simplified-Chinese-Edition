@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-02 17:39-0300\n"
-"PO-Revision-Date: 2024-02-10 14:01+0000\n"
+"POT-Creation-Date: 2024-04-03 14:35-0300\n"
+"PO-Revision-Date: 2024-03-16 18:48+0000\n"
 "Last-Translator: Giadej <Giadej@users.noreply.hosted.weblate.org>\n"
 "Language-Team: Italian <https://hosted.weblate.org/projects/klipperscreen/"
 "klipperscreen/it/>\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.4-dev\n"
+"X-Generator: Weblate 5.5-dev\n"
 
 #, python-format
 msgid "%s will be updated to version"
@@ -100,6 +100,9 @@ msgstr "Bed-Mesh"
 
 msgid "Bed screw configuration:"
 msgstr "Configurazione Bed Screw:"
+
+msgid "Both"
+msgstr ""
 
 msgid "Calibrate"
 msgstr "Calibra"
@@ -193,6 +196,9 @@ msgstr "Vuoi ripristinare %s?"
 msgid "Elapsed:"
 msgstr "Trascorso:"
 
+msgid "Emergency Stop"
+msgstr ""
+
 msgid "Ended official support in June 2023"
 msgstr "Supporto ufficiale terminato in giugno 2023"
 
@@ -200,15 +206,18 @@ msgid "Error"
 msgstr "Errore"
 
 msgid "Error clearing active spool"
-msgstr ""
+msgstr "Errore nella cancellazione della bobina attiva"
 
 msgid "Error getting active spool"
-msgstr ""
+msgstr "Errore nel caricamento della bobina attiva"
 
 msgid "Error setting active spool"
-msgstr ""
+msgstr "Errore nel settaggio della bobina attiva"
 
 msgid "Error trying to fetch spools"
+msgstr "Errore nel tentativo di recuperare le bobine"
+
+msgid "Error: Couldn't get a position to probe"
 msgstr ""
 
 msgid "Estimated Time Method"
@@ -224,7 +233,7 @@ msgid "Extrude"
 msgstr "Estrudi"
 
 msgid "Extruders"
-msgstr ""
+msgstr "Estrusori"
 
 msgid "Extrusion +"
 msgstr "Estrusione +"
@@ -363,7 +372,7 @@ msgstr ""
 "Potrebbero volerci più di 5 min. a seconda della potenza del riscaldatore."
 
 msgid "Klipper Restart"
-msgstr "Riavvio Klipper"
+msgstr "Riavvia Klipper"
 
 msgid "Klipper has disconnected"
 msgstr "Klipper si è disconnesso"
@@ -417,7 +426,7 @@ msgid "Loading..."
 msgstr "Caricamento..."
 
 msgid "Lost Connection to Moonraker"
-msgstr ""
+msgstr "Connessione persa con Moonraker"
 
 msgid "Lower Nozzle"
 msgstr "Abbassa Ugello"
@@ -439,9 +448,6 @@ msgstr "Max"
 
 msgid "Max Acceleration"
 msgstr "Max. Accelerazione"
-
-msgid "Max Acceleration to Deceleration"
-msgstr "Max. Accelerazione a Decelerazione"
 
 msgid "Max Velocity"
 msgstr "Velocità massima"
@@ -466,6 +472,9 @@ msgstr "Menù"
 
 msgid "Mesh calibrate"
 msgstr "Calibrazione mesh"
+
+msgid "Minimum Cruise Ratio"
+msgstr ""
 
 msgid "Modified"
 msgstr "Modificato"
@@ -740,10 +749,10 @@ msgid "System"
 msgstr "Sistema"
 
 msgid "System Restart"
-msgstr "Riavvio Sistema"
+msgstr "Riavvia Sistema"
 
 msgid "System Shutdown"
-msgstr "Spegnimento Sistema"
+msgstr "Spegni Sistema"
 
 msgid "Temp (°C)"
 msgstr "Temperatura (°C)"
@@ -843,6 +852,9 @@ msgstr "mm/s²"
 
 msgid "mm³/s"
 msgstr "mm³/s"
+
+#~ msgid "Max Acceleration to Deceleration"
+#~ msgstr "Max. Accelerazione a Decelerazione"
 
 #~ msgid "Continue"
 #~ msgstr "Continua"

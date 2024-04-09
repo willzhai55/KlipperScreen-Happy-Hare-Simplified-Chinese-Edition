@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: KlipperScreen\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-02 17:39-0300\n"
-"PO-Revision-Date: 2023-12-28 12:05+0000\n"
-"Last-Translator: 방영웅 <bangyeongung20@gmail.com>\n"
+"POT-Creation-Date: 2024-04-03 14:35-0300\n"
+"PO-Revision-Date: 2024-03-15 05:29+0000\n"
+"Last-Translator: 이정희 <daemul72@gmail.com>\n"
 "Language-Team: Korean <https://hosted.weblate.org/projects/klipperscreen/"
 "klipperscreen/ko/>\n"
 "Language: ko\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.4-dev\n"
+"X-Generator: Weblate 5.5-dev\n"
 
 #, python-format
 msgid "%s will be updated to version"
@@ -75,7 +75,7 @@ msgid "Are you sure you wish to reboot the system?"
 msgstr "시스템을 재시작 하시겠습니까?"
 
 msgid "Are you sure you wish to shutdown the system?"
-msgstr "시스템을 종료 하시겠습니까?"
+msgstr "시스템을 종료하시겠습니까?"
 
 msgid "Auto"
 msgstr "자동"
@@ -100,6 +100,9 @@ msgstr "배드 메시"
 
 msgid "Bed screw configuration:"
 msgstr "베드 스크류 설정:"
+
+msgid "Both"
+msgstr ""
 
 msgid "Calibrate"
 msgstr "교정"
@@ -193,6 +196,9 @@ msgstr "%s을(를) 복구하시겠습니까?"
 msgid "Elapsed:"
 msgstr "경과:"
 
+msgid "Emergency Stop"
+msgstr ""
+
 msgid "Ended official support in June 2023"
 msgstr ""
 
@@ -209,6 +215,9 @@ msgid "Error setting active spool"
 msgstr ""
 
 msgid "Error trying to fetch spools"
+msgstr ""
+
+msgid "Error: Couldn't get a position to probe"
 msgstr ""
 
 msgid "Estimated Time Method"
@@ -371,7 +380,7 @@ msgid "Klipper has encountered an error."
 msgstr "클리퍼에 오류가 발생했습니다."
 
 msgid "Klipper has shutdown"
-msgstr "클리퍼가 종료되었습니다"
+msgstr "클리퍼가 시스템 종료되었습니다"
 
 msgid "Klipper is attempting to start"
 msgstr "클리퍼 시작하는 중"
@@ -438,9 +447,6 @@ msgstr "최대"
 msgid "Max Acceleration"
 msgstr "최대 가속"
 
-msgid "Max Acceleration to Deceleration"
-msgstr "감속을 위한 최대 가속"
-
 msgid "Max Velocity"
 msgstr "최대 출력 속도"
 
@@ -465,6 +471,9 @@ msgstr "메뉴"
 msgid "Mesh calibrate"
 msgstr "메쉬 보정"
 
+msgid "Minimum Cruise Ratio"
+msgstr ""
+
 msgid "Modified"
 msgstr "수정됨"
 
@@ -472,7 +481,7 @@ msgid "Moonraker: connected"
 msgstr "문래이커: 연결됨"
 
 msgid "More"
-msgstr "더"
+msgstr "더보기"
 
 msgid "Move"
 msgstr "이동"
@@ -687,7 +696,7 @@ msgid "Show Scrollbars Buttons"
 msgstr "스크롤바 버튼 보기"
 
 msgid "Shutdown"
-msgstr "셧다운"
+msgstr "시스템 종료"
 
 msgid "Size"
 msgstr "크기"
@@ -777,7 +786,7 @@ msgid "Uploaded"
 msgstr "업로드됨"
 
 msgid "Warning"
-msgstr ""
+msgstr "경고"
 
 msgid "WebRTC is not supported by the backend trying Stream"
 msgstr ""
@@ -835,6 +844,9 @@ msgstr "mm/s²"
 
 msgid "mm³/s"
 msgstr "mm³/s"
+
+#~ msgid "Max Acceleration to Deceleration"
+#~ msgstr "감속을 위한 최대 가속"
 
 #~ msgid "Continue"
 #~ msgstr "계속"
