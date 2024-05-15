@@ -81,9 +81,9 @@ JFYI the installer will alter or add the KlipperScreen entry in `moonraker.conf`
 
     [update_manager KlipperScreen]
     type: git_repo
-    path: /home/pi/KlipperScreen
+    path: ~/KlipperScreen
     origin: https://github.com/moggieuk/KlipperScreen-Happy-Hare-Edition.git
-    env: /home/pi/.KlipperScreen-env/bin/python
+    env: ~/.KlipperScreen-env/bin/python
     requirements: scripts/KlipperScreen-requirements.txt
     install_script: scripts/KlipperScreen-install.sh
     managed_services: KlipperScreen
