@@ -470,7 +470,7 @@ class Panel(ScreenPanel):
                 self.set_state("printing")
             return
         elif action == "notify_metadata_update" and data['filename'] == self.filename:
-            self.update_file_metadata()
+            self.update_file_metadata(response=True)
         elif action != "notify_status_update":
             return
 
@@ -478,9 +478,9 @@ class Panel(ScreenPanel):
             if x in data:
                 self.update_temp(
                     x,
-                    self._printer.get_dev_stat(x, "temperature"),
-                    self._printer.get_dev_stat(x, "target"),
-                    self._printer.get_dev_stat(x, "power"),
+                    self._printer.get_stat(x, "temperature"),
+                    self._printer.get_stat(x, "target"),
+                    self._printer.get_stat(x, "power"),
                 )
                 if x in self.buttons['extruder']:
                     self.buttons['extruder'][x].set_label(self.labels[x].get_text())
@@ -749,15 +749,12 @@ class Panel(ScreenPanel):
             image.set_from_pixbuf(pixbuf)
 
     def show_fullscreen_thumbnail(self, widget):
-        buttons = [
-            {"name": _("Close"), "response": Gtk.ResponseType.CANCEL}
-        ]
         pixbuf = self.get_file_image(self.filename, self._screen.width * .9, self._screen.height * .75)
         if pixbuf is None:
             return
         image = Gtk.Image.new_from_pixbuf(pixbuf)
         image.set_vexpand(True)
-        self._gtk.Dialog(self.filename, buttons, image, self.close_fullscreen_thumbnail)
+        self._gtk.Dialog(self.filename, None, image, self.close_fullscreen_thumbnail)
 
     def close_fullscreen_thumbnail(self, dialog, response_id):
         self._gtk.remove_dialog(dialog)
@@ -765,30 +762,32 @@ class Panel(ScreenPanel):
     def update_filename(self, filename):
         if not filename:
             return
+        if self.animation_timeout is not None:
+            GLib.source_remove(self.animation_timeout)
+            self.animation_timeout = None
         self.filename = filename
+        logging.debug(f"Updating filename to {filename}")
         self.labels["file"].set_label(os.path.splitext(self.filename)[0])
         self.filename_label = {
             "complete": self.labels['file'].get_label(),
             "current": self.labels['file'].get_label(),
-            "position": 0,
-            "limit": (self._screen.width * 37 / 480) // (self._gtk.font_size / 11),
-            "length": len(self.labels['file'].get_label())
         }
-        if self.animation_timeout is None and (self.filename_label['length'] - self.filename_label['limit']) > 0:
+        ellipsized = self.labels['file'].get_layout().is_ellipsized()
+        if ellipsized:
             self.animation_timeout = GLib.timeout_add_seconds(1, self.animate_label)
         self.update_file_metadata()
 
     def animate_label(self):
-        pos = self.filename_label['position']
-        if pos > (self.filename_label['length'] - self.filename_label['limit']):
-            self.filename_label['position'] = 0
-            self.labels['file'].set_label(self.filename_label['complete'])
+        ellipsized = self.labels['file'].get_layout().is_ellipsized()
+        if ellipsized:
+            self.filename_label['current'] = self.filename_label['current'][2:]
+            self.labels['file'].set_label(self.filename_label['current'])
         else:
-            self.labels['file'].set_label(self.filename_label['current'][pos:self.filename_label['length']])
-            self.filename_label['position'] += 1
+            self.filename_label['current'] = self.filename_label['complete']
+            self.labels['file'].set_label(self.filename_label['complete'])
         return True
 
-    def update_file_metadata(self):
+    def update_file_metadata(self, response=False):
         if self._files.file_metadata_exists(self.filename):
             self.file_metadata = self._files.get_file_info(self.filename)
             logging.info(f"Update Metadata. File: {self.filename} Size: {self.file_metadata['size']}")
@@ -806,7 +805,9 @@ class Panel(ScreenPanel):
                     self.labels['total_layers'].set_label(f"{((self.oheight - self.f_layer_h) / self.layer_h) + 1:.0f}")
             if "filament_total" in self.file_metadata:
                 self.labels['filament_total'].set_label(f"{float(self.file_metadata['filament_total']) / 1000:.1f} m")
-        else:
+        elif not response:
             logging.debug("Cannot find file metadata. Listening for updated metadata")
             self._files.request_metadata(self.filename)
+        else:
+            logging.debug("Cannot load file metadata")
         self.show_file_thumbnail()

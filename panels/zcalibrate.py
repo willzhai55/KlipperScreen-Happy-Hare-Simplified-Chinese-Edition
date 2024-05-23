@@ -2,7 +2,7 @@ import logging
 import gi
 
 gi.require_version("Gtk", "3.0")
-from gi.repository import Gtk
+from gi.repository import Gtk, Pango
 from ks_includes.screen_panel import ScreenPanel
 
 
@@ -45,6 +45,9 @@ class Panel(ScreenPanel):
             pos.attach(Gtk.Label(label=_("New")), 1, 3, 1, 1)
             pos.attach(Gtk.Label(label=f"{self.z_offset:.3f}"), 0, 4, 1, 1)
             pos.attach(self.widgets['zoffset'], 1, 4, 1, 1)
+        for label in pos.get_children():
+            if isinstance(label, Gtk.Label):
+                label.set_ellipsize(Pango.EllipsizeMode.END)
         self.buttons = {
             'zpos': self._gtk.Button('z-farther', _("Raise Nozzle"), 'color4'),
             'zneg': self._gtk.Button('z-closer', _("Lower Nozzle"), 'color1'),
@@ -55,9 +58,12 @@ class Panel(ScreenPanel):
         self.buttons['zpos'].connect("clicked", self.move, "+")
         self.buttons['zneg'].connect("clicked", self.move, "-")
         self.buttons['complete'].connect("clicked", self.accept)
-        self.buttons['cancel'].connect("clicked", self.abort)
+        script = {"script": "ABORT"}
+        self.buttons['cancel'].connect("clicked", self._screen._confirm_send_action,
+                                       _("Are you sure you want to stop the calibration?"),
+                                       "printer.gcode.script", script)
 
-        self.labels['popover'] = Gtk.Popover(position=Gtk.PositionType.BOTTOM)
+        self.popover = Gtk.Popover(position=Gtk.PositionType.BOTTOM)
 
         self.set_functions()
 
@@ -79,16 +85,24 @@ class Panel(ScreenPanel):
 
         grid = Gtk.Grid(column_homogeneous=True)
         if self._screen.vertical_mode:
-            grid.attach(self.buttons['zpos'], 0, 1, 1, 1)
-            grid.attach(self.buttons['zneg'], 0, 2, 1, 1)
+            if self._config.get_config()["main"].getboolean("invert_z", False):
+                grid.attach(self.buttons['zpos'], 0, 2, 1, 1)
+                grid.attach(self.buttons['zneg'], 0, 1, 1, 1)
+            else:
+                grid.attach(self.buttons['zpos'], 0, 1, 1, 1)
+                grid.attach(self.buttons['zneg'], 0, 2, 1, 1)
             grid.attach(self.buttons['start'], 0, 0, 1, 1)
             grid.attach(pos, 1, 0, 1, 1)
             grid.attach(self.buttons['complete'], 1, 1, 1, 1)
             grid.attach(self.buttons['cancel'], 1, 2, 1, 1)
             grid.attach(distances, 0, 3, 2, 1)
         else:
-            grid.attach(self.buttons['zpos'], 0, 0, 1, 1)
-            grid.attach(self.buttons['zneg'], 0, 1, 1, 1)
+            if self._config.get_config()["main"].getboolean("invert_z", False):
+                grid.attach(self.buttons['zpos'], 0, 1, 1, 1)
+                grid.attach(self.buttons['zneg'], 0, 0, 1, 1)
+            else:
+                grid.attach(self.buttons['zpos'], 0, 0, 1, 1)
+                grid.attach(self.buttons['zneg'], 0, 1, 1, 1)
             grid.attach(self.buttons['start'], 1, 0, 1, 1)
             grid.attach(pos, 1, 1, 1, 1)
             grid.attach(self.buttons['complete'], 2, 0, 1, 1)
@@ -130,8 +144,11 @@ class Panel(ScreenPanel):
             # Since probes may not be accturate enough for deltas, always show the manual method
             self._add_button("Delta Manual", "delta_manual", pobox)
             functions.append("delta_manual")
+        if "AXIS_TWIST_COMPENSATION_CALIBRATE" in self._printer.available_commands:
+            self._add_button("Axis Twist Compensation", "axis_twist", pobox)
+            functions.append("axis_twist")
 
-        self.labels['popover'].add(pobox)
+        self.popover.add(pobox)
         if len(functions) > 1:
             self.buttons['start'].connect("clicked", self.on_popover_clicked)
         else:
@@ -148,11 +165,11 @@ class Panel(ScreenPanel):
         pobox.pack_start(popover_button, True, True, 5)
 
     def on_popover_clicked(self, widget):
-        self.labels['popover'].set_relative_to(widget)
-        self.labels['popover'].show_all()
+        self.popover.set_relative_to(widget)
+        self.popover.show_all()
 
     def start_calibration(self, widget, method):
-        self.labels['popover'].popdown()
+        self.popover.popdown()
         self.buttons['start'].set_sensitive(False)
         if self._printer.get_stat("toolhead", "homed_axes") != "xyz":
             self._screen._ws.klippy.gcode_script("G28")
@@ -170,6 +187,8 @@ class Panel(ScreenPanel):
                 self._screen._ws.klippy.gcode_script("DELTA_CALIBRATE METHOD=manual")
             elif method == "endstop":
                 self._screen._ws.klippy.gcode_script("Z_ENDSTOP_CALIBRATE")
+            elif method == "axis_twist":
+                self._screen._ws.klippy.gcode_script("AXIS_TWIST_COMPENSATION_CALIBRATE")
 
     def _move_to_position(self, x, y):
         if not x or not y:
@@ -265,12 +284,6 @@ class Panel(ScreenPanel):
 
     def move(self, widget, direction):
         self._screen._ws.klippy.gcode_script(f"TESTZ Z={direction}{self.distance}")
-
-    def abort(self, widget):
-        logging.info("Aborting calibration")
-        self._screen._ws.klippy.gcode_script("ABORT")
-        self.buttons_not_calibrating()
-        self._screen._menu_go_back()
 
     def accept(self, widget):
         logging.info("Accepting Z position")
