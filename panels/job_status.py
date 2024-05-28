@@ -481,6 +481,7 @@ class Panel(ScreenPanel):
                     self._printer.get_stat(x, "temperature"),
                     self._printer.get_stat(x, "target"),
                     self._printer.get_stat(x, "power"),
+                    digits=0
                 )
                 if x in self.buttons['extruder']:
                     self.buttons['extruder'][x].set_label(self.labels[x].get_text())
@@ -605,6 +606,7 @@ class Panel(ScreenPanel):
         self.labels["duration"].set_label(self.format_time(total_duration))
         elapsed_label = f"{self.labels['elapsed'].get_text()}  {self.labels['duration'].get_text()}"
         self.buttons['elapsed'].set_label(elapsed_label)
+        find_widget(self.buttons['elapsed'], Gtk.Label).set_ellipsize(Pango.EllipsizeMode.END)
         estimated = slicer_time = filament_time = file_time = 0
         timeleft_type = self._config.get_config()['main'].get('print_estimate_method', 'auto')
 
@@ -651,6 +653,7 @@ class Panel(ScreenPanel):
             self.labels["time_left"].set_label(self.format_eta(estimated, print_duration))
             remaining_label = f"{self.labels['left'].get_text()}  {self.labels['time_left'].get_text()}"
             self.buttons['left'].set_label(remaining_label)
+            find_widget(self.buttons['left'], Gtk.Label).set_ellipsize(Pango.EllipsizeMode.END)
         self.update_progress(progress)
 
     def update_progress(self, progress: float):
@@ -778,6 +781,8 @@ class Panel(ScreenPanel):
         self.update_file_metadata()
 
     def animate_label(self):
+        if not self.filename_label:
+            return False
         ellipsized = self.labels['file'].get_layout().is_ellipsized()
         if ellipsized:
             self.filename_label['current'] = self.filename_label['current'][2:]

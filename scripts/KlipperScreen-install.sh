@@ -103,10 +103,11 @@ install_packages()
 
 check_requirements()
 {
-    echo_text "Checking Python version"
+    VERSION="3,8"
+    echo_text "Checking Python version > "$VERSION
     python3 --version
-    if ! python3 -c 'import sys; exit(1) if sys.version_info <= (3,7) else exit(0)'; then
-        echo_text 'Not supported'
+    if ! python3 -c 'import sys; exit(1) if sys.version_info <= ('$VERSION') else exit(0)'; then
+        echo_error 'Not supported'
         exit 1
     fi
 }
@@ -201,6 +202,12 @@ create_policy()
     KS_GID=$( getent group klipperscreen | awk -F: '{printf "%d", $3}' )
     sudo tee ${RULE_FILE} > /dev/null << EOF
 // Allow KlipperScreen to reboot, shutdown, etc
+polkit.addRule(function(action, subject) {
+    if (action.id == "org.freedesktop.NetworkManager.settings.modify.system" &&
+        subject.isInGroup("network")) {
+        return polkit.Result.YES;
+    }
+});
 polkit.addRule(function(action, subject) {
     if ((action.id == "org.freedesktop.login1.power-off" ||
          action.id == "org.freedesktop.login1.power-off-multiple-sessions" ||
