@@ -221,7 +221,7 @@ class Panel(ScreenPanel):
                 color = self.COLOR_ORANGE
             self.labels[f'remaining_percentage_{i}'].override_color(Gtk.StateType.NORMAL,color)
 
-            self.labels[f'material_{i}'].set_label(material) 
+            self.labels[f'material_{i}'].set_label(material[:6]) 
             self.labels[f'filament_{i}'].set_label(filament) 
             #self.labels[f'vendor_{i}'].set_label(vendor) 
             self.labels[f'tools_{i}'].set_label(tool_str)
