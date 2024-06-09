@@ -276,7 +276,7 @@ class KlipperScreenConfig:
             {"theme": {
                 "section": "main", "name": _("Icon Theme"), "type": "dropdown",
                 "tooltip": _("Changes how the interface looks"),
-                "value": "z-bolt", "callback": screen.restart_ks, "options": [
+                "value": "z-bolt", "callback": screen.change_theme, "options": [
                     {"name": "Z-bolt" + " " + _("(default)"), "value": "z-bolt"}]}},
             {"print_estimate_method": {
                 "section": "main", "name": _("Estimated Time Method"), "type": "dropdown",
@@ -497,7 +497,8 @@ class KlipperScreenConfig:
         directories = [printer_data_config, xdg_config, klipperscreendir]
 
         for directory in directories:
-            if path := self.check_path_exists(directory, self.configfile_name):
+            path = self.check_path_exists(directory, self.configfile_name)
+            if path:
                 return path
 
         # fallback

@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Czech\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-05-23 23:37-0300\n"
-"PO-Revision-Date: 2024-05-27 14:12+0000\n"
+"POT-Creation-Date: 2024-06-02 08:38-0300\n"
+"PO-Revision-Date: 2024-06-03 19:09+0000\n"
 "Last-Translator: Miloslav Kos <kos.m@post.cz>\n"
 "Language-Team: Czech <https://hosted.weblate.org/projects/klipperscreen/"
 "klipperscreen/cs/>\n"
@@ -175,15 +175,24 @@ msgstr "Potvrzovat Emergency Stop"
 msgid "Connected"
 msgstr "Připojeno"
 
+msgid "Connecting"
+msgstr "Připojení"
+
 #, python-format
 msgid "Connecting to %s"
 msgstr "Připojování k %s"
+
+msgid "Connection failed"
+msgstr "Připojení se nezdařilo"
 
 msgid "Console"
 msgstr "Konsole"
 
 msgid "Cooldown"
 msgstr "Zchladit"
+
+msgid "Couldn't add network"
+msgstr "Nepodařilo se přidat síť"
 
 msgid "Current percentage and graph line"
 msgstr "Aktuální procento a linie grafu"
@@ -206,8 +215,18 @@ msgstr "Uvolnit motory"
 msgid "Disable for 12hs with am / pm"
 msgstr "Vypnout na 12 hodin am / pm"
 
+msgid "Disconnect"
+msgstr "Odpojení"
+
 msgid "Distance (mm)"
 msgstr "Vzdálenost (mm)"
+
+#, python-format
+msgid "Do you want to forget or disconnect %s?"
+msgstr "Chcete zapomenout nebo se odpojit %s?"
+
+msgid "Do you want to let KlipperScreen try to solve the issue?"
+msgstr "Chcete nechat KlipperScreen, aby se pokusil problém vyřešit?"
 
 #, python-format
 msgid "Do you want to recover %s?"
@@ -221,9 +240,6 @@ msgstr "Nouzové zastavení"
 
 msgid "Enable screen power management"
 msgstr "Povolit správu napájení obrazovky"
-
-msgid "Ended official support in June 2023"
-msgstr "Oficiální podpora ukončena v červnu 2023"
 
 msgid "Error"
 msgstr "Chyba"
@@ -242,6 +258,9 @@ msgstr "Chyba při pokusu o načtení cívek"
 
 msgid "Error: Couldn't get a position to probe"
 msgstr "Chyba: Nepodařilo se získat pozici pro sondování"
+
+msgid "Estimated Time"
+msgstr "Odhadovaný čas"
 
 msgid "Estimated Time Method"
 msgstr "Výpočet doby tisku"
@@ -264,11 +283,20 @@ msgstr "Extruze +"
 msgid "Extrusion -"
 msgstr "Extruze -"
 
+msgid "Failed to delete connection"
+msgstr "Nepodařilo se odstranit připojení"
+
+msgid "Failed to initialize"
+msgstr "Inicializace se nezdařila"
+
 msgid "Failed, adjust position first"
 msgstr "Chyba, nastav nejprve pozici"
 
 msgid "Fan"
 msgstr "Větrák"
+
+msgid "Filament"
+msgstr "Filament"
 
 msgid "Filament Used"
 msgstr "Typ filamentu"
@@ -312,17 +340,23 @@ msgstr "Rychlost toku:"
 msgid "Font Size"
 msgstr "Velikost fontu"
 
+msgid "Forget"
+msgstr "Zapomenout"
+
 msgid "Full Update"
 msgstr "Úplný update"
+
+msgid "Gcodes"
+msgstr "Gkódy"
+
+msgid "Getting IP address"
+msgstr "Získání IP adresy"
 
 msgid "Go Back"
 msgstr "Zpět"
 
 msgid "Height:"
 msgstr "Výška:"
-
-msgid "Hidden"
-msgstr "Skrytý"
 
 msgid "Hide"
 msgstr "Skrýt"
@@ -372,6 +406,12 @@ msgstr "Spustit PID kalibraci:"
 msgid "Input Shaper"
 msgstr "Kompenzace rezonancí"
 
+msgid "Insufficient priviledges detected"
+msgstr "Zjištěna nedostatečná oprávnění"
+
+msgid "Insufficient privileges"
+msgstr "Nedostatečná oprávnění"
+
 msgid "Interface"
 msgstr "Rozhraní"
 
@@ -417,9 +457,6 @@ msgstr "Klipper startuje"
 msgid "Klipper will reboot"
 msgstr "Klipper se restartuje"
 
-msgid "KlipperScreen will drop support in June 2024"
-msgstr "KlipperScreen ztratí podporu v červnu 2024"
-
 msgid ""
 "LOAD_FILAMENT/UNLOAD_FILAMENT are hidden and should be used from extrude"
 msgstr ""
@@ -433,6 +470,9 @@ msgstr "Velký"
 
 msgid "Last Used"
 msgstr "Munulý"
+
+msgid "Layer Height"
+msgstr "Výška vrstvy"
 
 msgid "Layer:"
 msgstr "Vrstva:"
@@ -479,6 +519,9 @@ msgstr "Max. zrychlení"
 msgid "Max Velocity"
 msgstr "Max. rychlost"
 
+msgid "Max:"
+msgstr "Max:"
+
 msgid "Maximum"
 msgstr "Maximum"
 
@@ -506,6 +549,9 @@ msgstr "Kalibrace sítě"
 msgid "Minimum Cruise Ratio"
 msgstr "Minimální cestovní poměr"
 
+msgid "Minimum:"
+msgstr "Min:"
+
 msgid "Modified"
 msgstr "Změněno"
 
@@ -526,6 +572,15 @@ msgstr "Jméno"
 
 msgid "Network"
 msgstr "Síť"
+
+msgid "Network connected"
+msgstr "Připojeno k síti"
+
+msgid "Network disconnected"
+msgstr "Síť odpojena"
+
+msgid "Network not found"
+msgstr "Síť nebyla nalezena"
 
 msgid "Never"
 msgstr "Nikdy"
@@ -606,14 +661,14 @@ msgstr "Zapni tiskárnu"
 msgid "Pressure Advance:"
 msgstr "Pressure Advance:"
 
+msgid "Pressure Advance"
+msgstr "Pressure Advance"
+
 msgid "Print"
 msgstr "Tisk"
 
 msgid "Print Control"
 msgstr "Nastavení tisku"
-
-msgid "Print Time"
-msgstr "Čas tisku"
 
 msgid "Printer"
 msgstr "Tiskárna"
@@ -656,6 +711,9 @@ msgstr "Odkaz"
 
 msgid "Refresh"
 msgstr "Obnovit"
+
+msgid "Remove network"
+msgstr "Odebrat síť"
 
 msgid "Rename/Move:"
 msgstr "Přejmenovat/Přesunout:"
@@ -775,9 +833,6 @@ msgstr "Pohotovostní režim"
 msgid "Start"
 msgstr "Start"
 
-msgid "Starting WiFi Association"
-msgstr "Připojování k WiFi"
-
 msgid "Starting recovery for"
 msgstr "Obnovuji"
 
@@ -796,11 +851,17 @@ msgstr "Restart systému"
 msgid "System Shutdown"
 msgstr "Vypnutí"
 
+msgid "System:"
+msgstr "Systém:"
+
 msgid "Temp (°C)"
 msgstr "Teplota (°C)"
 
 msgid "Temperature"
 msgstr "Teplota"
+
+msgid "The system doesn't meet the minimum requirement"
+msgstr "Systém nesplňuje minimální požadavky"
 
 msgid "This panel supports up-to 9 screws in a 3x3 Grid"
 msgstr "Tento panel podporuje až 9 šroubů v mřížce 3x3"
@@ -819,6 +880,9 @@ msgstr "Total:"
 
 msgid "Unknown Heater"
 msgstr "Neznámé topení"
+
+msgid "Unknown security type"
+msgstr "Neznámý typ zabezpečení"
 
 msgid "Unload"
 msgstr "Vysuň"
@@ -843,9 +907,6 @@ msgstr "Nahrané"
 
 msgid "Useful for un-responsive touchscreens"
 msgstr "Užitečné pro nereagující dotykové obrazovky"
-
-msgid "Warning"
-msgstr "Varování"
 
 msgid "WebRTC is not supported by the backend trying Stream"
 msgstr "WebRTC není podporováno backendem, který se pokouší spustit Stream"
@@ -876,9 +937,6 @@ msgid_plural "commits"
 msgstr[0] "potvrzení"
 msgstr[1] "potvrzení"
 msgstr[2] "potvrzení"
-
-msgid "dBm"
-msgstr "dBm"
 
 msgid "day"
 msgid_plural "days"
@@ -921,6 +979,27 @@ msgid_plural "seconds"
 msgstr[0] "sekunda"
 msgstr[1] "sekundy"
 msgstr[2] "sekundy"
+
+#~ msgid "Ended official support in June 2023"
+#~ msgstr "Oficiální podpora ukončena v červnu 2023"
+
+#~ msgid "Hidden"
+#~ msgstr "Skrytý"
+
+#~ msgid "KlipperScreen will drop support in June 2024"
+#~ msgstr "KlipperScreen ztratí podporu v červnu 2024"
+
+#~ msgid "Print Time"
+#~ msgstr "Čas tisku"
+
+#~ msgid "Starting WiFi Association"
+#~ msgstr "Připojování k WiFi"
+
+#~ msgid "Warning"
+#~ msgstr "Varování"
+
+#~ msgid "dBm"
+#~ msgstr "dBm"
 
 #~ msgid "Deselect"
 #~ msgstr "Odznačit"

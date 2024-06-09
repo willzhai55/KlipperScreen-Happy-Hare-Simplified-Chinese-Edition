@@ -1,3 +1,4 @@
+import subprocess
 import logging
 import os
 import gi
@@ -11,26 +12,40 @@ from ks_includes.sdbus_nm import SdbusNm
 class Panel(ScreenPanel):
 
     def __init__(self, screen, title):
+        title = title or _("Network")
         super().__init__(screen, title)
-        self.show_add = False
-        self.update_timeout = None
-        self.network_list = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, hexpand=True, vexpand=True)
-        self.network_rows = {}
-        self.networks = {}
         try:
             self.sdbus_nm = SdbusNm(self.popup_callback)
         except Exception as e:
             logging.exception("Failed to initialize")
             self.sdbus_nm = None
-            self.content.add(
+            self.error_box = Gtk.Box(
+                orientation=Gtk.Orientation.VERTICAL,
+                hexpand=True,
+                vexpand=True
+            )
+            message = (
+                _("Failed to initialize") + "\n"
+                + "This panel needs NetworkManager installed into the system\n"
+                + "And the apropriate permissions, without them it will not function.\n"
+                + f"\n{e}\n"
+            )
+            self.error_box.add(
                 Gtk.Label(
-                    label=_("Failed to initialize sdbus") + f"\n{e}",
+                    label=message,
                     wrap=True,
                     wrap_mode=Pango.WrapMode.WORD_CHAR,
                 )
             )
+            self.error_box.set_valign(Gtk.Align.CENTER)
+            self.content.add(self.error_box)
             self._screen.panels_reinit.append(self._screen._cur_panels[-1])
             return
+        self.show_add = False
+        self.update_timeout = None
+        self.network_list = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, hexpand=True, vexpand=True)
+        self.network_rows = {}
+        self.networks = {}
         self.wifi_signal_icons = {
             'excellent': self._gtk.PixbufFromIcon('wifi_excellent'),
             'good': self._gtk.PixbufFromIcon('wifi_good'),
@@ -79,6 +94,8 @@ class Panel(ScreenPanel):
             self.labels['main_box'].pack_start(sbox, False, False, 5)
             GLib.idle_add(self.load_networks)
             scroll.add(self.network_list)
+            self.sdbus_nm.enable_monitoring(True)
+            self.conn_status = GLib.timeout_add_seconds(1, self.sdbus_nm.monitor_connection_status)
         else:
             self._screen.show_popup_message(_("No wireless interface has been found"), level=2)
             self.labels['networkinfo'] = Gtk.Label()
@@ -132,7 +149,7 @@ class Panel(ScreenPanel):
                          halign=Gtk.Align.START, valign=Gtk.Align.CENTER)
         labels.add(name)
         labels.add(info)
-        icon = self._gtk.Image('wifi_weak')
+        icon = self._gtk.Image()
 
         self.network_rows[bssid] = Gtk.Box(spacing=5, hexpand=True, vexpand=False)
         self.network_rows[bssid].get_style_context().add_class("frame-item")
@@ -345,14 +362,20 @@ class Panel(ScreenPanel):
                     self._gtk.Button_busy(self.reload_button, True)
                     self.sdbus_nm.rescan()
                     self.load_networks()
+                self.update_all_networks()
                 self.update_timeout = GLib.timeout_add_seconds(5, self.update_all_networks)
             else:
+                self.update_single_network_info()
                 self.update_timeout = GLib.timeout_add_seconds(5, self.update_single_network_info)
 
     def deactivate(self):
+        if self.sdbus_nm is None:
+            return
         if self.update_timeout is not None:
             GLib.source_remove(self.update_timeout)
             self.update_timeout = None
+        if self.sdbus_nm.wifi:
+            self.sdbus_nm.enable_monitoring(False)
 
     def toggle_wifi(self, switch, gparams):
         enable = switch.get_active()
