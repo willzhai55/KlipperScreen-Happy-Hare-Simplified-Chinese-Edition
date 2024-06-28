@@ -4,6 +4,7 @@ import gi
 
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, Pango
+from ks_includes.KlippyGtk import find_widget
 
 
 class ScreenPanel:
@@ -128,6 +129,7 @@ class ScreenPanel:
 
     @staticmethod
     def format_time(seconds):
+        spc = "\u00A0"  # Non breakable space
         if seconds is None or seconds < 1:
             return "-"
         days = seconds // 86400
@@ -140,10 +142,10 @@ class ScreenPanel:
         min_units = ngettext("minute", "minutes", minutes)
         seconds %= 60
         sec_units = ngettext("second", "seconds", seconds)
-        return f"{f'{days:2.0f} {day_units} ' if days > 0 else ''}" \
-               f"{f'{hours:2.0f} {hour_units} ' if hours > 0 else ''}" \
-               f"{f'{minutes:2.0f} {min_units} ' if minutes > 0 and days == 0 else ''}" \
-               f"{f'{seconds:2.0f} {sec_units}' if days == 0 and hours == 0 and minutes == 0 else ''}"
+        return f"{f'{days:2.0f}{spc}{day_units}{spc}' if days > 0 else ''}" \
+               f"{f'{hours:2.0f}{spc}{hour_units}{spc}' if hours > 0 else ''}" \
+               f"{f'{minutes:2.0f}{spc}{min_units}{spc}' if minutes > 0 and days == 0 else ''}" \
+               f"{f'{seconds:2.0f}{spc}{sec_units}' if days == 0 and hours == 0 and minutes == 0 else ''}"
 
     def format_eta(self, total, elapsed):
         if total is None:
@@ -195,27 +197,21 @@ class ScreenPanel:
 
         show_power = self._show_heater_power and power
         if show_power:
-            if lines == 2:
-                # The label should wrap, but it doesn't work
-                # this is a workaround
-                new_label_text += "\n  "
             new_label_text += f" {power * 100:3.0f}%"
 
         if dev in self.labels:
-            self.labels[dev].set_label(new_label_text)
-            if show_power:
-                self.labels[dev].get_style_context().add_class("heater-grid-temp-power")
-            else:
-                self.labels[dev].get_style_context().remove_class("heater-grid-temp-power")
+            # Job_Status
+            find_widget(self.labels[dev], Gtk.Label).set_text(new_label_text)
         elif dev in self.devices:
-            self.devices[dev]["temp"].get_child().set_label(new_label_text)
+            # Temperature and Main_Menu
+            find_widget(self.devices[dev]["temp"], Gtk.Label).set_text(new_label_text)
 
     def add_option(self, boxname, opt_array, opt_name, option):
         if option['type'] is None:
             return
         name = Gtk.Label(
             hexpand=True, vexpand=True, halign=Gtk.Align.START, valign=Gtk.Align.CENTER,
-            wrap=True, wrap_mode=Pango.WrapMode.CHAR)
+            wrap=True, wrap_mode=Pango.WrapMode.WORD_CHAR, xalign=0)
         name.set_markup(f"<big><b>{option['name']}</b></big>")
 
         labels = Gtk.Box(spacing=0, orientation=Gtk.Orientation.VERTICAL, valign=Gtk.Align.CENTER)
@@ -224,7 +220,7 @@ class ScreenPanel:
             tooltip = Gtk.Label(
                 label=option['tooltip'],
                 hexpand=True, vexpand=True, halign=Gtk.Align.START, valign=Gtk.Align.CENTER,
-                wrap=True, wrap_mode=Pango.WrapMode.CHAR)
+                wrap=True, wrap_mode=Pango.WrapMode.WORD_CHAR, xalign=0)
             labels.add(tooltip)
 
         row_box = Gtk.Box(spacing=5, valign=Gtk.Align.CENTER, hexpand=True, vexpand=False)

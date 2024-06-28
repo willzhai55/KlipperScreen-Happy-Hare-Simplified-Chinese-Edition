@@ -243,7 +243,7 @@ class Printer:
         return list(self.get_config_section_list("mmu_encoder"))
 
     def get_probe(self):
-        probe_types = ["probe", "bltouch", "smart_effector", "dockable_probe"]
+        probe_types = ["probe", "bltouch", "smart_effector", "probe_eddy_current"]
         for probe_type in probe_types:
             if self.config_section_exists(probe_type):
                 logging.info(f"Probe type: {probe_type}")

@@ -14,7 +14,7 @@ from ks_includes.KlippyGtk import find_widget
 
 class Panel(ScreenPanel):
     def __init__(self, screen, title):
-        title = title or (_("Printing") if self._printer.extrudercount > 0 else _("Job Status"))
+        title = title or _("Job Status")
         super().__init__(screen, title)
         self.grid = Gtk.Grid(column_homogeneous=True)
         self.pos_z = 0.0
@@ -82,18 +82,15 @@ class Panel(ScreenPanel):
 
         self.labels['file'] = Gtk.Label(label="Filename", hexpand=True)
         self.labels['file'].get_style_context().add_class("printing-filename")
-        self.labels['status'] = Gtk.Label(label="Status")
-        self.labels['status'].get_style_context().add_class("printing-status")
-        self.labels['lcdmessage'] = Gtk.Label()
+        self.labels['lcdmessage'] = Gtk.Label(no_show_all=True)
         self.labels['lcdmessage'].get_style_context().add_class("printing-status")
 
         for label in self.labels:
             self.labels[label].set_halign(Gtk.Align.START)
             self.labels[label].set_ellipsize(Pango.EllipsizeMode.END)
 
-        fi_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        fi_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10, valign=Gtk.Align.CENTER)
         fi_box.add(self.labels['file'])
-        fi_box.add(self.labels['status'])
         fi_box.add(self.labels['lcdmessage'])
         self.grid.attach(fi_box, 1, 0, 3, 1)
 
@@ -106,13 +103,13 @@ class Panel(ScreenPanel):
         box.add(self.labels['progress_text'])
 
         overlay = Gtk.Overlay(hexpand=True)
+        overlay.set_size_request(*(self._gtk.font_size * 5,) * 2)
         overlay.add(self.labels['darea'])
         overlay.add_overlay(box)
         self.grid.attach(overlay, 0, 0, 1, 1)
 
         self.labels['thumbnail'] = self._gtk.Button("file")
         self.labels['thumbnail'].connect("clicked", self.show_fullscreen_thumbnail)
-        self.labels['thumbnail'].set_hexpand(False)
         self.labels['info_grid'] = Gtk.Grid()
         self.labels['info_grid'].attach(self.labels['thumbnail'], 0, 0, 1, 1)
         self.current_extruder = self._printer.get_stat("toolhead", "extruder")
@@ -365,22 +362,21 @@ class Panel(ScreenPanel):
     def save_offset(self, widget, device):
         sign = "+" if self.zoffset > 0 else "-"
         label = Gtk.Label(hexpand=True, vexpand=True, wrap=True)
+        saved_z_offset = None
+        msg = f"Apply {sign}{abs(self.zoffset)} offset to {device}?"
         if device == "probe":
-            probe = self._printer.get_probe()
-            saved_z_offset = probe['z_offset'] if probe else "?"
-            label.set_label(_("Apply %s%.3f offset to Probe?") % (sign, abs(self.zoffset))
-                            + "\n\n"
-                            + _("Saved offset: %s") % saved_z_offset)
+            msg = _("Apply %s%.3f offset to Probe?") % (sign, abs(self.zoffset))
+            if probe := self._printer.get_probe():
+                saved_z_offset = probe['z_offset']
         elif device == "endstop":
-            saved_z_offset = None
             msg = _("Apply %s%.3f offset to Endstop?") % (sign, abs(self.zoffset))
             if 'stepper_z' in self._printer.get_config_section_list():
                 saved_z_offset = self._printer.get_config_section('stepper_z')['position_endstop']
             elif 'stepper_a' in self._printer.get_config_section_list():
                 saved_z_offset = self._printer.get_config_section('stepper_a')['position_endstop']
-            if saved_z_offset:
-                msg += "\n\n" + _("Saved offset: %s") % saved_z_offset
-            label.set_label(msg)
+        if saved_z_offset:
+            msg += "\n\n" + _("Saved offset: %s") % saved_z_offset
+        label.set_label(msg)
         buttons = [
             {"name": _("Apply"), "response": Gtk.ResponseType.APPLY, "style": 'dialog-default'},
             {"name": _("Cancel"), "response": Gtk.ResponseType.CANCEL, "style": 'dialog-error'}
@@ -470,7 +466,7 @@ class Panel(ScreenPanel):
                 self.set_state("printing")
             return
         elif action == "notify_metadata_update" and data['filename'] == self.filename:
-            self.update_file_metadata(response=True)
+            self.get_file_metadata(response=True)
         elif action != "notify_status_update":
             return
 
@@ -489,9 +485,11 @@ class Panel(ScreenPanel):
                     self.buttons['heater'][x].set_label(self.labels[x].get_text())
 
         if "display_status" in data and "message" in data["display_status"]:
-            self.labels['lcdmessage'].set_label(
-                f"{data['display_status']['message'] if data['display_status']['message'] is not None else ''}"
-            )
+            if data['display_status']['message']:
+                self.labels['lcdmessage'].set_label(f"{data['display_status']['message']}")
+                self.labels['lcdmessage'].show()
+            else:
+                self.labels['lcdmessage'].hide()
 
         if 'toolhead' in data:
             if 'extruder' in data['toolhead'] and data['toolhead']['extruder'] != self.current_extruder:
@@ -633,7 +631,9 @@ class Panel(ScreenPanel):
         elif timeleft_type == "slicer":
             estimated = slicer_time
         elif estimated < 1:  # Auto
-            if print_duration < slicer_time > 1:
+            if "last_time" in self.file_metadata:
+                estimated = self.file_metadata['last_time']
+            elif print_duration < slicer_time > 1:
                 if progress < 0.15:
                     # At the begining file and filament are innacurate
                     estimated = slicer_time
@@ -663,25 +663,27 @@ class Panel(ScreenPanel):
 
     def set_state(self, state, msg=""):
         if state == "printing":
-            self.labels["status"].set_label(_("Printing"))
+            self._screen.set_panel_title(
+                _("Printing") if self._printer.extrudercount > 0 else _("Working")
+            )
         elif state == "complete":
             self.update_progress(1)
-            self.labels["status"].set_label(_("Complete"))
+            self._screen.set_panel_title(_("Complete"))
             self.buttons['left'].set_label("-")
             self._add_timeout(self._config.get_main_config().getint("job_complete_timeout", 0))
         elif state == "error":
-            self.labels['status'].set_label(_("Error"))
+            self._screen.set_panel_title(_("Error"))
             self._screen.show_popup_message(msg)
             self._add_timeout(self._config.get_main_config().getint("job_error_timeout", 0))
         elif state == "cancelling":
-            self.labels["status"].set_label(_("Cancelling"))
+            self._screen.set_panel_title(_("Cancelling"))
         elif state == "cancelled" or (state == "standby" and self.state == "cancelled"):
-            self.labels["status"].set_label(_("Cancelled"))
+            self._screen.set_panel_title(_("Cancelled"))
             self._add_timeout(self._config.get_main_config().getint("job_cancelled_timeout", 0))
         elif state == "paused":
-            self.labels["status"].set_label(_("Paused"))
+            self._screen.set_panel_title(_("Paused"))
         elif state == "standby":
-            self.labels["status"].set_label(_("Standby"))
+            self._screen.set_panel_title(_("Standby"))
         if self.state != state:
             logging.debug(f"Changing job_status state from '{self.state}' to '{state}'")
             self.state = state
@@ -737,18 +739,22 @@ class Panel(ScreenPanel):
 
     def show_file_thumbnail(self):
         if self._screen.vertical_mode:
-            width = self._screen.width * 0.9
-            height = self._screen.height / 4
+            max_width = self._screen.width * 0.9
+            max_height = self._screen.height / 4
         else:
-            width = self._screen.width * .25
-            height = self._gtk.content_height * 0.47
+            max_width = self._screen.width * .25
+            max_height = self._gtk.content_height * 0.47
+        width = min(self.labels['thumbnail'].get_allocated_width(), max_width)
+        height = min(self.labels['thumbnail'].get_allocated_height(), max_height)
+        if width <= 1 or height <= 1:
+            width = max_width
+            height = max_height
+        self.labels['thumbnail'].set_hexpand(False)
         pixbuf = self.get_file_image(self.filename, width, height)
-        logging.debug(self.filename)
         if pixbuf is None:
             logging.debug("no pixbuf")
             return
-        image = find_widget(self.labels['thumbnail'], Gtk.Image)
-        if image:
+        if image := find_widget(self.labels['thumbnail'], Gtk.Image):
             image.set_from_pixbuf(pixbuf)
 
     def show_fullscreen_thumbnail(self, widget):
@@ -768,6 +774,7 @@ class Panel(ScreenPanel):
         if self.animation_timeout is not None:
             GLib.source_remove(self.animation_timeout)
             self.animation_timeout = None
+
         self.filename = filename
         logging.debug(f"Updating filename to {filename}")
         self.labels["file"].set_label(os.path.splitext(self.filename)[0])
@@ -775,44 +782,55 @@ class Panel(ScreenPanel):
             "complete": self.labels['file'].get_label(),
             "current": self.labels['file'].get_label(),
         }
-        ellipsized = self.labels['file'].get_layout().is_ellipsized()
-        if ellipsized:
-            self.animation_timeout = GLib.timeout_add_seconds(1, self.animate_label)
-        self.update_file_metadata()
+
+        if ellipsized := self.labels['file'].get_layout().is_ellipsized():
+            self.animation_timeout = GLib.timeout_add(500, self.animate_label)
+        else:
+            self.animation_timeout = None
+
+        self.get_file_metadata()
 
     def animate_label(self):
-        if not self.filename_label:
+        if not self.filename_label or self.animation_timeout is None:
             return False
-        ellipsized = self.labels['file'].get_layout().is_ellipsized()
-        if ellipsized:
-            self.filename_label['current'] = self.filename_label['current'][2:]
-            self.labels['file'].set_label(self.filename_label['current'])
+
+        if ellipsized := self.labels['file'].get_layout().is_ellipsized():
+            self.filename_label['current'] = self.filename_label['current'][1:]
+            self.labels['file'].set_label(self.filename_label['current'] + " " * 6)
         else:
             self.filename_label['current'] = self.filename_label['complete']
             self.labels['file'].set_label(self.filename_label['complete'])
         return True
 
-    def update_file_metadata(self, response=False):
+    def get_file_metadata(self, response=False):
         if self._files.file_metadata_exists(self.filename):
-            self.file_metadata = self._files.get_file_info(self.filename)
-            logging.info(f"Update Metadata. File: {self.filename} Size: {self.file_metadata['size']}")
-            if "estimated_time" in self.file_metadata and self.timeleft_type == "slicer":
-                self.labels["est_time"].set_label(self.format_time(self.file_metadata['estimated_time']))
-            if "object_height" in self.file_metadata:
-                self.oheight = float(self.file_metadata['object_height'])
-                self.labels['height'].set_label(f"{self.oheight} {self.mm}")
-                if "layer_height" in self.file_metadata:
-                    self.layer_h = float(self.file_metadata['layer_height'])
-                    if "first_layer_height" in self.file_metadata:
-                        self.f_layer_h = float(self.file_metadata['first_layer_height'])
-                    else:
-                        self.f_layer_h = self.layer_h
-                    self.labels['total_layers'].set_label(f"{((self.oheight - self.f_layer_h) / self.layer_h) + 1:.0f}")
-            if "filament_total" in self.file_metadata:
-                self.labels['filament_total'].set_label(f"{float(self.file_metadata['filament_total']) / 1000:.1f} m")
+            self._update_file_metadata()
         elif not response:
             logging.debug("Cannot find file metadata. Listening for updated metadata")
             self._files.request_metadata(self.filename)
         else:
             logging.debug("Cannot load file metadata")
         self.show_file_thumbnail()
+
+    def _update_file_metadata(self):
+        self.file_metadata = self._files.get_file_info(self.filename)
+        logging.info(f"Update Metadata. File: {self.filename} Size: {self.file_metadata['size']}")
+        if "estimated_time" in self.file_metadata and self.timeleft_type == "slicer":
+            self.labels["est_time"].set_label(self.format_time(self.file_metadata['estimated_time']))
+        if "object_height" in self.file_metadata:
+            self.oheight = float(self.file_metadata['object_height'])
+            self.labels['height'].set_label(f"{self.oheight} {self.mm}")
+            if "layer_height" in self.file_metadata:
+                self.layer_h = float(self.file_metadata['layer_height'])
+                self.f_layer_h = (
+                    float(self.file_metadata['first_layer_height'])
+                    if "first_layer_height" in self.file_metadata
+                    else self.layer_h
+                )
+                self.labels['total_layers'].set_label(f"{((self.oheight - self.f_layer_h) / self.layer_h) + 1:.0f}")
+        if "filament_total" in self.file_metadata:
+            self.labels['filament_total'].set_label(f"{float(self.file_metadata['filament_total']) / 1000:.1f} m")
+        if "job_id" in self.file_metadata and self.file_metadata['job_id']:
+            history = self._screen.apiclient.send_request(f"server/history/job?uid={self.file_metadata['job_id']}")
+            if history and history['job']['status'] == "completed" and history['job']['print_duration']:
+                self.file_metadata["last_time"] = history['job']['print_duration']

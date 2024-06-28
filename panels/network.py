@@ -14,6 +14,7 @@ class Panel(ScreenPanel):
     def __init__(self, screen, title):
         title = title or _("Network")
         super().__init__(screen, title)
+        self.show_add = False
         try:
             self.sdbus_nm = SdbusNm(self.popup_callback)
         except Exception as e:
@@ -41,7 +42,6 @@ class Panel(ScreenPanel):
             self.content.add(self.error_box)
             self._screen.panels_reinit.append(self._screen._cur_panels[-1])
             return
-        self.show_add = False
         self.update_timeout = None
         self.network_list = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, hexpand=True, vexpand=True)
         self.network_rows = {}
@@ -379,9 +379,10 @@ class Panel(ScreenPanel):
 
     def toggle_wifi(self, switch, gparams):
         enable = switch.get_active()
-        if enable:
-            self.reload_button.show()
-        else:
-            self.reload_button.hide()
         logging.info(f"WiFi {enable}")
         self.sdbus_nm.toggle_wifi(enable)
+        if enable:
+            self.reload_button.show()
+            self.reload_networks()
+        else:
+            self.reload_button.hide()
