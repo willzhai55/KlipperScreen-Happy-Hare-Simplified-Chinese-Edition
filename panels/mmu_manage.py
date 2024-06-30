@@ -183,7 +183,7 @@ class Panel(ScreenPanel):
         self.ui_action_button_label = self.labels[self.ui_action_button_name].get_label()
         mmu = self._printer.get_stat("mmu")
         current_gate = mmu['gate']
-        self._screen._ws.klippy.gcode_script(f"MMU_CHECK_GATES GATE={current_gate} QUIET=1")
+        self._screen._ws.klippy.gcode_script(f"MMU_CHECK_GATE GATE={current_gate} QUIET=1")
 
     def select_load(self, widget):
         self.ui_action_button_name = 'load'

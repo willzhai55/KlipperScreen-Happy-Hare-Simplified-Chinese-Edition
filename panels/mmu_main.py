@@ -303,7 +303,7 @@ class Panel(ScreenPanel):
             None,
             "Check filament availabily in all MMU gates?\n\nAre you sure you want to continue?",
             "printer.gcode.script",
-            {'script': "MMU_CHECK_GATES QUIET=1"}
+            {'script': "MMU_CHECK_GATE ALL=1 QUIET=1"}
         )
 
     def select_tool(self, widget, param=0):
