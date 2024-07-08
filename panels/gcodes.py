@@ -16,7 +16,7 @@ def format_label(widget):
         label.set_line_wrap_mode(Pango.WrapMode.CHAR)
         label.set_line_wrap(True)
         label.set_ellipsize(Pango.EllipsizeMode.END)
-        label.set_lines(2)
+        label.set_lines(3)
 
 
 class Panel(ScreenPanel):
@@ -161,7 +161,8 @@ class Panel(ScreenPanel):
             icon = Gtk.Button()
             row = Gtk.Grid(hexpand=True, vexpand=False, valign=Gtk.Align.CENTER)
             row.get_style_context().add_class("frame-item")
-            row.attach(icon, 0, 0, 1, 2)
+            if self._screen.width >= 400:
+                row.attach(icon, 0, 0, 1, 2)
             row.attach(itemname, 1, 0, 3, 1)
             row.attach(info, 1, 1, 1, 1)
             row.attach(rename, 2, 1, 1, 1)
@@ -177,7 +178,11 @@ class Panel(ScreenPanel):
                 action.set_hexpand(False)
                 action.set_vexpand(False)
                 action.set_halign(Gtk.Align.END)
-                row.attach(action, 4, 0, 1, 2)
+                if self._screen.width >= 400:
+                    row.attach(action, 4, 0, 1, 2)
+                else:
+                    icon.get_style_context().add_class("color3")
+                    row.attach(icon, 4, 0, 1, 2)
             elif 'dirname' in item:
                 icon.connect("clicked", self.change_dir, path)
                 image_args = (None, icon, self.thumbsize / 2, True, "folder")
@@ -313,9 +318,9 @@ class Panel(ScreenPanel):
         action = _("Print") if self._printer.extrudercount > 0 else _("Start")
 
         buttons = [
-            {"name": _("Delete"), "response": Gtk.ResponseType.REJECT, "style": 'dialog-warning'},
-            {"name": action, "response": Gtk.ResponseType.OK},
-            {"name": _("Cancel"), "response": Gtk.ResponseType.CANCEL, "style": 'dialog-error'}
+            {"name": _("Delete"), "response": Gtk.ResponseType.REJECT, "style": 'dialog-error'},
+            {"name": action, "response": Gtk.ResponseType.OK, "style": 'dialog-primary'},
+            {"name": _("Cancel"), "response": Gtk.ResponseType.CANCEL, "style": 'dialog-secondary'}
         ]
 
         label = Gtk.Label(hexpand=True, vexpand=True, wrap=True, wrap_mode=Pango.WrapMode.WORD_CHAR)

@@ -29,6 +29,7 @@ class Printer:
         self.spoolman = False
         self.temp_devices = self.sensors = None
         self.system_info = {}
+        self.warnings = []
 
     def reinit(self, printer_info, data):
         self.config = data['configfile']['config']
@@ -47,6 +48,7 @@ class Printer:
         self.stop_tempstore_updates()
         self.has_mmu = False # Happy Hare
         self.system_info.clear()
+        self.warnings = []
 
         for x in self.config.keys():
             # Support for hiding devices by name
@@ -117,8 +119,11 @@ class Printer:
             return
 
         for x in data:
-            if x == "configfile" and 'config' in data[x]:
-                self.config.update(data[x]['config'])
+            if x == "configfile":
+                if 'config' in data[x]:
+                    self.config.update(data[x]['config'])
+                if 'warnings' in data[x]:
+                    self.warnings = data[x]['warnings']
             if x not in self.data:
                 self.data[x] = {}
             self.data[x].update(data[x])
@@ -235,7 +240,7 @@ class Printer:
 
     def get_filament_sensors(self):
         if self.sensors is None:
-            self.sensors = list(self.get_config_section_list("filament_switch_sensor "))
+            self.sensors = [x for x in list(self.get_config_section_list("filament_switch_sensor ")) if not x.startswith("filament_switch_sensor mmu_pre_gate_")] # Happy Hare" filter out pre-gate sensors
             self.sensors.extend(iter(self.get_config_section_list("filament_motion_sensor ")))
         return self.sensors
 

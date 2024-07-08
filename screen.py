@@ -9,6 +9,7 @@ import subprocess
 import pathlib
 import traceback  # noqa
 import locale
+import re
 import sys
 import gi
 
@@ -176,6 +177,8 @@ class KlipperScreen(Gtk.Window):
             self.set_screenblanking_timeout(self._config.get_main_config().get('screen_blanking_printing'))
         else:
             self.set_screenblanking_timeout(self._config.get_main_config().get('screen_blanking'))
+            for warning in self.printer.warnings:
+                self.show_popup_message(f"Klipper:\n{warning['message']}", level=2)
         callback()
         return False
 
@@ -274,7 +277,7 @@ class KlipperScreen(Gtk.Window):
         requested_updates = {
             "objects": {
                 "bed_mesh": ["profile_name", "mesh_max", "mesh_min", "probed_matrix", "profiles"],
-                "configfile": ["config"],
+                "configfile": ["config", "warnings"],
                 "display_status": ["progress", "message"],
                 "fan": ["speed"],
                 "gcode_move": ["extrude_factor", "gcode_position", "homing_origin", "speed_factor", "speed"],
@@ -354,6 +357,8 @@ class KlipperScreen(Gtk.Window):
                 self.panels[panel_name].__init__(self, title, **kwargs)
                 self.panels_reinit.remove(panel_name)
             self._cur_panels.append(panel_name)
+            if 'extra' in kwargs and hasattr(self.panels[panel], "set_extra"):
+                self.panels[panel].set_extra(**kwargs)
             self.attach_panel(panel_name)
         except Exception as e:
             logging.exception(f"Error attaching panel:\n{e}\n\n{traceback.format_exc()}")
@@ -386,8 +391,12 @@ class KlipperScreen(Gtk.Window):
         self.notification_log.append(log_entry)
         self.process_update("notify_log", log_entry)
 
+    def notification_log_clear(self):
+        self.notification_log.clear()
+
     def show_popup_message(self, message, level=3, from_ws=False, save=True, monospace=False): # Happy Hare: added `save=, monospace=` functionality
         message = message.replace("// ", "") # Happy Hare added to clean up multi-line messages
+
         if from_ws:
             if (datetime.now() - self.last_popup_time).seconds < 1:
                 return
@@ -935,37 +944,39 @@ class KlipperScreen(Gtk.Window):
             self.printer.process_power_update(data)
             self.panels['splash_screen'].check_power_status()
         elif action == "notify_gcode_response" and self.printer.state not in ["error", "shutdown"]:
-            if not (data.startswith("B:") or data.startswith("T:")):
-                if data.startswith("// action:"):
-                    action = data[10:]
-                    if action.startswith('prompt_begin'):
-                        if self.prompt is not None:
-                            self.prompt.end()
-                        self.prompt = Prompt(self)
-                    if self.prompt is None:
-                        return
-                    self.prompt.decode(action)
-                elif data.startswith("echo: "):
-                    self.show_popup_message(data[6:], 1, from_ws=True)
-                elif data.startswith("!! "):
-                    self.show_popup_message(data[3:], 3, from_ws=True)
-                elif "unknown" in data.lower() and \
-                        not ("TESTZ" in data or "MEASURE_AXES_NOISE" in data or "ACCELEROMETER_QUERY" in data or "MMU" in data or "TTG Map" or "Gates / Filaments" or "from Unknown to" in data or "Tool Unknown" in data): # Happy Hare modified
-                    if data.startswith("// "):
-                        self.show_popup_message(data[3:], from_ws=True)
-                    else:
-                        self.show_popup_message(data, from_ws=True)
-                elif "SAVE_CONFIG" in data and self.printer.state == "ready":
-                    script = {"script": "SAVE_CONFIG"}
-                    self._confirm_send_action(
-                        None,
-                        _("Save configuration?") + "\n\n" + _("Klipper will reboot"),
-                        "printer.gcode.script",
-                        script
-                    )
-                elif data.startswith("// MMU"): # Happy Hare
-                    if not data.startswith("// MMU [") and not data.startswith("// MMU BYPASS"):
-                        self.show_popup_message(data[3:], level=1, monospace=data.startswith("// MMU Statistics:"))
+            if re.match('^(?:ok\\s+)?(B|C|T\\d*):', data):
+                return
+            if data.startswith("// action:"):
+                action = data[10:]
+                if action.startswith('prompt_begin'):
+                    if self.prompt is not None:
+                        self.prompt.end()
+                    self.prompt = Prompt(self)
+                if self.prompt is None:
+                    return
+                self.prompt.decode(action)
+            elif data.startswith("echo: "):
+                self.show_popup_message(data[6:], 1, from_ws=True)
+            elif data.startswith("!! "):
+                self.show_popup_message(data[3:], 3, from_ws=True)
+            elif "unknown" in data.lower() and \
+                    not ("TESTZ" in data or "MEASURE_AXES_NOISE" in data or "ACCELEROMETER_QUERY" in data or "MMU" in data or "TTG Map" or "Gates / Filaments" or "from Unknown to" in data or "Tool Unknown" in data): # Happy Hare modified
+                if data.startswith("// "): # Happy Hare added
+                    self.show_popup_message(data[3:], from_ws=True)
+                else:
+                    self.show_popup_message(data, from_ws=True)
+            elif "SAVE_CONFIG" in data and self.printer.state == "ready":
+                script = {"script": "SAVE_CONFIG"}
+                self._confirm_send_action(
+                    None,
+                    _("Save configuration?") + "\n\n" + _("Klipper will reboot"),
+                    "printer.gcode.script",
+                    script
+                )
+            elif data.startswith("// MMU"): # Happy Hare
+                if not data.startswith("// MMU [") and not data.startswith("// MMU BYPASS"):
+                    self.show_popup_message(data[3:], level=1, monospace=data.startswith("// MMU Statistics:"))
+
         self.process_update(action, data)
 
     def process_update(self, *args):
@@ -1274,7 +1285,7 @@ class KlipperScreen(Gtk.Window):
     def update_size(self, *args):
         width, height = self.get_size()
         if width != self.width or height != self.height:
-            logging.info(f"Size changed: {self.width}x{self.height}")
+            logging.info(f"Size changed: {width}x{height}")
         self.width, self.height = width, height
         new_ratio = self.width / self.height
         new_mode = new_ratio < 1.0
