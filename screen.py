@@ -1194,6 +1194,11 @@ class KlipperScreen(Gtk.Window):
         self.initializing = False
         self.printer.process_update(data['status'])
         self.log_notification("Printer Initialized", 1)
+
+        # Happy Hare: Set sensible default value based on mmu config that we are connected to
+        mmu_default_spoolman = str(self.printer.has_mmu and self.printer.spoolman and self.printer.get_config_section("mmu")["enable_spoolman"])
+        self._config.set("main", "mmu_use_spoolman", mmu_default_spoolman)
+        # Happy Hare ^^^
         return False
 
     def init_tempstore(self):
