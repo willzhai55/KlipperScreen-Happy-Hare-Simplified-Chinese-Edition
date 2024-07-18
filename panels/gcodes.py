@@ -348,6 +348,8 @@ class Panel(ScreenPanel):
 
         info_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, vexpand=True)
         fileinfo = Gtk.Label(label=self.get_file_info_extended(filename), use_markup=True)
+        logging.info(f"PAUL: {self.get_file_info_extended(filename)}")
+#        fileinfo = Gtk.Label(label="PAUL", use_markup=True)
         info_box.pack_start(fileinfo, True, True, 0)
 
         inside_box.pack_start(info_box, True, True, 0)
@@ -406,8 +408,9 @@ class Panel(ScreenPanel):
             info += _("Filament") + ':\n'
         if "filament_type" in fileinfo:
             info += f'    <b>{fileinfo["filament_type"]}</b>\n'
-        if "filament_name" in fileinfo:
-            info += f'    <b>{fileinfo["filament_name"]}</b>\n'
+# Happy Hare temp TODO .. too long with multiple extruders
+#        if "filament_name" in fileinfo:
+#            info += f'    <b>{fileinfo["filament_name"]}</b>\n'
         if "filament_weight_total" in fileinfo:
             info += f'    <b>{fileinfo["filament_weight_total"]:.2f}</b> ' + _("g") + '\n'
         if "nozzle_diameter" in fileinfo:
