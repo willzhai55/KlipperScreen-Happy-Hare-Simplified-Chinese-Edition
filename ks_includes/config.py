@@ -246,13 +246,16 @@ class KlipperScreenConfig:
                         self.errors.append(msg)
                 elif key in numbers and not self.is_float(config[section][key]) \
                         or key in bools and not self.is_bool(config[section][key]):
-                    msg = (
-                        f'Unable to parse "{key}" from [{section}]\n'
-                        f'Expected a {"number" if key in numbers else "boolean"} but got: {config[section][key]}'
-                    )
-                    self.errors.append(msg)
-                    logging.error('Invalid configuration detected !!!')
-                    valid = False
+                    if key.startswith("mmu_"): # Happy Hare added temporary upgrade hack
+                        self.config.remove_option(section, key)
+                    else:
+                        msg = (
+                            f'Unable to parse "{key}" from [{section}]\n'
+                            f'Expected a {"number" if key in numbers else "boolean"} but got: {config[section][key]}'
+                        )
+                        self.errors.append(msg)
+                        logging.error('Invalid configuration detected !!!')
+                        valid = False
         return valid
 
     @staticmethod
