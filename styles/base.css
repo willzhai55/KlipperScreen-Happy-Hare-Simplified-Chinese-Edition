@@ -33,6 +33,10 @@ window {
     -gtk-icon-shadow: none;
 }
 
+junction {
+    background-color: @bg;
+}
+
 switch slider {
     border: 0;
 }
@@ -365,14 +369,6 @@ trough {
     margin: .2em;
     min-height: 2.9em;
     padding: 0 .5em;
-}
-
-.heater-grid-temp {
-    min-width: 5.5em;
-}
-
-.heater-grid-temp-power {
-    min-width: 8em;
 }
 
 .keyboard_matchbox {
