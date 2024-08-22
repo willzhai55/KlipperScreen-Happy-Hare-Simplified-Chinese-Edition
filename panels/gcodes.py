@@ -323,7 +323,11 @@ class Panel(ScreenPanel):
             {"name": _("Cancel"), "response": Gtk.ResponseType.CANCEL, "style": 'dialog-secondary'}
         ]
 
-        label = Gtk.Label(hexpand=True, vexpand=True, wrap=True, wrap_mode=Pango.WrapMode.WORD_CHAR)
+        label = Gtk.Label(
+            hexpand=True, vexpand=True, lines=2,
+            wrap=True, wrap_mode=Pango.WrapMode.WORD_CHAR,
+            ellipsize=Pango.EllipsizeMode.END
+        )
         label.set_markup(f"<b>{filename}</b>")
 
         main_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, vexpand=True)
@@ -347,9 +351,9 @@ class Panel(ScreenPanel):
             inside_box.pack_start(image_button, True, True, 0)
 
         info_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, vexpand=True)
-        fileinfo = Gtk.Label(label=self.get_file_info_extended(filename), use_markup=True)
-        logging.info(f"PAUL: {self.get_file_info_extended(filename)}")
-#        fileinfo = Gtk.Label(label="PAUL", use_markup=True)
+        fileinfo = Gtk.Label(
+            label=self.get_file_info_extended(filename), use_markup=True, ellipsize=Pango.EllipsizeMode.END
+        )
         info_box.pack_start(fileinfo, True, True, 0)
 
         inside_box.pack_start(info_box, True, True, 0)
@@ -386,9 +390,9 @@ class Panel(ScreenPanel):
         if "layer_height" in fileinfo:
             info += _("Layer Height") + f': <b>{fileinfo["layer_height"]}</b> ' + _("mm") + '\n'
         if "filament_type" in fileinfo:
-            info += _("Filament") + f': <b>{self.truncate_string(fileinfo["filament_type"], 25)}</b>\n'
+            info += _("Filament") + f': <b>{fileinfo["filament_type"]}</b>\n'
         if "filament_name" in fileinfo:
-            info += f'<b>{self.truncate_string(fileinfo["filament_name"], 25)}</b>\n'
+            info += f'<b>{fileinfo["filament_name"]}</b>\n'
         if "estimated_time" in fileinfo:
             info += _("Estimated Time") + f': <b>{self.format_time(fileinfo["estimated_time"])}</b>'
         return info
@@ -407,9 +411,9 @@ class Panel(ScreenPanel):
         if "filament_type" in fileinfo or "filament_name" in fileinfo:
             info += _("Filament") + ':\n'
         if "filament_type" in fileinfo:
-            info += f'    <b>{self.truncate_string(fileinfo["filament_type"], 25)}</b>\n'
+            info += f'    <b>{fileinfo["filament_type"]}</b>\n'
         if "filament_name" in fileinfo:
-            info += f'    <b>{self.truncate_string(fileinfo["filament_name"], 25)}</b>\n'
+            info += f'    <b>{fileinfo["filament_name"]}</b>\n'
         if "filament_weight_total" in fileinfo:
             info += f'    <b>{fileinfo["filament_weight_total"]:.2f}</b> ' + _("g") + '\n'
         if "nozzle_diameter" in fileinfo:
@@ -429,12 +433,6 @@ class Panel(ScreenPanel):
             if history and history['job']['status'] == "completed":
                 info += _("Last Duration") + f": <b>{self.format_time(history['job']['print_duration'])}</b>"
         return info
-
-    def truncate_string(self, s, x): # Happy Hare fix for muliple extruders
-        if len(s) <= x:
-            return s
-        else:
-            return s[:x-3] + "..." if x > 3 else "..."
 
     def load_files(self, result, method, params):
         start = datetime.now()
