@@ -35,7 +35,7 @@
 Read more on how [MMU Panels work...](docs/MMU.md)
 
 ## Introduction
-KlipperScreen Happy Hare edition is quite a mouthful!  It is a forked (but up-to-date) version of KlipperScreen designed to run/manage any MMU using the Happy Hare driver software.  [Click here to access the original documentation.](https://klipperscreen.readthedocs.io/en/latest/)
+KlipperScreen Happy Hare edition is quite a mouthful!  It is a forked (but kept up-to-date) version of KlipperScreen that is enhanced with functionality designed to run/manage any MMU using the Happy Hare driver software.  [Click here to access the original documentation.](https://klipperscreen.readthedocs.io/en/latest/)
 
 :pushpin: KlipperScreen is an amazing piece of software but unfortunally lacks the level of panel integration and features I needed for this project.  I hope in the future to have changes integrated so that this becomes a layered install rather than a fork.  Until then you must follow these install directions closely. **Also note that I regularly (every 2 weeks) re-merge with the master project so the Happy Hare addition is only additive and all original functionality is untouched.**
 
