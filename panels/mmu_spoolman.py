@@ -132,13 +132,9 @@ class Panel(ScreenPanel):
             logging.error("Exception when trying to fetch spools")
             return
         self.spools.clear()
-
-        materials=[]
         for spool in spools["result"]:
             spoolObject = SpoolmanSpool(**spool)
             self.spools[str(spoolObject.id)]=spoolObject
-            if spoolObject.filament.material not in materials:
-                materials.append(spoolObject.filament.material)
 
     def activate(self):
         self.is_running=True
