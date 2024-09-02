@@ -398,7 +398,7 @@ class KlipperScreen(Gtk.Window):
     def notification_log_clear(self):
         self.notification_log.clear()
 
-    def show_popup_message(self, message, level=3, from_ws=False, save=True, monospace=False): # Happy Hare: added `save=, monospace=` functionality
+    def show_popup_message(self, message, level=3, from_ws=False, save=False, monospace=False): # Happy Hare: added `save=, monospace=` functionality
         message = message.replace("// ", "") # Happy Hare added to clean up multi-line messages
 
         if from_ws:
@@ -441,7 +441,7 @@ class KlipperScreen(Gtk.Window):
         self.popup_message = popup
         self.popup_message.show_all()
 
-        if level >= 3 and save: # Happy Hare added
+        if save: # Happy Hare added
             self.last_popup_msg = message
 
         if self._config.get_main_config().getboolean('autoclose_popups', True):
@@ -967,7 +967,10 @@ class KlipperScreen(Gtk.Window):
                 self.show_popup_message(_("Temperature too low to extrude"))
                 return
             elif data.startswith("!! "):
-                self.show_popup_message(data[3:], 3, from_ws=True)
+                if data.startswith("!! MMU"): # Happy Hare added condition
+                    self.show_popup_message(data[3:], 3, from_ws=False, save=True)
+                else:
+                    self.show_popup_message(data[3:], 3, from_ws=True)
             elif "unknown" in data.lower() and \
                     not ("TESTZ" in data or "MEASURE_AXES_NOISE" in data or "ACCELEROMETER_QUERY" in data or "MMU" in data or "TTG Map" or "Gates / Filaments" or "from Unknown to" in data or "Tool Unknown" in data): # Happy Hare modified
                 if data.startswith("// "): # Happy Hare added
