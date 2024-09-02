@@ -3,10 +3,11 @@
 > [!IMPORTANT]  
 > **After updating KlipperScreen be sure to re-run:**
 > ```
-> cd ~/KlipperScreen
-> ./happy_hare/install_ks.sh -g <num_gates>
+> cd ~/KlipperScreen/happy_hare
+> ./install_ks.sh -g <num_gates>
 > ```
-> **to install new images, update menus and other config.**
+> where `<num_gates>` is the number of gates on your MMU.<br>
+> **This will install new images, update menus and other config.**
 
 <hr>
 
