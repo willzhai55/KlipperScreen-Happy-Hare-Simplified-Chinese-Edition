@@ -46,6 +46,8 @@ class Panel(ScreenPanel):
                             unique_cbs.append(cb)
 
         # Call specific associated callbacks
+        if unique_cbs:
+            self.j2_data = self._printer.get_printer_status_data() # Happy Hare: must refresh for dynamic sensitive state
         for cb in unique_cbs:
             cb[0](cb[1])
 
