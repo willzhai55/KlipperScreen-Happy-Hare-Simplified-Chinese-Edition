@@ -24,9 +24,6 @@ The options listed here are not editable from within the user interface.
 # Time in seconds before the Job Status closes itself if an error is encountered
 # job_error_timeout: 0
 
-# Allows the cursor to be displayed on the screen
-# show_cursor: False
-
 # If multiple printers are defined, this can be set the name of the one to show at startup.
 # default_printer: MyPrinter
 
@@ -49,8 +46,13 @@ Multiple printers can be defined
 [printer MyPrinter]
 # Define the moonraker host/port if different from 127.0.0.1 and 7125
 moonraker_host: 127.0.0.1
-# ports 443 and 7130 will use https/wss
 moonraker_port: 7125
+# Use HTTPS/WSS. Defaults to True for ports 443 or 7130, False for any other port
+# moonraker_ssl: False
+# If you're using the route_prefix option in your moonraker config, specify it here.
+# This can be useful for running multiple printers behind a path-based reverse proxy.
+# Most installs will not need this. 
+# moonraker_path: printer1
 # Moonraker API key if this host is not connecting from a trusted client IP
 # moonraker_api_key: False
 

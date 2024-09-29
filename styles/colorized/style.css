@@ -32,6 +32,7 @@ button {
     background-color: @solarized-base03;
 }
 
+.active image,
 button:active {
     background-color: @solarized-orange;
 }
@@ -109,14 +110,23 @@ popover button {
     border-color: @solarized-base03;
 }
 
-treeview.view check,
 switch {
     background-color: @solarized-base02;
 }
-
-treeview.view check:checked,
 switch:checked {
     background-color: @solarized-green;
+}
+
+treeview.view check {
+    background-image: none;
+    background-color: @solarized-base02;
+    border-radius: .51em;
+}
+
+treeview.view check:checked {
+    background-image: none;
+    background-color: @solarized-base02;
+    -gtk-icon-source: url("./styles/colorized/images/complete.svg");
 }
 
 entry {

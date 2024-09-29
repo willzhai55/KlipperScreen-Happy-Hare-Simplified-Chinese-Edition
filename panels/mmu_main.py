@@ -333,7 +333,7 @@ class Panel(ScreenPanel):
         # This is a multipurpose button to select subpanel or load bypass
         mmu = self._printer.get_stat("mmu")
         tool = mmu['tool']
-        if self.ui_sel_tool == self.TOOL_GATE_BYPASS:
+        if tool == self.TOOL_GATE_BYPASS:
             self._screen._ws.klippy.gcode_script(f"MMU_LOAD EXTRUDER_ONLY=1")
         else:
             self._screen.show_panel('mmu_picker', 'MMU Tool Picker')
