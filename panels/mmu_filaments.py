@@ -179,6 +179,7 @@ class Panel(ScreenPanel):
         self.labels['id_entry'].connect("changed", self.select_spool_id)
         self.labels['id_entry'].grab_focus_without_selecting()
         self.labels['id_entry'].set_max_length(4)
+        self.labels['id_entry'].set_input_purpose(Gtk.InputPurpose.DIGITS)
 
         self.labels['filament'].set_vexpand(False)
         self.labels['filament'].get_style_context().add_class("mmu_recover")
