@@ -154,4 +154,3 @@ If you are upgrading and see a message like this when accessing the main MMU pan
 The original Klipperscreen panels can be [found here](https://klipperscreen.readthedocs.io/en/latest/Panels/)
 
 *All screen shots are taken with the "Colorize" theme (my preference because the buttons are more defined).  The default is z-bolt and looks slightly different*
-
