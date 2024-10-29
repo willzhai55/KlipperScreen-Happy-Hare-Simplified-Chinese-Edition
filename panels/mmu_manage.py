@@ -33,6 +33,7 @@ class Panel(ScreenPanel):
         # btn_states: The "gaps" are what functionality the state takes away. Multiple states are combined
         self.btn_states = {
             'all':             ['gate', 'checkgate', 'recover', 'load', 'eject', 'home', 'motors_off', 'servo_up', 'servo_move', 'servo_down', 'load_ext', 'unload_ext'],
+            'homed':           ['gate', 'checkgate', 'recover', 'load', 'eject',         'motors_off', 'servo_up', 'servo_move', 'servo_down', 'load_ext', 'unload_ext'],
             'not_homed':       [                     'recover',         'eject', 'home', 'motors_off', 'servo_up', 'servo_move', 'servo_down', 'load_ext', 'unload_ext'],
             'servo_up':        ['gate', 'checkgate', 'recover', 'load', 'eject', 'home', 'motors_off',             'servo_move', 'servo_down', 'load_ext', 'unload_ext'],
             'servo_move':      ['gate', 'checkgate', 'recover', 'load', 'eject', 'home', 'motors_off', 'servo_up',               'servo_down', 'load_ext', 'unload_ext'],
@@ -239,7 +240,7 @@ class Panel(ScreenPanel):
         filament = mmu['filament']
         ui_state = []
         if enabled:
-            ui_state.extend(['servo_up'] if servo == 'Up' else ['servo_down'] if servo == 'Down' else ['servo_move'] if servo == 'Move' else [] if servo == 'Unknown' else ['servo_up', 'servo_down', 'servo_move'])
+            ui_state.extend(['servo_up'] if servo == 'Up' else ['servo_down'] if servo == 'Down' else ['servo_move'] if servo == 'Move' else [] if servo == 'Unknown' else ['servo_up', 'servo_down', 'servo_move', 'homed'])
             if not is_homed:
                 ui_state.append("not_homed")
 
