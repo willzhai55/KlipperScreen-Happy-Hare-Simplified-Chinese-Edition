@@ -231,7 +231,7 @@ class Panel(ScreenPanel):
     def update_active_buttons(self):
         mmu = self._printer.get_stat("mmu")
         enabled = mmu['enabled']
-        servo = mmu['servo']
+        servo = mmu.get('servo', None)
         is_homed = mmu['is_homed']
         gate = mmu['gate']
         tool = mmu['tool']
@@ -239,7 +239,7 @@ class Panel(ScreenPanel):
         filament = mmu['filament']
         ui_state = []
         if enabled:
-            ui_state.append("servo_up" if servo == "Up" else "servo_down" if servo == "Down" else "servo_move" if servo == "Move" else "all")
+            ui_state.extend(['servo_up'] if servo == 'Up' else ['servo_down'] if servo == 'Down' else ['servo_move'] if servo == 'Move' else [] if servo == 'Unknown' else ['servo_up', 'servo_down', 'servo_move'])
             if not is_homed:
                 ui_state.append("not_homed")
 

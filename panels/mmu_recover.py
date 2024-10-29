@@ -139,7 +139,6 @@ class Panel(ScreenPanel):
     # Dynamically update button sensitivity based on state
     def update_active_buttons(self):
         mmu = self._printer.get_stat("mmu")
-        servo = mmu['servo']
         enabled = mmu['enabled']
         tool = mmu['tool']
         ui_state = []
