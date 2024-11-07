@@ -68,7 +68,7 @@ class Panel(ScreenPanel):
             'bypass_unloaded': ['check_gates', 'tool',           'picker', 'pause', 'message', 'extrude', 'unlock', 'resume', 'manage', 'more'],
             'bypass_unknown':  ['check_gates', 'tool', 'unload', 'picker', 'pause', 'message', 'extrude', 'unlock', 'resume', 'manage', 'more'],
             'tool_loaded':     ['check_gates', 'tool', 'unload', 'picker', 'pause', 'message', 'extrude', 'unlock', 'resume', 'manage', 'more'],
-            'tool_unloaded':   ['check_gates', 'tool',           'picker', 'pause', 'message', 'extrude', 'unlock', 'resume', 'manage', 'more'],
+            'tool_unloaded':   ['check_gates', 'tool', 'unload', 'picker', 'pause', 'message', 'extrude', 'unlock', 'resume', 'manage', 'more'],
             'tool_unknown':    ['check_gates', 'tool', 'unload', 'picker', 'pause', 'message', 'extrude', 'unlock', 'resume', 'manage', 'more'],
             'no_message':      ['check_gates', 'tool', 'unload', 'picker', 'pause',            'extrude', 'unlock', 'resume', 'manage', 'more'],
             'busy':            [                                                                                              'manage', 'more'],
@@ -97,7 +97,7 @@ class Panel(ScreenPanel):
             'select_bypass_img': self._gtk.Image('mmu_select_bypass'), # Alternative for tool
             'load_bypass_img': self._gtk.Image('mmu_load_bypass'),     # Alternative for picker
             'unload_bypass_img': self._gtk.Image('mmu_unload_bypass'), # Alternative for unload/eject
-            'eject_img': self._gtk.Image('mmu_eject'), # TODO: Alternative for unload button to fully eject
+            'eject_img': self._gtk.Image('mmu_eject'), # Alternative for unload button to fully eject
             'sync_drive_img': self._gtk.Image('mmu_synced_extruder', self._gtk.img_width * 0.8, self._gtk.img_height * 0.8), # Alternative for tool_icon
         }
         self.labels['unload_img'] = self.labels['unload'].get_image()
@@ -328,8 +328,12 @@ class Panel(ScreenPanel):
         self.update_tool_buttons()
 
     def select_unload_eject(self, widget):
-        # TODO implement unload/eject split
-        self._screen._ws.klippy.gcode_script(f"MMU_UNLOAD")
+        mmu = self._printer.get_stat("mmu")
+        filament = mmu['filament']
+        if filament != "Unloaded":
+            self._screen._ws.klippy.gcode_script(f"MMU_UNLOAD")
+        else:
+            self._screen._ws.klippy.gcode_script(f"MMU_EJECT")
 
     def select_picker(self, widget):
         # This is a multipurpose button to select subpanel or load bypass
@@ -368,6 +372,7 @@ class Panel(ScreenPanel):
         next_tool = mmu['next_tool']
         last_tool = mmu['last_tool']
         sync_drive = mmu['sync_drive']
+        filament = mmu['filament']
         if next_tool != self.TOOL_GATE_UNKNOWN:
             # Change in progress
             text = ("T%d " % last_tool) if (last_tool >= 0 and last_tool != next_tool) else "Bypass " if last_tool == -2 else "Unknown " if last_tool == -1 else ""
@@ -387,9 +392,12 @@ class Panel(ScreenPanel):
         else:
             self.labels['picker'].set_image(self.labels['tool_picker_img'])
             self.labels['picker'].set_label(f"Tools...")
-            # TODO Add unload/eject split
-            self.labels['unload'].set_image(self.labels['unload_img'])
-            self.labels['unload'].set_label(f"Unload")
+            if filament != "Unloaded":
+                self.labels['unload'].set_image(self.labels['unload_img'])
+                self.labels['unload'].set_label(f"Unload")
+            else:
+                self.labels['unload'].set_image(self.labels['eject_img'])
+                self.labels['unload'].set_label(f"Eject")
 
     def update_tool_buttons(self, tool_sensitive=True):
         mmu = self._printer.get_stat("mmu")
