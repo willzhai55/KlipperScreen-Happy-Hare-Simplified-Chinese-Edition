@@ -21,9 +21,8 @@
     border: 0;
 }
 
-/* Happy Hare changed opacity from .2 to .8 */
 button:disabled {
-    opacity: .8;
+    opacity: .5;
 }
 
 list row,
@@ -283,8 +282,8 @@ trough {
     margin: .5em .5em;
 }
 
-.action_bar :disabled{
-    opacity: .6;
+.action_bar :disabled {
+    opacity: .7;
 }
 
 .title_bar {
@@ -650,7 +649,6 @@ keyboard_box {
     padding: 0 20em;
 }
 
-
 /* vvv Happy Hare added vvv */
 
 .mmu_runout slider, .mmu_runout highlight, .mmu_runout fill {
@@ -806,4 +804,3 @@ keyboard_box {
     border: 0;
     padding: 0 1em;
 }
-

@@ -59,20 +59,20 @@ class Panel(ScreenPanel):
 
         # btn_states: The "gaps" are what functionality the state takes away. Multiple states are combined
         self.btn_states = {
-            'all':             ['check_gates', 'tool', 'eject', 'picker', 'pause', 'message', 'extrude', 'unlock', 'resume', 'manage', 'more'],
-            'printing':        [                                          'pause',                                                     'more'],
-            'pause_locked':    ['check_gates', 'tool', 'eject', 'picker',          'message',            'unlock', 'resume', 'manage', 'more'],
-            'paused':          ['check_gates', 'tool', 'eject', 'picker',          'message', 'extrude',           'resume', 'manage', 'more'],
-            'idle':            ['check_gates', 'tool', 'eject', 'picker', 'pause', 'message', 'extrude',                     'manage', 'more'],
-            'bypass_loaded':   [                       'eject',           'pause', 'message', 'extrude', 'unlock', 'resume', 'manage', 'more'],
-            'bypass_unloaded': ['check_gates', 'tool',          'picker', 'pause', 'message', 'extrude', 'unlock', 'resume', 'manage', 'more'],
-            'bypass_unknown':  ['check_gates', 'tool', 'eject', 'picker', 'pause', 'message', 'extrude', 'unlock', 'resume', 'manage', 'more'],
-            'tool_loaded':     ['check_gates', 'tool', 'eject', 'picker', 'pause', 'message', 'extrude', 'unlock', 'resume', 'manage', 'more'],
-            'tool_unloaded':   ['check_gates', 'tool',          'picker', 'pause', 'message', 'extrude', 'unlock', 'resume', 'manage', 'more'],
-            'tool_unknown':    ['check_gates', 'tool', 'eject', 'picker', 'pause', 'message', 'extrude', 'unlock', 'resume', 'manage', 'more'],
-            'no_message':      ['check_gates', 'tool', 'eject', 'picker', 'pause',            'extrude', 'unlock', 'resume', 'manage', 'more'],
-            'busy':            [                                                                                             'manage', 'more'],
-            'disabled':        [                                                                                                             ],
+            'all':             ['check_gates', 'tool', 'unload', 'picker', 'pause', 'message', 'extrude', 'unlock', 'resume', 'manage', 'more'],
+            'printing':        [                                           'pause',                                                     'more'],
+            'pause_locked':    ['check_gates', 'tool', 'unload', 'picker',          'message',            'unlock', 'resume', 'manage', 'more'],
+            'paused':          ['check_gates', 'tool', 'unload', 'picker',          'message', 'extrude',           'resume', 'manage', 'more'],
+            'idle':            ['check_gates', 'tool', 'unload', 'picker', 'pause', 'message', 'extrude',                     'manage', 'more'],
+            'bypass_loaded':   [                       'unload',           'pause', 'message', 'extrude', 'unlock', 'resume', 'manage', 'more'],
+            'bypass_unloaded': ['check_gates', 'tool',           'picker', 'pause', 'message', 'extrude', 'unlock', 'resume', 'manage', 'more'],
+            'bypass_unknown':  ['check_gates', 'tool', 'unload', 'picker', 'pause', 'message', 'extrude', 'unlock', 'resume', 'manage', 'more'],
+            'tool_loaded':     ['check_gates', 'tool', 'unload', 'picker', 'pause', 'message', 'extrude', 'unlock', 'resume', 'manage', 'more'],
+            'tool_unloaded':   ['check_gates', 'tool',           'picker', 'pause', 'message', 'extrude', 'unlock', 'resume', 'manage', 'more'],
+            'tool_unknown':    ['check_gates', 'tool', 'unload', 'picker', 'pause', 'message', 'extrude', 'unlock', 'resume', 'manage', 'more'],
+            'no_message':      ['check_gates', 'tool', 'unload', 'picker', 'pause',            'extrude', 'unlock', 'resume', 'manage', 'more'],
+            'busy':            [                                                                                              'manage', 'more'],
+            'disabled':        [                                                                                                              ],
         }
 
         self.labels = {
@@ -82,7 +82,7 @@ class Panel(ScreenPanel):
             'tool': self._gtk.Button('mmu_extruder', 'Load T0', 'color2'),
             't_increase': self._gtk.Button('increase', None, scale=self.bts * 1.2),
             'picker': self._gtk.Button('mmu_tool_picker', 'Tools...', 'color3'),
-            'eject': self._gtk.Button('mmu_eject', 'Eject', 'color4'),
+            'unload': self._gtk.Button('mmu_unload', 'Unload', 'color4'), # Doubles as eject button
             'pause': self._gtk.Button('pause', 'MMU Pause', 'color1'),
             'message': self._gtk.Button('warning', 'Last Error', 'color1'),
             'unlock': self._gtk.Button('heat-up', 'Unlock', 'color2'),
@@ -96,10 +96,11 @@ class Panel(ScreenPanel):
             'sensor_state': Gtk.Label('   '),
             'select_bypass_img': self._gtk.Image('mmu_select_bypass'), # Alternative for tool
             'load_bypass_img': self._gtk.Image('mmu_load_bypass'),     # Alternative for picker
-            'unload_bypass_img': self._gtk.Image('mmu_unload_bypass'), # Alternative for eject
+            'unload_bypass_img': self._gtk.Image('mmu_unload_bypass'), # Alternative for unload/eject
+            'eject_img': self._gtk.Image('mmu_eject'), # TODO: Alternative for unload button to fully eject
             'sync_drive_img': self._gtk.Image('mmu_synced_extruder', self._gtk.img_width * 0.8, self._gtk.img_height * 0.8), # Alternative for tool_icon
         }
-        self.labels['eject_img'] = self.labels['eject'].get_image()
+        self.labels['unload_img'] = self.labels['unload'].get_image()
         self.labels['tool_img'] = self.labels['tool'].get_image()
         self.labels['tool_picker_img'] = self.labels['picker'].get_image()
         self.labels['tool_icon_pixbuf'] = self.labels['tool_icon'].get_pixbuf()
@@ -111,7 +112,7 @@ class Panel(ScreenPanel):
         self.labels['tool'].connect("clicked", self.select_tool, 0)
         self.labels['t_increase'].connect("clicked", self.select_tool, 1)
         self.labels['picker'].connect("clicked", self.select_picker)
-        self.labels['eject'].connect("clicked", self.select_eject)
+        self.labels['unload'].connect("clicked", self.select_unload_eject)
         self.labels['pause'].connect("clicked", self.select_pause)
         self.labels['message'].connect("clicked", self.select_message)
         self.labels['unlock'].connect("clicked", self.select_unlock)
@@ -214,7 +215,7 @@ class Panel(ScreenPanel):
         main_grid.set_column_homogeneous(True)
         main_grid.attach(tool_grid,                   0, 0, 6, 1)
         main_grid.attach(self.labels['picker'],       6, 0, 2, 1)
-        main_grid.attach(self.labels['eject'],        8, 0, 2, 1)
+        main_grid.attach(self.labels['unload'],        8, 0, 2, 1)
         main_grid.attach(self.labels['check_gates'], 10, 0, 2, 1)
         main_grid.attach(self.labels['pause_layer'],  0, 1, 3, 1)
         main_grid.attach(self.labels['unlock'],       3, 1, 2, 1)
@@ -326,8 +327,9 @@ class Panel(ScreenPanel):
             return
         self.update_tool_buttons()
 
-    def select_eject(self, widget):
-        self._screen._ws.klippy.gcode_script(f"MMU_EJECT")
+    def select_unload_eject(self, widget):
+        # TODO implement unload/eject split
+        self._screen._ws.klippy.gcode_script(f"MMU_UNLOAD")
 
     def select_picker(self, widget):
         # This is a multipurpose button to select subpanel or load bypass
@@ -380,13 +382,14 @@ class Panel(ScreenPanel):
         if tool == self.TOOL_GATE_BYPASS:
             self.labels['picker'].set_image(self.labels['load_bypass_img'])
             self.labels['picker'].set_label(f"Load")
-            self.labels['eject'].set_image(self.labels['unload_bypass_img'])
-            self.labels['eject'].set_label(f"Unload")
+            self.labels['unload'].set_image(self.labels['unload_bypass_img'])
+            self.labels['unload'].set_label(f"Unload")
         else:
             self.labels['picker'].set_image(self.labels['tool_picker_img'])
             self.labels['picker'].set_label(f"Tools...")
-            self.labels['eject'].set_image(self.labels['eject_img'])
-            self.labels['eject'].set_label(f"Eject")
+            # TODO Add unload/eject split
+            self.labels['unload'].set_image(self.labels['unload_img'])
+            self.labels['unload'].set_label(f"Unload")
 
     def update_tool_buttons(self, tool_sensitive=True):
         mmu = self._printer.get_stat("mmu")

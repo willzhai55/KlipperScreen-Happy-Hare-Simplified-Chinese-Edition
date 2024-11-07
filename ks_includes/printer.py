@@ -1,5 +1,6 @@
 import logging
 import gi
+import re # Happy Hare
 
 gi.require_version("Gtk", "3.0")
 from gi.repository import GLib
@@ -239,8 +240,9 @@ class Printer:
         return self.get_config_section_list("temperature_sensor")
 
     def get_filament_sensors(self):
+        mmu_gate_sensors = r"^filament_switch_sensor mmu_.*_\d+$" # Happy Hare
         if self.sensors is None:
-            self.sensors = [x for x in list(self.get_config_section_list("filament_switch_sensor ")) if not x.startswith("filament_switch_sensor mmu_pre_gate_")] # Happy Hare" filter out pre-gate sensors
+            self.sensors = [x for x in list(self.get_config_section_list("filament_switch_sensor ")) if not re.match(mmu_gate_sensors, x)] # Happy Hare" filter out "gate" sensors -- too many
             self.sensors.extend(iter(self.get_config_section_list("filament_motion_sensor ")))
         return self.sensors
 

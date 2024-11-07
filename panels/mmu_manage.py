@@ -32,20 +32,20 @@ class Panel(ScreenPanel):
 
         # btn_states: The "gaps" are what functionality the state takes away. Multiple states are combined
         self.btn_states = {
-            'all':             ['gate', 'checkgate', 'recover', 'load', 'eject', 'home', 'motors_off', 'servo_up', 'servo_move', 'servo_down', 'load_ext', 'unload_ext'],
-            'homed':           ['gate', 'checkgate', 'recover', 'load', 'eject',         'motors_off', 'servo_up', 'servo_move', 'servo_down', 'load_ext', 'unload_ext'],
-            'not_homed':       [                     'recover',         'eject', 'home', 'motors_off', 'servo_up', 'servo_move', 'servo_down', 'load_ext', 'unload_ext'],
-            'servo_up':        ['gate', 'checkgate', 'recover', 'load', 'eject', 'home', 'motors_off',             'servo_move', 'servo_down', 'load_ext', 'unload_ext'],
-            'servo_move':      ['gate', 'checkgate', 'recover', 'load', 'eject', 'home', 'motors_off', 'servo_up',               'servo_down', 'load_ext', 'unload_ext'],
-            'servo_down':      ['gate', 'checkgate', 'recover', 'load', 'eject', 'home', 'motors_off', 'servo_up', 'servo_move',               'load_ext', 'unload_ext'],
-            'bypass_loaded':   [                     'recover',         'eject',         'motors_off', 'servo_up', 'servo_move', 'servo_down',             'unload_ext'],
-            'bypass_unloaded': ['gate', 'checkgate', 'recover', 'load',          'home', 'motors_off', 'servo_up', 'servo_move', 'servo_down', 'load_ext', 'unload_ext'],
-            'bypass_unknown':  ['gate', 'checkgate', 'recover', 'load', 'eject', 'home', 'motors_off', 'servo_up', 'servo_move', 'servo_down', 'load_ext', 'unload_ext'],
-            'tool_loaded':     [                     'recover',         'eject',         'motors_off', 'servo_up', 'servo_move', 'servo_down',             'unload_ext'],
-            'tool_unloaded':   ['gate', 'checkgate', 'recover', 'load',          'home', 'motors_off', 'servo_up', 'servo_move', 'servo_down', 'load_ext', 'unload_ext'],
-            'tool_unknown':    ['gate', 'checkgate', 'recover', 'load', 'eject', 'home', 'motors_off', 'servo_up', 'servo_move', 'servo_down', 'load_ext', 'unload_ext'],
-            'busy':            [                                                                                                                         ],
-            'disabled':        [                                                                                                                         ],
+            'all':             ['gate', 'checkgate', 'recover', 'load', 'unload', 'home', 'motors_off', 'servo_up', 'servo_move', 'servo_down', 'load_ext', 'unload_ext'],
+            'homed':           ['gate', 'checkgate', 'recover', 'load', 'unload',         'motors_off', 'servo_up', 'servo_move', 'servo_down', 'load_ext', 'unload_ext'],
+            'not_homed':       [                     'recover',         'unload', 'home', 'motors_off', 'servo_up', 'servo_move', 'servo_down', 'load_ext', 'unload_ext'],
+            'servo_up':        ['gate', 'checkgate', 'recover', 'load', 'unload', 'home', 'motors_off',             'servo_move', 'servo_down', 'load_ext', 'unload_ext'],
+            'servo_move':      ['gate', 'checkgate', 'recover', 'load', 'unload', 'home', 'motors_off', 'servo_up',               'servo_down', 'load_ext', 'unload_ext'],
+            'servo_down':      ['gate', 'checkgate', 'recover', 'load', 'unload', 'home', 'motors_off', 'servo_up', 'servo_move',               'load_ext', 'unload_ext'],
+            'bypass_loaded':   [                     'recover',         'unload',         'motors_off', 'servo_up', 'servo_move', 'servo_down',             'unload_ext'],
+            'bypass_unloaded': ['gate', 'checkgate', 'recover', 'load',           'home', 'motors_off', 'servo_up', 'servo_move', 'servo_down', 'load_ext', 'unload_ext'],
+            'bypass_unknown':  ['gate', 'checkgate', 'recover', 'load', 'unload', 'home', 'motors_off', 'servo_up', 'servo_move', 'servo_down', 'load_ext', 'unload_ext'],
+            'tool_loaded':     [                     'recover',         'unload',         'motors_off', 'servo_up', 'servo_move', 'servo_down',             'unload_ext'],
+            'tool_unloaded':   ['gate', 'checkgate', 'recover', 'load',           'home', 'motors_off', 'servo_up', 'servo_move', 'servo_down', 'load_ext', 'unload_ext'],
+            'tool_unknown':    ['gate', 'checkgate', 'recover', 'load', 'unload', 'home', 'motors_off', 'servo_up', 'servo_move', 'servo_down', 'load_ext', 'unload_ext'],
+            'busy':            [                                                                                                                                        ],
+            'disabled':        [                                                                                                                                        ],
         }
 
         self.labels = {
@@ -60,7 +60,7 @@ class Panel(ScreenPanel):
             'servo_move': self._gtk.Button('arrow-right', 'Servo Move', 'color2'),
             'servo_down': self._gtk.Button('arrow-down', 'Servo Down', 'color3'),
             'load': self._gtk.Button('mmu_load', 'Load', 'color1'),
-            'eject': self._gtk.Button('mmu_eject', 'Eject', 'color2'),
+            'unload': self._gtk.Button('mmu_unload', 'Unload', 'color2'),
             'load_ext': self._gtk.Button('mmu_load_extruder', 'Load Extruder', 'color3'),
             'unload_ext': self._gtk.Button('mmu_unload_extruder', 'Unload Extruder', 'color4'),
         }
@@ -71,7 +71,7 @@ class Panel(ScreenPanel):
         self.labels['checkgate'].connect("clicked", self.select_checkgate)
         self.labels['recover'].connect("clicked", self.menu_item_clicked, {"panel": "mmu_recover", "name": "MMU State Recovery"})
         self.labels['load'].connect("clicked", self.select_load)
-        self.labels['eject'].connect("clicked", self.select_eject)
+        self.labels['unload'].connect("clicked", self.select_unload)
         self.labels['home'].connect("clicked", self.select_home)
         self.labels['motors_off'].connect("clicked", self.select_motors_off)
         self.labels['servo_up'].connect("clicked", self.select_servo_up)
@@ -107,7 +107,7 @@ class Panel(ScreenPanel):
         grid.attach(self.labels['motors_off'], 2, 1, 1, 1)
         grid.attach(self.labels['checkgate'],  3, 1, 1, 1)
         grid.attach(self.labels['load'],       0, 2, 1, 1)
-        grid.attach(self.labels['eject'],      1, 2, 1, 1)
+        grid.attach(self.labels['unload'],      1, 2, 1, 1)
         grid.attach(self.labels['load_ext'],   2, 2, 1, 1)
         grid.attach(self.labels['unload_ext'], 3, 2, 1, 1)
 
@@ -191,10 +191,10 @@ class Panel(ScreenPanel):
         self.ui_action_button_label = self.labels[self.ui_action_button_name].get_label()
         self._screen._ws.klippy.gcode_script(f"MMU_LOAD TEST=0") # TEST=0 is to aid backward compatibility of MMU_LOAD command
 
-    def select_eject(self, widget):
-        self.ui_action_button_name = 'eject'
+    def select_unload(self, widget):
+        self.ui_action_button_name = 'unload'
         self.ui_action_button_label = self.labels[self.ui_action_button_name].get_label()
-        self._screen._ws.klippy.gcode_script(f"MMU_EJECT")
+        self._screen._ws.klippy.gcode_script(f"MMU_UNLOAD")
 
     def select_home(self, widget):
         self.ui_action_button_name = 'home'
@@ -226,7 +226,7 @@ class Panel(ScreenPanel):
     def select_unload_extruder(self, widget):
         self.ui_action_button_name = 'unload_ext'
         self.ui_action_button_label = self.labels[self.ui_action_button_name].get_label()
-        self._screen._ws.klippy.gcode_script(f"MMU_EJECT EXTRUDER_ONLY=1")
+        self._screen._ws.klippy.gcode_script(f"MMU_UNLOAD EXTRUDER_ONLY=1")
 
     # Dynamically update button sensitivity based on state
     def update_active_buttons(self):
