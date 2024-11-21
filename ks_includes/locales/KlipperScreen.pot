@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-10-09 18:08-0300\n"
+"POT-Creation-Date: 2024-11-20 23:24-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -166,6 +166,9 @@ msgid "Complete"
 msgstr ""
 
 msgid "Confirm Emergency Stop"
+msgstr ""
+
+msgid "Confirm TTG/EndlessSpool Reset"
 msgstr ""
 
 msgid "Connected"
@@ -503,6 +506,21 @@ msgid "Lost Connection to Moonraker"
 msgstr ""
 
 msgid "Lower Nozzle"
+msgstr ""
+
+msgid "MMU shortcut on sidebar"
+msgstr ""
+
+msgid "MMU show bold filament"
+msgstr ""
+
+msgid "MMU show color in gates"
+msgstr ""
+
+msgid "MMU show colored filament"
+msgstr ""
+
+msgid "MMU use SpoolMan for filaments"
 msgstr ""
 
 msgid "Macro shortcut on sidebar"
@@ -1004,148 +1022,3 @@ msgid "second"
 msgid_plural "seconds"
 msgstr[0] ""
 msgstr[1] ""
-
-#
-#
-#
-#
-# 以下为兔子多色翻译
-
-msgid "MMU"
-msgstr ""
-
-msgid "Manage TTG..."
-msgstr ""
-
-msgid "Filaments..."
-msgstr ""
-
-msgid "Spoolman..."
-msgstr ""
-
-msgid "Load Tool..."
-msgstr ""
-
-msgid "Preload Gate..."
-msgstr ""
-
-msgid "Eject Gate..."
-msgstr ""
-
-msgid "Check Gate..."
-msgstr ""
-
-msgid "Select Gate..."
-msgstr ""
-
-msgid "Select Tool..."
-msgstr ""
-
-msgid "Select Bypass"
-msgstr ""
-
-msgid "Display Status"
-msgstr ""
-
-msgid "Print Stats"
-msgstr ""
-
-msgid "Reset Stats"
-msgstr ""
-
-msgid "Enable E.Spool"
-msgstr ""
-
-msgid "Disable E.Spool"
-msgstr ""
-
-msgid "Disable LED"
-msgstr ""
-
-msgid "LED Gate Status"
-msgstr ""
-
-msgid "LED Fil. Color"
-msgstr ""
-
-msgid "user def"
-msgstr ""
-
-msgid "Home Selector"
-msgstr ""
-
-msgid "Servo UP"
-msgstr ""
-
-msgid "Servo Down"
-msgstr ""
-
-msgid "Disable Motors"
-msgstr ""
-
-# ---------- MMU Manage submenu end
-# ---------- MMU config/calibration menu
-
-msgid "MMU Setup"
-msgstr ""
-
-msgid "Home"
-msgstr ""
-
-msgid "Test Grip"
-msgstr ""
-
-msgid "Form Tip"
-msgstr ""
-
-msgid "Servo MOVE"
-msgstr ""
-
-msgid "Cal. Encoder"
-msgstr ""
-
-msgid "Calibrate ALL"
-msgstr ""
-
-msgid "Cal. Gate..."
-msgstr ""
-
-# iter_calibration.conf
-
-msgid "Calibrate #{i}"
-msgstr ""
-
-# iter_check_gates.conf
-
-msgid "Check Gate #{i}"
-msgstr ""
-
-# iter_config_select_gates.conf
-
-msgid "Select Gate #{i}"
-msgstr ""
-
-# iter_eject_gates.conf
-
-msgid "Eject Gate #{i}"
-msgstr ""
-
-# iter_load_tools.conf
-
-msgid "T{i}"
-msgstr ""
-
-# iter_preload_gates.conf
-
-msgid "Preload Gate #{i}"
-msgstr ""
-
-# iter_select_gates.conf
-
-msgid "Select Gate #{i}"
-msgstr ""
-
-# iter_select_tools.conf
-
-msgid "Select Tool T{i}"
-msgstr ""
