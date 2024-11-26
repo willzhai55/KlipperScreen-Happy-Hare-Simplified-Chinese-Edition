@@ -7,7 +7,7 @@ xgettext --keyword=_ --keyword=ngettext:1,2 --language=Python --no-location --so
     ks_includes/*.py \
     ks_includes/widgets/*.py \
     panels/*.py \
-    config/*.conf
+    config/*.conf \
     happy_hare/*.conf
 # Update po
 for FILE in ks_includes/locales/*; do
