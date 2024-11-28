@@ -113,7 +113,7 @@ class Panel(ScreenPanel):
             'status': self._gtk.Image(),
             'available': Gtk.Label(_("Unknown")),
             'gate_icon': self._gtk.Image('mmu_gate', width=img_width, height=img_height),
-            'gate_label': Gtk.Label(_('Gate #0)),
+            'gate_label': Gtk.Label(_('Gate #0')),
             'color': Gtk.Label(self.EMPTY_SWATCH),
             'material': Gtk.Label(_('PLA')),
             'tools': Gtk.Label(_("n/a")),
