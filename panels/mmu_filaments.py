@@ -75,7 +75,7 @@ class Panel(ScreenPanel):
 
             gate_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
             gate_icon = self.labels[f'gate_icon_{i}'] = self._gtk.Image('mmu_gate', width=img_width, height=img_height)
-            gate_label = self.labels[f'gate_label_{i}'] = Gtk.Label(f'Gate #{i}')
+            gate_label = self.labels[f'gate_label_{i}'] = Gtk.Label(_('Gate #%i') %i)  #(f'Gate #{i}')
             gate_box.pack_start(gate_icon, True, True, 0)
             gate_box.pack_start(gate_label, True, True, 0)
 
@@ -95,7 +95,8 @@ class Panel(ScreenPanel):
             spool_id.get_style_context().add_class("mmu_spool_id_text")
             spool_id.set_xalign(0)
 
-            edit = self.labels[f'edit_{i}'] = self._gtk.Button('mmu_gear', f'Edit', 'color4')
+            edit = self.labels[f'edit_{i}'] = self._gtk.Button('mmu_gear', _('Edit'), 'color4')
+            #edit = self.labels[f'edit_{i}'] = self._gtk.Button('mmu_gear', f'Edit', 'color4')
             edit.connect("clicked", self.select_edit, i)
 
             grid.attach(status_box, 0, i, 3, 1)
@@ -118,12 +119,13 @@ class Panel(ScreenPanel):
             'material': Gtk.Label(_('PLA')),
             'tools': Gtk.Label(_("n/a")),
             'spool_id': Gtk.Label(_("n/a")),
-            'save': self._gtk.Button('mmu_save', f'Save', 'color1'),
+            'save': self._gtk.Button('mmu_save', _('Save'), 'color1'),
+            #'save': self._gtk.Button('mmu_save', f'Save', 'color1'),
             'c_picker': self._gtk.Button('mmu_color_chooser', None, 'color2', scale=self.bts * 0.8),
             'c_selector': Gtk.ComboBoxText(),
             'm_entry': Gtk.Entry(),
             'id_entry': Gtk.Entry(),
-            'filament': Gtk.CheckButton(" Available"),
+            'filament': Gtk.CheckButton(_(" Available")),
             'fetch': self._gtk.Button('refresh', None, None, scale=self.bts * 0.8),
             'cancel': self._gtk.Button('cancel', _("Cancel"), 'color4', scale=self.bts),
         } )
@@ -210,7 +212,7 @@ class Panel(ScreenPanel):
         pad.set_vexpand(True)
 
         edit_grid.attach(current_gate_grid,         0, 0, 16, 1)
-        edit_grid.attach(Gtk.Label(_('SpoolID:')),     0, 1,  2, 1)
+        edit_grid.attach(Gtk.Label('SpoolID:'),     0, 1,  2, 1)
         edit_grid.attach(self.labels['id_entry'],   2, 1,  4, 1)
         edit_grid.attach(Gtk.Box(),                 6, 1,  2, 1)
         edit_grid.attach(self.labels['filament'],   8, 1,  5, 1)
@@ -302,19 +304,19 @@ class Panel(ScreenPanel):
     def get_status_details(self, gate_status):
         if gate_status == self.GATE_AVAILABLE:
             status_icon = 'available_icon'
-            status_str = "Available"
+            status_str = _("Available")
             status_color = self.COLOR_GREEN
         elif gate_status == self.GATE_AVAILABLE_FROM_BUFFER:
             status_icon = 'available_icon'
-            status_str = "Buffered"
+            status_str = _("Buffered")
             status_color = self.COLOR_GREEN
         elif gate_status == self.GATE_EMPTY:
             status_icon = 'empty_icon'
-            status_str = "Empty"
+            status_str = _("Empty")
             status_color = self.COLOR_RED
         else: 
             status_icon = 'unknown_icon'
-            status_str = "Unknown"
+            status_str = _("Unknown")
             status_color = self.COLOR_LIGHT_GREY
         return status_icon, status_str, status_color
 
