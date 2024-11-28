@@ -125,7 +125,7 @@ class Panel(ScreenPanel):
             'id_entry': Gtk.Entry(),
             'filament': Gtk.CheckButton(" Available"),
             'fetch': self._gtk.Button('refresh', None, None, scale=self.bts * 0.8),
-            'cancel': self._gtk.Button('cancel', "Cancel", 'color4', scale=self.bts),
+            'cancel': self._gtk.Button('cancel', _("Cancel"), 'color4', scale=self.bts),
         } )
 
         edit_status_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
