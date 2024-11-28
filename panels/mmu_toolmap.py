@@ -45,14 +45,14 @@ class Panel(ScreenPanel):
 
         self.labels = {
             't_decrease': self._gtk.Button('decrease', None, 'color1', scale=self.bts * 1.2),
-            'tool': Gtk.Label("T0"),
+            'tool': Gtk.Label(_("T0")),
             't_increase': self._gtk.Button('increase', None, 'color2', scale=self.bts * 1.2),
             'g_decrease': self._gtk.Button('decrease', None, 'color1', scale=self.bts * 1.2),
-            'gate': Gtk.Label("#0"),
+            'gate': Gtk.Label(_("#0")),
             'g_increase': self._gtk.Button('increase', None, 'color2', scale=self.bts * 1.2),
             'save': self._gtk.Button('mmu_save', 'Save', 'color3'),
             'es_decrease': self._gtk.Button('decrease', None, scale=self.bts * 0.6),
-            'es_group': Gtk.Label("ES Group: A"),
+            'es_group': Gtk.Label(_("ES Group: A")),
             'es_increase': self._gtk.Button('increase', None, scale=self.bts * 0.6),
             'reset': self._gtk.Button('refresh', 'Reset', scale=self.bts, position=Gtk.PositionType.LEFT, lines=1),
             'endless_spool': Gtk.CheckButton("EndlessSpool - Editing"),
