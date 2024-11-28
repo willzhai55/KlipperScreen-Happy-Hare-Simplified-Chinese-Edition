@@ -76,19 +76,19 @@ class Panel(ScreenPanel):
         }
 
         self.labels = {
-            'check_gates': self._gtk.Button('mmu_checkgates', "Gates", 'color1'),
-            'manage': self._gtk.Button('mmu_manage', "Manage...",'color2'),
+            'check_gates': self._gtk.Button('mmu_checkgates', _("Gates"), 'color1'),
+            'manage': self._gtk.Button('mmu_manage', _("Manage..."),'color2'),
             't_decrease': self._gtk.Button('decrease', None, scale=self.bts * 1.2),
-            'tool': self._gtk.Button('mmu_extruder', 'Load T0', 'color2'),
+            'tool': self._gtk.Button('mmu_extruder', _('Load T0'), 'color2'),
             't_increase': self._gtk.Button('increase', None, scale=self.bts * 1.2),
-            'picker': self._gtk.Button('mmu_tool_picker', 'Tools...', 'color3'),
-            'unload': self._gtk.Button('mmu_unload', 'Unload', 'color4'), # Doubles as eject button
-            'pause': self._gtk.Button('pause', 'MMU Pause', 'color1'),
-            'message': self._gtk.Button('warning', 'Last Error', 'color1'),
-            'unlock': self._gtk.Button('heat-up', 'Unlock', 'color2'),
-            'resume': self._gtk.Button('resume', 'Resume', 'color3'),
-            'extrude': self._gtk.Button('extrude', 'Extrude...', 'color4'),
-            'more': self._gtk.Button('mmu_more', 'More...', 'color1'),
+            'picker': self._gtk.Button('mmu_tool_picker', _('Tools...'), 'color3'),
+            'unload': self._gtk.Button('mmu_unload', _('Unload'), 'color4'), # Doubles as eject button
+            'pause': self._gtk.Button('pause', _('MMU Pause'), 'color1'),
+            'message': self._gtk.Button('warning', _('Last Error'), 'color1'),
+            'unlock': self._gtk.Button('heat-up', _('Unlock', 'color2'),
+            'resume': self._gtk.Button('resume', _('Resume'), 'color3'),
+            'extrude': self._gtk.Button('extrude', _('Extrude...'), 'color4'),
+            'more': self._gtk.Button('mmu_more', _('More...'), 'color1'),
             'tool_icon': self._gtk.Image('mmu_extruder', self._gtk.img_width * 0.8, self._gtk.img_height * 0.8),
             'tool_label': Gtk.Label('Unknown'),
             'filament': Gtk.Label('Filament: Unknown'),
