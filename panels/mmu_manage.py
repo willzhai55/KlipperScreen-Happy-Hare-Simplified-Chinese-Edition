@@ -59,7 +59,7 @@ class Panel(ScreenPanel):
             'servo_up': self._gtk.Button('arrow-up', _('Servo Up'), 'color1'),
             'servo_move': self._gtk.Button('arrow-right', _('Servo Move'), 'color2'),
             'servo_down': self._gtk.Button('arrow-down', _('Servo Down'), 'color3'),
-            'load': self._gtk.Button('mmu_load', _(Load'), 'color1'),
+            'load': self._gtk.Button('mmu_load', _('Load'), 'color1'),
             'unload': self._gtk.Button('mmu_unload', _('Unload'), 'color2'),
             'load_ext': self._gtk.Button('mmu_load_extruder', _('Load Extruder'), 'color3'),
             'unload_ext': self._gtk.Button('mmu_unload_extruder', _('Unload Extruder'), 'color4'),
