@@ -43,7 +43,7 @@ class Panel(ScreenPanel):
         for i in range(num_tools):
             status_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
             status = self.labels[f'status_{i}'] = self._gtk.Image()
-            available = self.labels[f'available_{i}'] = Gtk.Label("Unknown")
+            available = self.labels[f'available_{i}'] = Gtk.Label(_("Unknown"))
             available.get_style_context().add_class("mmu_available_text")
             status_box.pack_start(status, True, True, 0)
             status_box.pack_start(available, True, True, 0)
@@ -55,16 +55,16 @@ class Panel(ScreenPanel):
             color.get_style_context().add_class("mmu_color_swatch")
             color.set_xalign(0.7)
 
-            material = self.labels[f'material_{i}'] = Gtk.Label("n/a")
+            material = self.labels[f'material_{i}'] = Gtk.Label(_("n/a"))
             material.get_style_context().add_class("mmu_material_text")
             material.set_xalign(0.1)
 
             gate_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
-            gate = self.labels[f'gate_{i}'] = Gtk.Label("n/a")
+            gate = self.labels[f'gate_{i}'] = Gtk.Label(_("n/a"))
             gate.get_style_context().add_class("mmu_gate_text")
             gate.set_halign(Gtk.Align.START)
             gate.set_valign(Gtk.Align.END)
-            alt_gates = self.labels[f'alt_gates_{i}'] = Gtk.Label("n/a")
+            alt_gates = self.labels[f'alt_gates_{i}'] = Gtk.Label(_("n/a"))
             alt_gates.set_halign(Gtk.Align.START)
             alt_gates.set_valign(Gtk.Align.START)
             gate_box.pack_start(gate, True, True, 0)
