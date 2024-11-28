@@ -85,14 +85,14 @@ class Panel(ScreenPanel):
             'unload': self._gtk.Button('mmu_unload', _('Unload'), 'color4'), # Doubles as eject button
             'pause': self._gtk.Button('pause', _('MMU Pause'), 'color1'),
             'message': self._gtk.Button('warning', _('Last Error'), 'color1'),
-            'unlock': self._gtk.Button('heat-up', _('Unlock', 'color2'),
+            'unlock': self._gtk.Button('heat-up', _('Unlock'), 'color2'),
             'resume': self._gtk.Button('resume', _('Resume'), 'color3'),
             'extrude': self._gtk.Button('extrude', _('Extrude...'), 'color4'),
             'more': self._gtk.Button('mmu_more', _('More...'), 'color1'),
             'tool_icon': self._gtk.Image('mmu_extruder', self._gtk.img_width * 0.8, self._gtk.img_height * 0.8),
-            'tool_label': Gtk.Label('Unknown'),
-            'filament': Gtk.Label('Filament: Unknown'),
-            'sensor': Gtk.Label('Ts:'),
+            'tool_label': Gtk.Label(_('Unknown')),
+            'filament': Gtk.Label(_('Filament: Unknown')),
+            'sensor': Gtk.Label(_('Ts:')),
             'sensor_state': Gtk.Label('   '),
             'select_bypass_img': self._gtk.Image('mmu_select_bypass'), # Alternative for tool
             'load_bypass_img': self._gtk.Image('mmu_load_bypass'),     # Alternative for picker
