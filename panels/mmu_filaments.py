@@ -68,7 +68,7 @@ class Panel(ScreenPanel):
         for i in range(num_gates):
             status_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
             status = self.labels[f'status_{i}'] = self._gtk.Image()
-            available = self.labels[f'available_{i}'] = Gtk.Label("Unknown")
+            available = self.labels[f'available_{i}'] = Gtk.Label(_("Unknown"))
             available.get_style_context().add_class("mmu_available_text")
             status_box.pack_start(status, True, True, 0)
             status_box.pack_start(available, True, True, 0)
@@ -83,15 +83,15 @@ class Panel(ScreenPanel):
             color.get_style_context().add_class("mmu_color_swatch")
             color.set_xalign(0.7)
 
-            material = self.labels[f'material_{i}'] = Gtk.Label("n/a")
+            material = self.labels[f'material_{i}'] = Gtk.Label(_("n/a"_)
             material.get_style_context().add_class("mmu_material_text")
             material.set_xalign(0.1)
 
-            tools = self.labels[f'tools_{i}'] = Gtk.Label("n/a")
+            tools = self.labels[f'tools_{i}'] = Gtk.Label(_("n/a"))
             tools.get_style_context().add_class("mmu_gate_text")
             tools.set_xalign(0)
 
-            spool_id = self.labels[f'spool_id_{i}'] = Gtk.Label("n/a")
+            spool_id = self.labels[f'spool_id_{i}'] = Gtk.Label(_("n/a"))
             spool_id.get_style_context().add_class("mmu_spool_id_text")
             spool_id.set_xalign(0)
 
@@ -111,13 +111,13 @@ class Panel(ScreenPanel):
 
         self.labels.update( {
             'status': self._gtk.Image(),
-            'available': Gtk.Label("Unknown"),
+            'available': Gtk.Label(_("Unknown")),
             'gate_icon': self._gtk.Image('mmu_gate', width=img_width, height=img_height),
-            'gate_label': Gtk.Label('Gate #0'),
+            'gate_label': Gtk.Label(_('Gate #0)),
             'color': Gtk.Label(self.EMPTY_SWATCH),
-            'material': Gtk.Label('PLA'),
-            'tools': Gtk.Label("n/a"),
-            'spool_id': Gtk.Label("n/a"),
+            'material': Gtk.Label(_('PLA')),
+            'tools': Gtk.Label(_("n/a")),
+            'spool_id': Gtk.Label(_("n/a")),
             'save': self._gtk.Button('mmu_save', f'Save', 'color1'),
             'c_picker': self._gtk.Button('mmu_color_chooser', None, 'color2', scale=self.bts * 0.8),
             'c_selector': Gtk.ComboBoxText(),
@@ -210,7 +210,7 @@ class Panel(ScreenPanel):
         pad.set_vexpand(True)
 
         edit_grid.attach(current_gate_grid,         0, 0, 16, 1)
-        edit_grid.attach(Gtk.Label('SpoolID:'),     0, 1,  2, 1)
+        edit_grid.attach(Gtk.Label(_('SpoolID:')),     0, 1,  2, 1)
         edit_grid.attach(self.labels['id_entry'],   2, 1,  4, 1)
         edit_grid.attach(Gtk.Box(),                 6, 1,  2, 1)
         edit_grid.attach(self.labels['filament'],   8, 1,  5, 1)
