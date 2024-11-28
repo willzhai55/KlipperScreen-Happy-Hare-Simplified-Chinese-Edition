@@ -50,9 +50,9 @@ class Panel(ScreenPanel):
             'gate': Gtk.Label("Gate #0"),
             'g_increase': self._gtk.Button('increase', None, scale=self.bts * 1.2),
             'filament': Gtk.CheckButton("Filament: Unknown"),
-            'reset': self._gtk.Button('mmu_reset', 'Reset MMU', 'color1'),
-            'auto': self._gtk.Button('mmu_recover_auto', 'Auto Recover', 'color2'),
-            'manual': self._gtk.Button('mmu_recover_manual', 'Set State', 'color1'),
+            'reset': self._gtk.Button('mmu_reset', _('Reset MMU'), 'color1'),
+            'auto': self._gtk.Button('mmu_recover_auto', _('Auto Recover'), 'color2'),
+            'manual': self._gtk.Button('mmu_recover_manual', _('Set State'), 'color1'),
         }
 
         self.labels['t_decrease'].connect("clicked", self.select_toolgate, 'tool', -1)
