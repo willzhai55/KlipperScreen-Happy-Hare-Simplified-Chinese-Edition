@@ -281,13 +281,13 @@ class Panel(ScreenPanel):
                     self.update_active_buttons()
             except KeyError as ke:
                 # Almost certainly a mismatch of Happy Hare on the printer
-                msg = "You are probably trying to connect to an incompatible"
-                msg += "\nversion of Happy Hare on your printer. Ensure Happy Hare"
-                msg += "\nis up-to-date, re-run Happy-Hare/install.sh on the"
-                msg += "\nprinter, then make sure you restart Klipper."
-                msg += "\n\nI'll bet this will work out for you :-)"
+                msg = _("You are probably trying to connect to an incompatible")
+                msg += _("\nversion of Happy Hare on your printer. Ensure Happy Hare")
+                msg += _("\nis up-to-date, re-run Happy-Hare/install.sh on the")
+                msg += _("\nprinter, then make sure you restart Klipper.")
+                msg += _("\n\nI'll bet this will work out for you :-)")
                 self._screen.show_popup_message(msg, 3, save=True)
-                logging.info("Happy Hare: %s" % str(ke))
+                logging.info(_("Happy Hare: %s") % str(ke))
 
     def init_tool_value(self):
         mmu = self._printer.get_stat("mmu")
@@ -302,7 +302,7 @@ class Panel(ScreenPanel):
     def select_check_gates(self, widget):
         self._screen._confirm_send_action(
             None,
-            "Check filament availabily in all MMU gates?\n\nAre you sure you want to continue?",
+            _("Check filament availabily in all MMU gates?\n\nAre you sure you want to continue?"),
             "printer.gcode.script",
             {'script': "MMU_CHECK_GATE ALL=1 QUIET=1"}
         )
@@ -349,8 +349,8 @@ class Panel(ScreenPanel):
 
     def select_message(self, widget):
         last_toolchange = self._printer.get_stat('mmu', 'last_toolchange')
-        self._screen.show_last_popup_message(f"Last Toolchange: {last_toolchange}")
-
+        self._screen.show_last_popup_message(_("Last Toolchange: %s") %last_toolchange)
+        #self._screen.show_last_popup_message(f"Last Toolchange: {last_toolchange}")
     def select_resume(self, widget):
         self._screen._ws.klippy.gcode_script(f"RESUME")
 
@@ -375,10 +375,10 @@ class Panel(ScreenPanel):
         filament = mmu['filament']
         if next_tool != self.TOOL_GATE_UNKNOWN:
             # Change in progress
-            text = ("T%d " % last_tool) if (last_tool >= 0 and last_tool != next_tool) else "Bypass " if last_tool == -2 else "Unknown " if last_tool == -1 else ""
+            text = ("T%d " % last_tool) if (last_tool >= 0 and last_tool != next_tool) else _("Bypass ") if last_tool == -2 else _("Unknown ") if last_tool == -1 else ""
             text += ("> T%d" % next_tool) if next_tool >= 0 else ""
         else:
-            text = ("T%d " % tool) if tool >= 0 else "Bypass " if tool == -2 else "Unknown " if tool == -1 else ""
+            text = ("T%d " % tool) if tool >= 0 else _("Bypass ") if tool == -2 else _("Unknown ") if tool == -1 else ""
         self.labels['tool_label'].set_text(text)
         if sync_drive:
             self.labels['tool_icon'].set_from_pixbuf(self.labels['sync_drive_pixbuf'])
@@ -468,7 +468,7 @@ class Panel(ScreenPanel):
     def update_runout_mode(self):
         detection_mode = self._printer.get_stat('mmu_encoder mmu_encoder')['detection_mode']
         enabled = self._printer.get_stat('mmu_encoder mmu_encoder')['enabled']
-        detection_mode_str = "Disabled" if not enabled else "Clog (Auto)" if detection_mode == 2 else "Clog (Man)" if detection_mode == 1 else "Clog Off"
+        detection_mode_str = "Disabled" if not enabled else _("Clog (Auto)") if detection_mode == 2 else _("Clog (Man)") if detection_mode == 1 else _("Clog Off")
         self.labels['runout_frame'].set_label(f'{detection_mode_str}')
         self.labels['runout_frame'].set_sensitive(detection_mode and enabled)
 
@@ -482,7 +482,8 @@ class Panel(ScreenPanel):
         if mmu_print_state in ("complete", "error", "cancelled", "started"):
             pos_str = mmu_print_state.capitalize()
         elif action == "Idle":
-            pos_str = (f"Filament: {encoder_pos}mm") if filament != "Unloaded" else "Filament: Unloaded"
+            pos_str = (_("Filament: %.1fmm") %encoder_pos) if filament != "Unloaded" else _("Filament: Unloaded")
+            #pos_str = (f"Filament: {encoder_pos}mm") if filament != "Unloaded" else "Filament: Unloaded"
             if flow_rate and self._printer.get_stat("print_stats")['state'] == "printing":
                 pos_str += f"  ➥ {flow_rate}%"
         elif action == "Loading" or action == "Unloading":
@@ -613,10 +614,10 @@ class Panel(ScreenPanel):
         num_gates = len(gate_status)
 
         multi_tool = False
-        msg_gates = "Gates: "
-        msg_tools = "Tools: "
-        msg_avail = "Avail: "
-        msg_selct = "Selct: "
+        msg_gates = _("Gates: ")
+        msg_tools = _("Tools: ")
+        msg_avail = _("Avail: ")
+        msg_selct = _("Selct: ")
         for g in range(num_gates):
             color = self.get_rgb_color(gate_color[g])
             filament_icon = ("█") if not markup or color == "" else (f"<span color='{color}'>█</span>")
@@ -667,16 +668,19 @@ class Panel(ScreenPanel):
         t_str   = ("T%s " % str(tool))[:3] if tool >= 0 else "BYPASS " if tool == self.TOOL_GATE_BYPASS else "T? "
         g_str   = "{0}{0}".format(past(self.FILAMENT_POS_UNLOADED))
         gs_str  = "{0}{2}{1}{1}{1}".format(*homed(self.FILAMENT_POS_HOMED_GATE, trig(gs, self.ENDSTOP_GATE))) if self._has_sensor(self.ENDSTOP_GATE) else ""
-        en_str  = "En{0}{0}".format(past(self.FILAMENT_POS_IN_BOWDEN if gate_homing_endstop == self.ENDSTOP_GATE else self.FILAMENT_POS_START_BOWDEN)) if self._has_sensor(self.ENDSTOP_ENCODER) else ""
+        en_str1 = _("En")
+        en_str2 = "{0}{0}".format(past(self.FILAMENT_POS_IN_BOWDEN if gate_homing_endstop == self.ENDSTOP_GATE else self.FILAMENT_POS_START_BOWDEN)) if self._has_sensor(self.ENDSTOP_ENCODER) else ""
         bowden1 = "{0}".format(past(self.FILAMENT_POS_IN_BOWDEN)) * bseg
         bowden2 = "{0}".format(past(self.FILAMENT_POS_END_BOWDEN)) * bseg
         es_str  = "{0}{2}{1}{1}{1}".format(*homed(self.FILAMENT_POS_HOMED_ENTRY, trig(es, self.ENDSTOP_EXTRUDER))) if self._has_sensor(self.ENDSTOP_EXTRUDER) else ""
-        ex_str  = "{0}{2}{1}{1}{1}".format(*homed(self.FILAMENT_POS_HOMED_EXTRUDER, "Ex"))
+        ex_str  = "{0}{2}{1}{1}{1}".format(*homed(self.FILAMENT_POS_HOMED_EXTRUDER, _("Ex")))
         ts_str  = "{0}{2}{1}{1}{1}".format(*homed(self.FILAMENT_POS_HOMED_TS, trig(ts, self.ENDSTOP_TOOLHEAD))) if self._has_sensor(self.ENDSTOP_TOOLHEAD) else ""
-        nz_str  = "{0}{1}Nz{2}{2}".format(*nozz(self.FILAMENT_POS_LOADED))
-        summary = " LOADED" if filament_pos == self.FILAMENT_POS_LOADED else " UNLOADED" if filament_pos == self.FILAMENT_POS_UNLOADED else " UNKNOWN" if filament_pos == self.FILAMENT_POS_UNKNOWN else " ▷▷▷" if filament_direction == self.DIRECTION_LOAD else " ◁◁◁" if filament_direction == self.DIRECTION_UNLOAD else ""
+        nz_str1 = "{0}{1}".format(*nozz(self.FILAMENT_POS_LOADED))
+        nz_str2 = _("Nz")
+        nz_str3 = "{2}{2}".format(*nozz(self.FILAMENT_POS_LOADED))
+        summary = _(" LOADED") if filament_pos == self.FILAMENT_POS_LOADED else _(" UNLOADED") if filament_pos == self.FILAMENT_POS_UNLOADED else _(" UNKNOWN") if filament_pos == self.FILAMENT_POS_UNKNOWN else " ▷▷▷" if filament_direction == self.DIRECTION_LOAD else " ◁◁◁" if filament_direction == self.DIRECTION_UNLOAD else ""
 
-        visual = "".join((t_str, g_str, gs_str, en_str, bowden1, bowden2, es_str, ex_str, ts_str, nz_str, summary))
+        visual = "".join((t_str, g_str, gs_str, en_str1, en_str2, bowden1, bowden2, es_str, ex_str, ts_str, nz_str1, nz_str2, nz_str3, summary))
 
         last_home = visual.rfind(home)
         last_index = visual.rfind(arrow)
