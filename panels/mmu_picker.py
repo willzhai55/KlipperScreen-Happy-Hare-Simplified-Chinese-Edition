@@ -101,7 +101,7 @@ class Panel(ScreenPanel):
             if not Gdk.RGBA.parse(color, gate_color[gate]):
                 Gdk.RGBA.parse(color, '#' + gate_color[gate])
 
-            gate_str = (_("Gate #%s" %t_map['gate']))
+            gate_str = (_("Gate #%s") %t_map['gate'])
             #gate_str = (f"Gate #{t_map['gate']}")
             alt_gate_str = ''
             if endless_spool == 1 and len(t_map['alt_gates']) > 0:
