@@ -287,7 +287,7 @@ class Panel(ScreenPanel):
         filament = mmu['filament']
         num_gates = len(mmu['gate_status'])
         action = mmu['action']
-        if (gate == self.TOOL_BYPASS and filament != "Unloaded") or not gate_sensitive:
+        if (gate == self.TOOL_BYPASS and filament != "Unloaded") or not gate_sensitive
             self.labels['g_decrease'].set_sensitive(False)
             self.labels['g_increase'].set_sensitive(False)
         else:
@@ -303,7 +303,7 @@ class Panel(ScreenPanel):
 
         if action == "Idle":
             if self.ui_sel_gate >= 0:
-                self.labels['gate'].set_label(_("Gate #%s" %self.ui_sel_gate)
+                self.labels['gate'].set_label(_("Gate #%s" %self.ui_sel_gate))
                 #self.labels['gate'].set_label(f"Gate #{self.ui_sel_gate}")
                 if mmu['gate'] == self.ui_sel_gate:
                     self.labels['gate'].set_sensitive(False)
