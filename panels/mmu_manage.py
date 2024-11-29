@@ -131,9 +131,11 @@ class Panel(ScreenPanel):
                 if 'gate' in e_data:
                     self.ui_sel_gate = e_data['gate']
                     if e_data['gate'] >= 0:
-                        self.labels['load'].set_label(f"Load #{e_data['gate']}")
+                        self.labels['load'].set_label(_("Load #%s") %e_data['gate'])
+                        #self.labels['load'].set_label(f"Load #{e_data['gate']}")
                     else:
-                        self.labels['load'].set_label(f"Load")
+                        self.labels['load'].set_label(_("Load"))
+                        #self.labels['load'].set_label(f"Load")
                 if 'action' in e_data:
                     action = e_data['action']
                     if self.ui_action_button_name != None:
@@ -301,7 +303,8 @@ class Panel(ScreenPanel):
 
         if action == "Idle":
             if self.ui_sel_gate >= 0:
-                self.labels['gate'].set_label(f"Gate #{self.ui_sel_gate}")
+                self.labels['gate'].set_label(_("Gate #%s" %self.ui_sel_gate)
+                #self.labels['gate'].set_label(f"Gate #{self.ui_sel_gate}")
                 if mmu['gate'] == self.ui_sel_gate:
                     self.labels['gate'].set_sensitive(False)
                 else:
