@@ -303,7 +303,7 @@ class Panel(ScreenPanel):
 
         if action == "Idle":
             if self.ui_sel_gate >= 0:
-                self.labels['gate'].set_label(_("Gate #%s" %self.ui_sel_gate))
+                self.labels['gate'].set_label(_("Gate #%s") %self.ui_sel_gate)
                 #self.labels['gate'].set_label(f"Gate #{self.ui_sel_gate}")
                 if mmu['gate'] == self.ui_sel_gate:
                     self.labels['gate'].set_sensitive(False)
