@@ -375,10 +375,10 @@ class Panel(ScreenPanel):
         filament = mmu['filament']
         if next_tool != self.TOOL_GATE_UNKNOWN:
             # Change in progress
-            text = ("T%d " % last_tool) if (last_tool >= 0 and last_tool != next_tool) else _("Bypass ") if last_tool == -2 else _("Unknown ") if last_tool == -1 else ""
-            text += ("> T%d" % next_tool) if next_tool >= 0 else ""
+            text = _("T%d " % last_tool) if (last_tool >= 0 and last_tool != next_tool) else _("Bypass ") if last_tool == -2 else _("Unknown ") if last_tool == -1 else ""
+            text += _("> T%d" % next_tool) if next_tool >= 0 else ""
         else:
-            text = ("T%d " % tool) if tool >= 0 else _("Bypass ") if tool == -2 else _("Unknown ") if tool == -1 else ""
+            text = _("T%d " % tool) if tool >= 0 else _("Bypass ") if tool == -2 else _("Unknown ") if tool == -1 else ""
         self.labels['tool_label'].set_text(text)
         if sync_drive:
             self.labels['tool_icon'].set_from_pixbuf(self.labels['sync_drive_pixbuf'])
@@ -386,18 +386,23 @@ class Panel(ScreenPanel):
             self.labels['tool_icon'].set_from_pixbuf(self.labels['tool_icon_pixbuf'])
         if tool == self.TOOL_GATE_BYPASS:
             self.labels['picker'].set_image(self.labels['load_bypass_img'])
-            self.labels['picker'].set_label(f"Load")
+            self.labels['picker'].set_label(_("Load"))
+            #self.labels['picker'].set_label(f"Load")
             self.labels['unload'].set_image(self.labels['unload_bypass_img'])
-            self.labels['unload'].set_label(f"Unload")
+            self.labels['unload'].set_label(_("Unload"))
+            #self.labels['unload'].set_label(f"Unload")
         else:
             self.labels['picker'].set_image(self.labels['tool_picker_img'])
-            self.labels['picker'].set_label(f"Tools...")
+            self.labels['picker'].set_label(_("Tools..."))
+            #self.labels['picker'].set_label(f"Tools...")
             if filament != "Unloaded":
                 self.labels['unload'].set_image(self.labels['unload_img'])
-                self.labels['unload'].set_label(f"Unload")
+                self.labels['unload'].set_label(_("Unload"))
+                #self.labels['unload'].set_label(f"Unload")
             else:
                 self.labels['unload'].set_image(self.labels['eject_img'])
-                self.labels['unload'].set_label(f"Eject")
+                self.labels['unload'].set_label(_("Eject"))
+                #self.labels['unload'].set_label(f"Eject")
 
     def update_tool_buttons(self, tool_sensitive=True):
         mmu = self._printer.get_stat("mmu")
@@ -431,10 +436,12 @@ class Panel(ScreenPanel):
                 else:
                     self.labels['tool'].set_sensitive(tool_sensitive)
             elif self.ui_sel_tool == self.TOOL_GATE_BYPASS:
-                self.labels['tool'].set_label(f"Bypass")
+                self.labels['tool'].set_label(_("Bypass"))
+                #self.labels['tool'].set_label(f"Bypass")
                 self.labels['tool'].set_sensitive(tool_sensitive)
             else:
-                self.labels['tool'].set_label(f"n/a")
+                self.labels['tool'].set_label(_("n/a"))
+                #self.labels['tool'].set_label(f"n/a")
                 self.labels['tool'].set_sensitive(tool_sensitive)
         else:
             self.labels['tool'].set_label(action)
@@ -487,9 +494,11 @@ class Panel(ScreenPanel):
             if flow_rate and self._printer.get_stat("print_stats")['state'] == "printing":
                 pos_str += f"  ➥ {flow_rate}%"
         elif action == "Loading" or action == "Unloading":
-            pos_str = (f"{action}: {encoder_pos}mm")
+            pos_str = (_("%s: %.1fmm") %action %encoder_pos)
+            #pos_str = (f"{action}: {encoder_pos}mm")
         else:
-            pos_str = (f"{action}")
+            pos_str = (_("%s) %action)
+            #pos_str = (f"{action}")
         self.labels['filament'].set_label(f"{pos_str}")
 
     def update_filament_status(self):
@@ -665,7 +674,7 @@ class Panel(ScreenPanel):
         trig  = lambda name, sensor: re.sub(r'[a-zA-Z◯]', '●', name) if self._check_sensor(sensor) else name
         bseg = 4 + 2 * sum(not self._has_sensor(sensor) for sensor in [self.ENDSTOP_ENCODER, self.ENDSTOP_GATE, self.ENDSTOP_EXTRUDER, self.ENDSTOP_TOOLHEAD]) - (tool == self.TOOL_GATE_BYPASS)
 
-        t_str   = ("T%s " % str(tool))[:3] if tool >= 0 else "BYPASS " if tool == self.TOOL_GATE_BYPASS else "T? "
+        t_str   = ("T%s " % str(tool))[:3] if tool >= 0 else _("BYPASS ") if tool == self.TOOL_GATE_BYPASS else _("T? ")
         g_str   = "{0}{0}".format(past(self.FILAMENT_POS_UNLOADED))
         gs_str  = "{0}{2}{1}{1}{1}".format(*homed(self.FILAMENT_POS_HOMED_GATE, trig(gs, self.ENDSTOP_GATE))) if self._has_sensor(self.ENDSTOP_GATE) else ""
         en_str1 = _("En")
