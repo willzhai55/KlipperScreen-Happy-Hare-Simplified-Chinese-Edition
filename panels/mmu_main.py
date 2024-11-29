@@ -149,7 +149,7 @@ class Panel(ScreenPanel):
 
         runout_frame = Gtk.Frame()
         self.labels['runout_frame'] = runout_frame
-        runout_frame.set_label(f"Clog")
+        runout_frame.set_label(_("Clog"))
         runout_frame.set_label_align(0.5, 0)
         runout_frame.add(scale)
 
@@ -475,7 +475,7 @@ class Panel(ScreenPanel):
     def update_runout_mode(self):
         detection_mode = self._printer.get_stat('mmu_encoder mmu_encoder')['detection_mode']
         enabled = self._printer.get_stat('mmu_encoder mmu_encoder')['enabled']
-        detection_mode_str = "Disabled" if not enabled else _("Clog (Auto)") if detection_mode == 2 else _("Clog (Man)") if detection_mode == 1 else _("Clog Off")
+        detection_mode_str = _("Disabled") if not enabled else _("Clog (Auto)") if detection_mode == 2 else _("Clog (Man)") if detection_mode == 1 else _("Clog Off")
         self.labels['runout_frame'].set_label(f'{detection_mode_str}')
         self.labels['runout_frame'].set_sensitive(detection_mode and enabled)
 
@@ -500,8 +500,7 @@ class Panel(ScreenPanel):
                 action1 = _("Unloading")    
             pos_str = (f"{action1}: {encoder_pos}mm")
         else:
-            action1 = _("Unknown")
-            pos_str = (f"{action1}")
+            pos_str = (f"{action}")
         self.labels['filament'].set_label(f"{pos_str}")
 
     def update_filament_status(self):
