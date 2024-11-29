@@ -494,11 +494,14 @@ class Panel(ScreenPanel):
             if flow_rate and self._printer.get_stat("print_stats")['state'] == "printing":
                 pos_str += f"  ➥ {flow_rate}%"
         elif action == "Loading" or action == "Unloading":
-            pos_str = (_("%s: %.1fmm") %action %encoder_pos)
-            #pos_str = (f"{action}: {encoder_pos}mm")
+            if action == "Loading":
+                action1 = _("Loading")
+            if action == "Unloading":
+                action1 = _("Unloading")    
+            pos_str = (f"{action1}: {encoder_pos}mm")
         else:
-            pos_str = (_("%s) %action)
-            #pos_str = (f"{action}")
+            action1 = _("Unknown")
+            pos_str = (f"{action1}")
         self.labels['filament'].set_label(f"{pos_str}")
 
     def update_filament_status(self):
