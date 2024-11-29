@@ -83,7 +83,7 @@ class Panel(ScreenPanel):
             color.get_style_context().add_class("mmu_color_swatch")
             color.set_xalign(0.7)
 
-            material = self.labels[f'material_{i}'] = Gtk.Label(_("n/a"_)
+            material = self.labels[f'material_{i}'] = Gtk.Label(_("n/a"))
             material.get_style_context().add_class("mmu_material_text")
             material.set_xalign(0.1)
 
