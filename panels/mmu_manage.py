@@ -310,13 +310,13 @@ class Panel(ScreenPanel):
                 else:
                     self.labels['gate'].set_sensitive(gate_sensitive)
             elif self.ui_sel_gate == self.TOOL_BYPASS:
-                self.labels['gate'].set_label(f"Bypass")
+                self.labels['gate'].set_label(_("Bypass"))
                 if mmu['gate'] == self.ui_sel_gate:
                     self.labels['gate'].set_sensitive(False)
                 else:
                     self.labels['gate'].set_sensitive(gate_sensitive)
             else:
-                self.labels['gate'].set_label(f"Unknown")
+                self.labels['gate'].set_label(_("Unknown"))
         else:
             self.labels['gate'].set_label(action)
             self.labels['gate'].set_sensitive(False)
