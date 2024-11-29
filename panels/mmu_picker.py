@@ -101,7 +101,8 @@ class Panel(ScreenPanel):
             if not Gdk.RGBA.parse(color, gate_color[gate]):
                 Gdk.RGBA.parse(color, '#' + gate_color[gate])
 
-            gate_str = (f"Gate #{t_map['gate']}")
+            gate_str = (_("Gate #%s" %t_map['gate']))
+            #gate_str = (f"Gate #{t_map['gate']}")
             alt_gate_str = ''
             if endless_spool == 1 and len(t_map['alt_gates']) > 0:
                 alt_gate_str = '+(' + ', '.join(map(str, t_map['alt_gates'][:6]))
@@ -125,19 +126,19 @@ class Panel(ScreenPanel):
     def get_status_details(self, gate_status):
         if gate_status == self.GATE_AVAILABLE:
             status_icon = 'available_icon'
-            status_str = "Available"
+            status_str = _("Available")
             status_color = self.COLOR_GREEN
         elif gate_status == self.GATE_AVAILABLE_FROM_BUFFER:
             status_icon = 'available_icon'
-            status_str = "Buffered"
+            status_str = _("Buffered")
             status_color = self.COLOR_GREEN
         elif gate_status == self.GATE_EMPTY:
             status_icon = 'empty_icon'
-            status_str = "Empty"
+            status_str = _("Empty")
             status_color = self.COLOR_RED
         else: 
             status_icon = 'unknown_icon'
-            status_str = "Unknown"
+            status_str = _("Unknown")
             status_color = self.COLOR_LIGHT_GREY
         return status_icon, status_str, status_color
 
